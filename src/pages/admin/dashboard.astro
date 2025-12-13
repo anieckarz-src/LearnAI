@@ -1,0 +1,19 @@
+---
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import { DashboardContent } from '@/components/admin/DashboardContent';
+
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+---
+
+<AdminLayout 
+  title="Dashboard" 
+  description="Przegląd statystyk i aktywności platformy"
+  user={user}
+  currentPath={Astro.url.pathname}
+>
+  <DashboardContent client:load />
+</AdminLayout>

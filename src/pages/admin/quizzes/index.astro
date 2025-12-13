@@ -1,0 +1,19 @@
+---
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import { QuizzesManagement } from '@/components/admin/QuizzesManagement';
+
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+---
+
+<AdminLayout 
+  title="Zarządzanie quizami" 
+  description="Przeglądaj i zarządzaj quizami platformy"
+  user={user}
+  currentPath={Astro.url.pathname}
+>
+  <QuizzesManagement client:load />
+</AdminLayout>

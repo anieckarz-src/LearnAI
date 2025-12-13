@@ -1,0 +1,19 @@
+---
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import { CoursesManagement } from '@/components/admin/CoursesManagement';
+
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+---
+
+<AdminLayout 
+  title="Zarządzanie kursami" 
+  description="Twórz i zarządzaj kursami edukacyjnymi"
+  user={user}
+  currentPath={Astro.url.pathname}
+>
+  <CoursesManagement client:load />
+</AdminLayout>

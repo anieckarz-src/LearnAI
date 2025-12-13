@@ -1,0 +1,19 @@
+---
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import { SettingsManagement } from '@/components/admin/SettingsManagement';
+
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+---
+
+<AdminLayout 
+  title="Ustawienia systemu" 
+  description="Konfiguruj platformę edukacyjną"
+  user={user}
+  currentPath={Astro.url.pathname}
+>
+  <SettingsManagement client:load />
+</AdminLayout>

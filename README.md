@@ -1,26 +1,50 @@
-# 10x Astro Starter - LearnAI Landing Page
+# 10x Astro Starter - LearnAI Platform
 
-A modern, opinionated starter template for building fast, accessible, and AI-friendly web applications with a professional landing page.
+A modern, full-stack educational platform with landing page and admin panel, built with Astro, React, and Supabase.
 
 ## ✨ What's New
 
-This starter now includes a **complete landing page** for LearnAI - an educational platform powered by AI. The landing page features:
+This starter now includes:
 
-- 🎨 Modern dark theme with animated gradients
-- 📱 Fully responsive (mobile-first design)
-- ♿ Accessibility-first approach (WCAG AA compliant)
-- 🚀 Smooth animations and interactions
-- 💨 Optimized performance
-- 🔍 SEO-ready with meta tags
+### 🎓 **Complete Admin Panel**
+- Full-featured admin dashboard for managing educational platform
+- User management (roles, permissions, blocking)
+- Course and lesson management (CRUD operations)
+- Quiz management with AI generation support
+- Content moderation system
+- System settings configuration
+
+[📖 Full Admin Panel Documentation](./ADMIN_PANEL.md)
+
+### 🌟 **Professional Landing Page**
+- Modern dark theme with animated gradients
+- Fully responsive (mobile-first design)
+- Accessibility-first approach (WCAG AA compliant)
+- Smooth animations and interactions
+- Optimized performance
+- SEO-ready with meta tags
 
 [📖 Full Landing Page Documentation](./LANDING_PAGE.md)
 
 ## Tech Stack
 
+### Frontend
 - [Astro](https://astro.build/) v5.13.7 - Modern web framework for building fast, content-focused websites
 - [React](https://react.dev/) v19.1.1 - UI library for building interactive components
 - [TypeScript](https://www.typescriptlang.org/) v5 - Type-safe JavaScript
 - [Tailwind CSS](https://tailwindcss.com/) v4.1.13 - Utility-first CSS framework
+- [shadcn/ui](https://ui.shadcn.com/) - Re-usable UI components
+
+### Backend
+- [Supabase](https://supabase.com/) - Backend-as-a-Service (Auth, Database, Storage)
+- PostgreSQL - Database with Row Level Security
+- Astro API Routes - Server-side endpoints
+
+### Additional Libraries
+- recharts - Data visualization
+- react-hook-form + zod - Form validation
+- date-fns - Date formatting
+- lucide-react - Icon library
 
 ## Prerequisites
 
@@ -64,6 +88,33 @@ npm run build
 - `npm run lint` - Run ESLint
 - `npm run lint:fix` - Fix ESLint issues
 
+## Key Features
+
+### Admin Panel (`/admin/dashboard`)
+- **Dashboard:** Overview with key metrics and statistics
+- **User Management:** CRUD operations, role assignment, account blocking
+- **Course Management:** Create, edit, publish courses and lessons
+- **Quiz Management:** View, create, delete quizzes (AI generation ready)
+- **Content Moderation:** Handle user reports and content flags
+- **System Settings:** Configure platform, AI, security settings
+- **Audit Logging:** Track all admin actions
+
+### Authentication & Security
+- Supabase authentication integration
+- Role-based access control (Admin, Instructor, Student)
+- Row Level Security (RLS) policies
+- Middleware protection for admin routes
+- Session management
+
+### Database Schema
+- Users (with roles and blocking)
+- Courses, Lessons, Quizzes
+- Course Enrollments
+- Quiz Attempts
+- Content Reports
+- System Settings
+- Audit Log
+
 ## Project Structure
 
 ```
@@ -71,21 +122,31 @@ npm run build
 ├── src/
 │   ├── components/
 │   │   ├── landing/       # Landing page components
-│   │   │   ├── Navbar.astro
-│   │   │   ├── HeroSection.astro
-│   │   │   ├── ScrollingBanner.astro
-│   │   │   ├── ValueSection.astro
-│   │   │   ├── StatsSection.astro
-│   │   │   ├── FeaturesSection.astro
-│   │   │   ├── ControlSection.astro
-│   │   │   └── Footer.astro
-│   │   └── ui/            # Reusable UI components
-│   ├── layouts/           # Astro layouts
-│   ├── pages/             # Astro pages
+│   │   ├── admin/         # Admin panel components
+│   │   └── ui/            # Reusable UI components (shadcn/ui)
+│   ├── layouts/
+│   │   ├── Layout.astro   # Main layout
+│   │   └── AdminLayout.astro  # Admin panel layout
+│   ├── pages/
 │   │   ├── index.astro    # Landing page
+│   │   ├── login.astro    # Login page
+│   │   ├── admin/         # Admin panel pages
+│   │   │   ├── dashboard.astro
+│   │   │   ├── users/
+│   │   │   ├── courses/
+│   │   │   ├── quizzes/
+│   │   │   ├── reports/
+│   │   │   └── settings/
 │   │   └── api/           # API endpoints
+│   │       └── admin/     # Admin API routes
+│   ├── middleware/        # Astro middleware (auth)
+│   ├── db/                # Supabase client & types
 │   ├── lib/               # Utilities and helpers
+│   ├── types.ts           # TypeScript types
 │   └── styles/            # Global styles
+├── supabase/
+│   ├── migrations/        # Database migrations
+│   └── README.md          # Supabase setup guide
 └── public/                # Public assets
 ```
 
