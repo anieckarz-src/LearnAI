@@ -1,7 +1,6 @@
 ---
 import AdminLayout from "@/layouts/AdminLayout.astro";
-import { CourseForm } from "@/components/admin/CourseForm";
-import { LessonsManager } from "@/components/admin/LessonsManager";
+import { CourseEditTabs } from "@/components/admin/CourseEditTabs";
 import type { Course } from "@/types";
 
 const user = Astro.locals.user;
@@ -55,8 +54,5 @@ if (!course || error) {
   user={user}
   currentPath={Astro.url.pathname}
 >
-  <div class="space-y-6">
-    <CourseForm client:load course={course} />
-    <LessonsManager client:load courseId={course.id} />
-  </div>
+  <CourseEditTabs client:load course={course} />
 </AdminLayout>
