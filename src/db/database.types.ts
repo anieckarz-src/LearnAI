@@ -174,41 +174,6 @@ export interface Database {
           completed_at?: string;
         };
       };
-      content_reports: {
-        Row: {
-          id: string;
-          reported_by: string;
-          content_type: "course" | "lesson" | "comment";
-          content_id: string;
-          reason: string;
-          status: "pending" | "reviewed" | "resolved";
-          reviewed_by: string | null;
-          reviewed_at: string | null;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          reported_by: string;
-          content_type: "course" | "lesson" | "comment";
-          content_id: string;
-          reason: string;
-          status?: "pending" | "reviewed" | "resolved";
-          reviewed_by?: string | null;
-          reviewed_at?: string | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          reported_by?: string;
-          content_type?: "course" | "lesson" | "comment";
-          content_id?: string;
-          reason?: string;
-          status?: "pending" | "reviewed" | "resolved";
-          reviewed_by?: string | null;
-          reviewed_at?: string | null;
-          created_at?: string;
-        };
-      };
       system_settings: {
         Row: {
           key: string;

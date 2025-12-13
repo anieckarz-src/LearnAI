@@ -4,8 +4,6 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Create custom types
 CREATE TYPE user_role AS ENUM ('admin', 'instructor', 'student');
 CREATE TYPE course_status AS ENUM ('draft', 'published', 'archived');
-CREATE TYPE content_type AS ENUM ('course', 'lesson', 'comment');
-CREATE TYPE report_status AS ENUM ('pending', 'reviewed', 'resolved');
 
 -- Users table (extends auth.users)
 CREATE TABLE public.users (
@@ -66,20 +64,6 @@ CREATE TABLE public.quiz_attempts (
   CONSTRAINT quiz_attempts_score_check CHECK (score >= 0 AND score <= 100)
 );
 
--- Content reports table
-CREATE TABLE public.content_reports (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  reported_by UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-  content_type content_type NOT NULL,
-  content_id UUID NOT NULL,
-  reason TEXT NOT NULL,
-  status report_status NOT NULL DEFAULT 'pending',
-  reviewed_by UUID REFERENCES public.users(id),
-  reviewed_at TIMESTAMP WITH TIME ZONE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  CONSTRAINT content_reports_reason_check CHECK (char_length(reason) >= 10)
-);
-
 -- System settings table
 CREATE TABLE public.system_settings (
   key TEXT PRIMARY KEY,
@@ -120,7 +104,6 @@ CREATE INDEX idx_lessons_order ON public.lessons(course_id, order_index);
 CREATE INDEX idx_quizzes_lesson ON public.quizzes(lesson_id);
 CREATE INDEX idx_quiz_attempts_quiz ON public.quiz_attempts(quiz_id);
 CREATE INDEX idx_quiz_attempts_user ON public.quiz_attempts(user_id);
-CREATE INDEX idx_content_reports_status ON public.content_reports(status);
 CREATE INDEX idx_course_enrollments_user ON public.course_enrollments(user_id);
 CREATE INDEX idx_course_enrollments_course ON public.course_enrollments(course_id);
 CREATE INDEX idx_audit_log_user ON public.audit_log(user_id);

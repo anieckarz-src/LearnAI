@@ -93,50 +93,27 @@ export function DashboardContent() {
       icon: CheckCircle,
       color: "from-emerald-500 to-emerald-600",
     },
-    {
-      title: "Oczekujące zgłoszenia",
-      value: stats.pending_reports,
-      change: stats.pending_reports > 0 ? "Wymaga uwagi" : "Brak zgłoszeń",
-      icon: AlertCircle,
-      color: stats.pending_reports > 0 ? "from-yellow-500 to-yellow-600" : "from-gray-500 to-gray-600",
-      link: stats.pending_reports > 0 ? "/admin/reports" : undefined,
-    },
   ];
 
   return (
     <div className="space-y-6">
       {/* Stats Grid - Compact Version */}
-      <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-6">
+      <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-5">
         {statCards.map((stat) => {
           const Icon = stat.icon;
           
           return (
             <Card key={stat.title} className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
-              {stat.link ? (
-                <a href={stat.link} className="block transition-transform hover:scale-[1.02]">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className={`p-1.5 rounded-lg bg-gradient-to-br ${stat.color}`}>
-                        <Icon className="h-3.5 w-3.5 text-white" />
-                      </div>
-                    </div>
-                    <div className="text-xl font-bold text-white mb-0.5">{stat.value}</div>
-                    <p className="text-xs font-medium text-gray-300 mb-1">{stat.title}</p>
-                    <p className="text-xs text-gray-400">{stat.change}</p>
-                  </CardContent>
-                </a>
-              ) : (
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className={`p-1.5 rounded-lg bg-gradient-to-br ${stat.color}`}>
-                      <Icon className="h-3.5 w-3.5 text-white" />
-                    </div>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className={`p-1.5 rounded-lg bg-gradient-to-br ${stat.color}`}>
+                    <Icon className="h-3.5 w-3.5 text-white" />
                   </div>
-                  <div className="text-xl font-bold text-white mb-0.5">{stat.value}</div>
-                  <p className="text-xs font-medium text-gray-300 mb-1">{stat.title}</p>
-                  <p className="text-xs text-gray-400">{stat.change}</p>
-                </CardContent>
-              )}
+                </div>
+                <div className="text-xl font-bold text-white mb-0.5">{stat.value}</div>
+                <p className="text-xs font-medium text-gray-300 mb-1">{stat.title}</p>
+                <p className="text-xs text-gray-400">{stat.change}</p>
+              </CardContent>
             </Card>
           );
         })}

@@ -68,12 +68,6 @@ export const GET: APIRoute = async ({ locals }) => {
         ? quizScores.reduce((sum, attempt) => sum + attempt.score, 0) / quizScores.length
         : 0;
 
-    // Get pending reports
-    const { count: pendingReports } = await supabase
-      .from("content_reports")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "pending");
-
     const stats = {
       total_users: totalUsers || 0,
       new_users_this_month: newUsersThisMonth || 0,
@@ -85,7 +79,6 @@ export const GET: APIRoute = async ({ locals }) => {
       total_quizzes: totalQuizzes || 0,
       total_quiz_attempts: totalQuizAttempts || 0,
       avg_quiz_score: avgQuizScore,
-      pending_reports: pendingReports || 0,
     };
 
     return new Response(JSON.stringify({ success: true, data: stats }), {

@@ -101,7 +101,6 @@ npm run build
 - **User Management:** CRUD operations, role assignment, account blocking
 - **Course Management:** Create, edit, publish courses and lessons
 - **Quiz Management:** View, create, delete quizzes (AI generation ready)
-- **Content Moderation:** Handle user reports and content flags
 - **System Settings:** Configure platform, AI, security settings
 - **Audit Logging:** Track all admin actions
 
@@ -119,7 +118,6 @@ npm run build
 - Courses, Lessons, Quizzes
 - Course Enrollments
 - Quiz Attempts
-- Content Reports
 - System Settings
 - Audit Log
 

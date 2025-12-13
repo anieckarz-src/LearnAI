@@ -44,6 +44,9 @@ supabase db push
    - `001_initial_schema.sql`
    - `002_row_level_security.sql`
    - `003_seed_data.sql`
+   - `004_storage_setup.sql`
+   - `005_lesson_storage_setup.sql`
+   - `006_remove_content_reports.sql` (optional - removes content_reports table)
 
 ## Creating the First Admin User
 

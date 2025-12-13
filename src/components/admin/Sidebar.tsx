@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, BookOpen, FileQuestion, Flag, Settings, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, Users, BookOpen, FileQuestion, Settings, LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -11,7 +11,6 @@ const navigation = [
   { name: "Użytkownicy", href: "/admin/users", icon: Users },
   { name: "Kursy", href: "/admin/courses", icon: BookOpen },
   { name: "Quizy", href: "/admin/quizzes", icon: FileQuestion },
-  { name: "Zgłoszenia", href: "/admin/reports", icon: Flag },
   { name: "Ustawienia", href: "/admin/settings", icon: Settings },
 ];
 

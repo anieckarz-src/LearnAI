@@ -77,27 +77,6 @@ export interface QuizAttempt {
   completed_at: string;
 }
 
-// Report types
-export type ContentType = "course" | "lesson" | "comment";
-export type ReportStatus = "pending" | "reviewed" | "resolved";
-
-export interface ContentReport {
-  id: string;
-  reported_by: string;
-  content_type: ContentType;
-  content_id: string;
-  reason: string;
-  status: ReportStatus;
-  reviewed_by: string | null;
-  reviewed_at: string | null;
-  created_at: string;
-}
-
-export interface ContentReportWithUsers extends ContentReport {
-  reporter: User;
-  reviewer: User | null;
-}
-
 // System settings types
 export interface SystemSettings {
   key: string;
@@ -127,7 +106,6 @@ export interface DashboardStats {
   total_quizzes: number;
   total_quiz_attempts: number;
   avg_quiz_score: number;
-  pending_reports: number;
 }
 
 export interface ActivityData {
@@ -189,11 +167,6 @@ export interface CourseFilters extends PaginationParams {
   status?: CourseStatus;
   instructor_id?: string;
   search?: string;
-}
-
-export interface ReportFilters extends PaginationParams {
-  status?: ReportStatus;
-  content_type?: ContentType;
 }
 
 // Course form types

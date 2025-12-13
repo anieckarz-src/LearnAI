@@ -4,7 +4,6 @@ ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.lessons ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.quizzes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.quiz_attempts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.content_reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.system_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.course_enrollments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.audit_log ENABLE ROW LEVEL SECURITY;
@@ -170,23 +169,6 @@ CREATE POLICY "Admins can view all quiz attempts"
   ON public.quiz_attempts FOR SELECT
   TO authenticated
   USING (is_admin());
-
--- CONTENT_REPORTS table policies
-CREATE POLICY "Users can view their own reports"
-  ON public.content_reports FOR SELECT
-  TO authenticated
-  USING (reported_by = auth.uid() OR is_admin());
-
-CREATE POLICY "Users can create reports"
-  ON public.content_reports FOR INSERT
-  TO authenticated
-  WITH CHECK (reported_by = auth.uid());
-
-CREATE POLICY "Admins can manage reports"
-  ON public.content_reports FOR ALL
-  TO authenticated
-  USING (is_admin())
-  WITH CHECK (is_admin());
 
 -- SYSTEM_SETTINGS table policies
 CREATE POLICY "Anyone can view system settings"

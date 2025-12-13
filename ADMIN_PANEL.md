@@ -66,7 +66,6 @@ src/
 │   │   ├── UserModal.tsx            # Modal edycji użytkownika
 │   │   ├── CoursesManagement.tsx    # Zarządzanie kursami
 │   │   ├── QuizzesManagement.tsx    # Zarządzanie quizami
-│   │   ├── ReportsManagement.tsx    # Moderacja treści
 │   │   └── SettingsManagement.tsx   # Ustawienia systemu
 │   └── ui/                          # Komponenty UI (shadcn/ui)
 ├── layouts/
@@ -80,8 +79,6 @@ src/
 │   │   │   └── index.astro          # Lista kursów
 │   │   ├── quizzes/
 │   │   │   └── index.astro          # Lista quizów
-│   │   ├── reports/
-│   │   │   └── index.astro          # Zgłoszenia
 │   │   └── settings/
 │   │       └── index.astro          # Ustawienia
 │   └── api/
@@ -101,9 +98,6 @@ src/
 │           ├── quizzes/
 │           │   ├── index.ts         # Lista/tworzenie
 │           │   └── [id].ts          # Szczegóły/usuwanie
-│           ├── reports/
-│           │   ├── index.ts         # Lista zgłoszeń
-│           │   └── [id].ts          # Aktualizacja statusu
 │           └── settings/
 │               └── index.ts         # Odczyt/zapis ustawień
 ├── middleware/
@@ -295,11 +289,6 @@ Pełna dokumentacja API:
 - `POST /api/admin/quizzes` - tworzenie quizu
 - `GET /api/admin/quizzes/[id]` - szczegóły quizu
 - `DELETE /api/admin/quizzes/[id]` - usuwanie quizu
-
-### Reports
-
-- `GET /api/admin/reports` - lista zgłoszeń
-- `PATCH /api/admin/reports/[id]` - aktualizacja statusu
 
 ### Settings
 
