@@ -105,8 +105,8 @@ export function DashboardContent() {
 
   return (
     <div className="space-y-6">
-      {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {/* Stats Grid - Compact Version */}
+      <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-6">
         {statCards.map((stat) => {
           const Icon = stat.icon;
           
@@ -114,30 +114,28 @@ export function DashboardContent() {
             <Card key={stat.title} className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
               {stat.link ? (
                 <a href={stat.link} className="block transition-transform hover:scale-[1.02]">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-gray-300">{stat.title}</CardTitle>
-                    <div className={`p-2 rounded-lg bg-gradient-to-br ${stat.color}`}>
-                      <Icon className="h-4 w-4 text-white" />
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className={`p-1.5 rounded-lg bg-gradient-to-br ${stat.color}`}>
+                        <Icon className="h-3.5 w-3.5 text-white" />
+                      </div>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-white">{stat.value}</div>
-                    <p className="text-xs text-gray-400 mt-1">{stat.change}</p>
+                    <div className="text-xl font-bold text-white mb-0.5">{stat.value}</div>
+                    <p className="text-xs font-medium text-gray-300 mb-1">{stat.title}</p>
+                    <p className="text-xs text-gray-400">{stat.change}</p>
                   </CardContent>
                 </a>
               ) : (
-                <>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-gray-300">{stat.title}</CardTitle>
-                    <div className={`p-2 rounded-lg bg-gradient-to-br ${stat.color}`}>
-                      <Icon className="h-4 w-4 text-white" />
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className={`p-1.5 rounded-lg bg-gradient-to-br ${stat.color}`}>
+                      <Icon className="h-3.5 w-3.5 text-white" />
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-white">{stat.value}</div>
-                    <p className="text-xs text-gray-400 mt-1">{stat.change}</p>
-                  </CardContent>
-                </>
+                  </div>
+                  <div className="text-xl font-bold text-white mb-0.5">{stat.value}</div>
+                  <p className="text-xs font-medium text-gray-300 mb-1">{stat.title}</p>
+                  <p className="text-xs text-gray-400">{stat.change}</p>
+                </CardContent>
               )}
             </Card>
           );
@@ -146,8 +144,6 @@ export function DashboardContent() {
 
       {/* Analytics Charts */}
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-white">Analityka</h2>
-
         {/* Activity Chart - Full Width */}
         <ActivityChart />
 
