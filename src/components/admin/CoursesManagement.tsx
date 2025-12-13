@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Course, CourseStatus, PaginatedResponse } from "@/types";
-import { Search, Plus, Edit, Trash2, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight, User, Calendar } from "lucide-react";
 
 interface CourseWithInstructor extends Course {
   instructor: {
@@ -23,6 +23,13 @@ export function CoursesManagement() {
   const [statusFilter, setStatusFilter] = useState<CourseStatus | "">("");
 
   const limit = 12;
+
+  // Helper function to strip HTML tags from description
+  const stripHtml = (html: string) => {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || "";
+  };
 
   useEffect(() => {
     fetchCourses();
@@ -147,40 +154,57 @@ export function CoursesManagement() {
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {courses.map((course) => (
-              <Card key={course.id} className="bg-slate-800/50 border-white/10 backdrop-blur-sm overflow-hidden">
+              <Card
+                key={course.id}
+                className="bg-slate-800/50 border-white/10 backdrop-blur-sm overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/10"
+              >
                 {course.thumbnail_url && (
-                  <div className="h-48 bg-slate-700 overflow-hidden">
-                    <img src={course.thumbnail_url} alt={course.title} className="w-full h-full object-cover" />
+                  <div className="relative h-40 bg-slate-700 overflow-hidden group">
+                    <img
+                      src={course.thumbnail_url}
+                      alt={course.title}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                    {/* Badge on thumbnail */}
+                    <div className="absolute top-2 right-2">{getStatusBadge(course.status)}</div>
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
                   </div>
                 )}
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-white text-lg line-clamp-2">{course.title}</CardTitle>
-                    {getStatusBadge(course.status)}
-                  </div>
-                  <p className="text-sm text-gray-400 line-clamp-2">{course.description || "Brak opisu"}</p>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-white text-lg font-semibold line-clamp-2 leading-tight">
+                    {course.title}
+                  </CardTitle>
+                  {/* Display clean text instead of HTML */}
+                  <p className="text-sm text-gray-400 line-clamp-3 mt-2">
+                    {course.description ? stripHtml(course.description) : "Brak opisu"}
+                  </p>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-0">
                   <div className="space-y-3">
-                    <div className="text-sm text-gray-400">
-                      <span className="font-medium">Instruktor:</span>{" "}
-                      {course.instructor.full_name || course.instructor.email}
+                    {/* Instructor info */}
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <User className="w-4 h-4" />
+                      <span>{course.instructor.full_name || course.instructor.email}</span>
                     </div>
-                    <div className="text-xs text-gray-500">
-                      Utworzono: {new Date(course.created_at).toLocaleDateString("pl-PL")}
+                    {/* Creation date */}
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <Calendar className="w-3 h-3" />
+                      <span>{new Date(course.created_at).toLocaleDateString("pl-PL")}</span>
                     </div>
+                    {/* Action buttons */}
                     <div className="flex items-center gap-2 pt-2">
                       <Button
                         size="sm"
-                        variant="outline"
                         onClick={() => (window.location.href = `/admin/courses/${course.id}`)}
-                        className="flex-1"
+                        className="flex-1 bg-blue-600 hover:bg-blue-700"
                       >
                         <Edit className="w-3 h-3 mr-1" />
                         Edytuj
                       </Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleDelete(course.id)}>
-                        <Trash2 className="w-3 h-3" />
+                      <Button size="sm" variant="destructive" onClick={() => handleDelete(course.id)} className="px-3">
+                        <Trash2 className="w-3 h-3 mr-1" />
+                        Usuń
                       </Button>
                     </div>
                   </div>

@@ -9,6 +9,7 @@ Successfully implemented a tabbed layout for the course edit page, replacing the
 ### 1. New Files Created
 
 #### `src/components/ui/tabs.tsx`
+
 - Base Tabs component using Radix UI
 - Includes: `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`
 - Styled with dark theme matching the existing design system
@@ -16,6 +17,7 @@ Successfully implemented a tabbed layout for the course edit page, replacing the
 - Inactive tabs: slate background with transparency
 
 #### `src/components/admin/CourseEditTabs.tsx`
+
 - Wrapper component that combines CourseForm and LessonsManager into tabs
 - Two tabs:
   - **"Szczegóły kursu"** (Course Details) - with FileText icon
@@ -26,6 +28,7 @@ Successfully implemented a tabbed layout for the course edit page, replacing the
 ### 2. Modified Files
 
 #### `src/pages/admin/courses/[id].astro`
+
 - Replaced separate `CourseForm` and `LessonsManager` components
 - Now uses single `CourseEditTabs` component
 - Simplified layout structure
@@ -54,6 +57,7 @@ Successfully implemented a tabbed layout for the course edit page, replacing the
 ## Usage
 
 Navigate to any course edit page (`/admin/courses/{id}`), and you'll see:
+
 - Tab navigation at the top
 - "Szczegóły kursu" tab selected by default
 - Click "Lekcje" to manage course lessons
