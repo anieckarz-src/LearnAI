@@ -20,12 +20,15 @@ PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 5. Skopiuj i uruchom każdą migrację w kolejności:
 
 #### Migracja 1: Schema (001_initial_schema.sql)
+
 Skopiuj zawartość z `supabase/migrations/001_initial_schema.sql` i uruchom.
 
 #### Migracja 2: Row Level Security (002_row_level_security.sql)
+
 Skopiuj zawartość z `supabase/migrations/002_row_level_security.sql` i uruchom.
 
 #### Migracja 3: Seed Data (003_seed_data.sql)
+
 Skopiuj zawartość z `supabase/migrations/003_seed_data.sql` i uruchom.
 
 ### Opcja B: Przez Supabase CLI
@@ -65,6 +68,7 @@ VALUES (
 ```
 
 Przykład z prawdziwym UUID:
+
 ```sql
 INSERT INTO public.users (id, email, full_name, role)
 VALUES (
@@ -80,12 +84,13 @@ VALUES (
 ### Sprawdź czy tabele zostały utworzone:
 
 ```sql
-SELECT table_name 
-FROM information_schema.tables 
+SELECT table_name
+FROM information_schema.tables
 WHERE table_schema = 'public';
 ```
 
 Powinny być widoczne:
+
 - users
 - courses
 - lessons
@@ -125,29 +130,35 @@ npm run dev
 ## 🔒 Bezpieczeństwo
 
 ✅ Row Level Security (RLS) jest włączone na wszystkich tabelach
-✅ Tylko administratorzy mają dostęp do /admin/*
+✅ Tylko administratorzy mają dostęp do /admin/\*
 ✅ API endpoints są chronione middleware
 
 ## 🐛 Rozwiązywanie problemów
 
 ### Problem: "Missing Supabase environment variables"
+
 **Rozwiązanie:** Sprawdź czy plik `.env` istnieje i zawiera poprawne klucze
 
 ### Problem: "User not found" po zalogowaniu
+
 **Rozwiązanie:** Upewnij się, że UUID w tabeli `users` odpowiada UUID z `auth.users`
 
 ### Problem: "Unauthorized" przy dostępie do /admin
+
 **Rozwiązanie:** Sprawdź czy użytkownik ma rolę 'admin' w tabeli users:
+
 ```sql
 UPDATE public.users SET role = 'admin' WHERE email = 'twoj@email.com';
 ```
 
 ### Problem: Tabele nie istnieją
+
 **Rozwiązanie:** Uruchom ponownie migracje w kolejności 001 → 002 → 003
 
 ## 📚 Następne kroki
 
 Po skonfigurowaniu możesz:
+
 1. Dodać więcej użytkowników z rolami instructor/student
 2. Utworzyć kursy w panelu admina
 3. Skonfigurować ustawienia w /admin/settings

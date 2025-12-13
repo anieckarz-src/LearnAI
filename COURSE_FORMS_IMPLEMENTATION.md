@@ -21,31 +21,38 @@ Wszystkie zadania z planu zostały pomyślnie zaimplementowane.
 ## 🗂️ Utworzone pliki
 
 ### Migracje bazy danych
+
 - ✅ `supabase/migrations/004_storage_setup.sql` - Konfiguracja Storage bucket dla miniatur
 
 ### API Endpoints
+
 - ✅ `src/pages/api/admin/courses/upload-thumbnail.ts` - Upload miniatur do Supabase Storage
 
 ### Komponenty React
+
 - ✅ `src/components/admin/CourseForm.tsx` - Główny formularz kursu
 - ✅ `src/components/admin/RichTextEditor.tsx` - Edytor tekstu z Tiptap
 - ✅ `src/components/admin/ImageUpload.tsx` - Upload obrazów
 
 ### Komponenty UI (shadcn/ui)
+
 - ✅ `src/components/ui/label.tsx` - Etykiety formularzy
 - ✅ `src/components/ui/select.tsx` - Dropdown select
 - ✅ `src/components/ui/textarea.tsx` - Pole tekstowe
 
 ### Strony Astro
+
 - ✅ `src/pages/admin/courses/new.astro` - Strona tworzenia nowego kursu
 - ✅ `src/pages/admin/courses/[id].astro` - Strona edycji kursu
 
 ### Typy
+
 - ✅ `src/types.ts` - Dodano `CourseFormData` interface
 
 ## 🎨 Funkcjonalności
 
 ### 1. Formularz kursu (`CourseForm.tsx`)
+
 - ✅ React Hook Form z walidacją Zod
 - ✅ Tryb tworzenia i edycji
 - ✅ Automatyczne pobieranie listy instruktorów
@@ -55,6 +62,7 @@ Wszystkie zadania z planu zostały pomyślnie zaimplementowane.
 - ✅ Przekierowanie po zapisie
 
 **Pola formularza:**
+
 - Tytuł kursu (wymagane, 3-200 znaków)
 - Opis kursu (rich text editor)
 - Instruktor (dropdown z listą instruktorów)
@@ -62,6 +70,7 @@ Wszystkie zadania z planu zostały pomyślnie zaimplementowane.
 - Miniatura (upload obrazu)
 
 ### 2. Rich Text Editor (`RichTextEditor.tsx`)
+
 - ✅ Tiptap editor z toolbar
 - ✅ Formatowanie: bold, italic
 - ✅ Nagłówki: H2, H3
@@ -73,6 +82,7 @@ Wszystkie zadania z planu zostały pomyślnie zaimplementowane.
 - ✅ Kontrolowany komponent (HTML output)
 
 ### 3. Image Upload (`ImageUpload.tsx`)
+
 - ✅ Drag & drop interface
 - ✅ Kliknięcie do wyboru pliku
 - ✅ Podgląd obrazu
@@ -83,6 +93,7 @@ Wszystkie zadania z planu zostały pomyślnie zaimplementowane.
 - ✅ Obsługa błędów
 
 ### 4. Upload API (`upload-thumbnail.ts`)
+
 - ✅ Autoryzacja (tylko admin)
 - ✅ Multipart/form-data
 - ✅ Walidacja typu i rozmiaru
@@ -91,6 +102,7 @@ Wszystkie zadania z planu zostały pomyślnie zaimplementowane.
 - ✅ Zwracanie publicznego URL
 
 ### 5. Supabase Storage
+
 - ✅ Bucket `course-thumbnails`
 - ✅ RLS policies:
   - Admini mogą uploadować
@@ -103,11 +115,13 @@ Wszystkie zadania z planu zostały pomyślnie zaimplementowane.
 ### 6. Strony Astro
 
 **`/admin/courses/new`**
+
 - ✅ Sprawdzenie autoryzacji
 - ✅ Tylko dla adminów
 - ✅ Renderuje CourseForm w trybie tworzenia
 
 **`/admin/courses/[id]`**
+
 - ✅ Sprawdzenie autoryzacji
 - ✅ Tylko dla adminów
 - ✅ Pobieranie danych kursu z API
@@ -117,18 +131,21 @@ Wszystkie zadania z planu zostały pomyślnie zaimplementowane.
 ## 🔗 Integracja z istniejącym kodem
 
 ### Wykorzystane istniejące API
+
 - ✅ `POST /api/admin/courses` - Tworzenie kursu
 - ✅ `GET /api/admin/courses/[id]` - Pobieranie kursu
 - ✅ `PATCH /api/admin/courses/[id]` - Aktualizacja kursu
 - ✅ `GET /api/admin/users?role=instructor` - Lista instruktorów
 
 ### Nawigacja
+
 - ✅ Przycisk "Dodaj nowy kurs" w `CoursesManagement.tsx` → `/admin/courses/new`
 - ✅ Przycisk "Edytuj" w `CoursesManagement.tsx` → `/admin/courses/[id]`
 
 ## 🎨 Styling
 
 Wszystkie komponenty używają spójnego stylu z resztą admin panelu:
+
 - Dark theme (slate-800/700 backgrounds)
 - White/10 borders
 - Blue-600 primary colors
@@ -141,12 +158,14 @@ Wszystkie komponenty używają spójnego stylu z resztą admin panelu:
 Aby przetestować implementację:
 
 1. **Uruchom migrację bazy danych:**
+
    ```bash
    # W Supabase Dashboard lub poprzez CLI
    supabase migration up
    ```
 
 2. **Uruchom dev server:**
+
    ```bash
    npm run dev
    ```
@@ -169,17 +188,20 @@ Aby przetestować implementację:
 ## 📝 Notatki
 
 ### Walidacja
+
 - Schema Zod w `CourseForm.tsx` zapewnia walidację po stronie klienta
 - API endpoints mają własną walidację po stronie serwera
 - Obrazy są walidowane zarówno w komponencie jak i w API
 
 ### Bezpieczeństwo
+
 - Tylko adminowie mają dostęp do formularzy
 - RLS policies na Supabase Storage
 - Walidacja typu i rozmiaru plików
 - UUID dla unikalnych nazw plików
 
 ### UX
+
 - Loading states dla wszystkich operacji asynchronicznych
 - Przyjazne komunikaty błędów
 - Podgląd obrazu przed zapisem

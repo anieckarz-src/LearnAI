@@ -1,16 +1,16 @@
 ---
-import AdminLayout from '@/layouts/AdminLayout.astro';
-import { ReportsManagement } from '@/components/admin/ReportsManagement';
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import { ReportsManagement } from "@/components/admin/ReportsManagement";
 
 const user = Astro.locals.user;
 
 if (!user) {
-  return Astro.redirect('/login');
+  return Astro.redirect("/login");
 }
 ---
 
-<AdminLayout 
-  title="Moderacja treści" 
+<AdminLayout
+  title="Moderacja treści"
   description="Zarządzaj zgłoszeniami użytkowników"
   user={user}
   currentPath={Astro.url.pathname}

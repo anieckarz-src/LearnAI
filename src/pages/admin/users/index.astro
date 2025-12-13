@@ -1,16 +1,16 @@
 ---
-import AdminLayout from '@/layouts/AdminLayout.astro';
-import { UsersManagement } from '@/components/admin/UsersManagement';
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import { UsersManagement } from "@/components/admin/UsersManagement";
 
 const user = Astro.locals.user;
 
 if (!user) {
-  return Astro.redirect('/login');
+  return Astro.redirect("/login");
 }
 ---
 
-<AdminLayout 
-  title="Zarządzanie użytkownikami" 
+<AdminLayout
+  title="Zarządzanie użytkownikami"
   description="Przeglądaj i zarządzaj kontami użytkowników platformy"
   user={user}
   currentPath={Astro.url.pathname}

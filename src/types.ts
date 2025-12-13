@@ -1,5 +1,5 @@
 // User types
-export type UserRole = 'admin' | 'instructor' | 'student';
+export type UserRole = "admin" | "instructor" | "student";
 
 export interface User {
   id: string;
@@ -12,7 +12,7 @@ export interface User {
 }
 
 // Course types
-export type CourseStatus = 'draft' | 'published' | 'archived';
+export type CourseStatus = "draft" | "published" | "archived";
 
 export interface Course {
   id: string;
@@ -31,6 +31,16 @@ export interface CourseWithInstructor extends Course {
 }
 
 // Lesson types
+export type LessonMaterialType = "pdf" | "video" | "image";
+
+export interface LessonMaterial {
+  id: string;
+  type: LessonMaterialType;
+  url: string;
+  name: string;
+  size: number;
+}
+
 export interface Lesson {
   id: string;
   course_id: string;
@@ -38,6 +48,7 @@ export interface Lesson {
   content: string | null;
   order_index: number;
   created_at: string;
+  materials?: LessonMaterial[];
 }
 
 // Quiz types
@@ -67,8 +78,8 @@ export interface QuizAttempt {
 }
 
 // Report types
-export type ContentType = 'course' | 'lesson' | 'comment';
-export type ReportStatus = 'pending' | 'reviewed' | 'resolved';
+export type ContentType = "course" | "lesson" | "comment";
+export type ReportStatus = "pending" | "reviewed" | "resolved";
 
 export interface ContentReport {
   id: string;
@@ -192,4 +203,19 @@ export interface CourseFormData {
   instructor_id: string;
   status: CourseStatus;
   thumbnail_url: string;
+}
+
+// Lesson form types
+export interface LessonFormData {
+  title: string;
+  content: string;
+  materials: LessonMaterial[];
+}
+
+// Quiz form types
+export interface QuizFormData {
+  lesson_id: string;
+  title: string;
+  questions: QuizQuestion[];
+  ai_generated?: boolean;
 }

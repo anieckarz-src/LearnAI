@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import type { ContentReport, ContentType, ReportStatus } from '@/types';
-import { ChevronLeft, ChevronRight, AlertCircle, CheckCircle, Eye } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import type { ContentReport, ContentType, ReportStatus } from "@/types";
+import { ChevronLeft, ChevronRight, AlertCircle, CheckCircle, Eye } from "lucide-react";
 
 interface ContentReportWithUsers extends ContentReport {
   reporter: {
@@ -23,8 +23,8 @@ export function ReportsManagement() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<ReportStatus | ''>('');
-  const [contentTypeFilter, setContentTypeFilter] = useState<ContentType | ''>('');
+  const [statusFilter, setStatusFilter] = useState<ReportStatus | "">("");
+  const [contentTypeFilter, setContentTypeFilter] = useState<ContentType | "">("");
 
   const limit = 10;
 
@@ -40,8 +40,8 @@ export function ReportsManagement() {
         limit: limit.toString(),
       });
 
-      if (statusFilter) params.append('status', statusFilter);
-      if (contentTypeFilter) params.append('content_type', contentTypeFilter);
+      if (statusFilter) params.append("status", statusFilter);
+      if (contentTypeFilter) params.append("content_type", contentTypeFilter);
 
       const response = await fetch(`/api/admin/reports?${params}`);
       const result = await response.json();
@@ -51,7 +51,7 @@ export function ReportsManagement() {
         setTotal(result.data.total);
       }
     } catch (error) {
-      console.error('Error fetching reports:', error);
+      console.error("Error fetching reports:", error);
     } finally {
       setLoading(false);
     }
@@ -60,8 +60,8 @@ export function ReportsManagement() {
   const handleUpdateStatus = async (reportId: string, newStatus: ReportStatus) => {
     try {
       const response = await fetch(`/api/admin/reports/${reportId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
       const result = await response.json();
@@ -69,19 +69,22 @@ export function ReportsManagement() {
       if (result.success) {
         fetchReports();
       } else {
-        alert(result.error || 'Nie udało się zaktualizować zgłoszenia');
+        alert(result.error || "Nie udało się zaktualizować zgłoszenia");
       }
     } catch (error) {
-      console.error('Error updating report:', error);
-      alert('Wystąpił błąd');
+      console.error("Error updating report:", error);
+      alert("Wystąpił błąd");
     }
   };
 
   const getStatusBadge = (status: ReportStatus) => {
-    const variants: Record<ReportStatus, { variant: 'warning' | 'secondary' | 'success'; label: string; icon: React.ReactNode }> = {
-      pending: { variant: 'warning', label: 'Oczekuje', icon: <AlertCircle className="w-3 h-3" /> },
-      reviewed: { variant: 'secondary', label: 'Sprawdzone', icon: <Eye className="w-3 h-3" /> },
-      resolved: { variant: 'success', label: 'Rozwiązane', icon: <CheckCircle className="w-3 h-3" /> },
+    const variants: Record<
+      ReportStatus,
+      { variant: "warning" | "secondary" | "success"; label: string; icon: React.ReactNode }
+    > = {
+      pending: { variant: "warning", label: "Oczekuje", icon: <AlertCircle className="w-3 h-3" /> },
+      reviewed: { variant: "secondary", label: "Sprawdzone", icon: <Eye className="w-3 h-3" /> },
+      resolved: { variant: "success", label: "Rozwiązane", icon: <CheckCircle className="w-3 h-3" /> },
     };
 
     const config = variants[status];
@@ -96,9 +99,9 @@ export function ReportsManagement() {
 
   const getContentTypeBadge = (type: ContentType) => {
     const labels: Record<ContentType, string> = {
-      course: 'Kurs',
-      lesson: 'Lekcja',
-      comment: 'Komentarz',
+      course: "Kurs",
+      lesson: "Lekcja",
+      comment: "Komentarz",
     };
 
     return <Badge variant="outline">{labels[type]}</Badge>;
@@ -117,7 +120,7 @@ export function ReportsManagement() {
             <select
               value={statusFilter}
               onChange={(e) => {
-                setStatusFilter(e.target.value as ReportStatus | '');
+                setStatusFilter(e.target.value as ReportStatus | "");
                 setPage(1);
               }}
               className="px-4 py-2 rounded-md bg-slate-700/50 border border-white/10 text-white"
@@ -130,7 +133,7 @@ export function ReportsManagement() {
             <select
               value={contentTypeFilter}
               onChange={(e) => {
-                setContentTypeFilter(e.target.value as ContentType | '');
+                setContentTypeFilter(e.target.value as ContentType | "");
                 setPage(1);
               }}
               className="px-4 py-2 rounded-md bg-slate-700/50 border border-white/10 text-white"
@@ -150,9 +153,7 @@ export function ReportsManagement() {
         </div>
       ) : reports.length === 0 ? (
         <Card className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
-          <CardContent className="text-center py-12 text-gray-400">
-            Nie znaleziono zgłoszeń
-          </CardContent>
+          <CardContent className="text-center py-12 text-gray-400">Nie znaleziono zgłoszeń</CardContent>
         </Card>
       ) : (
         <>
@@ -172,45 +173,41 @@ export function ReportsManagement() {
                       </div>
                       <div className="text-sm text-gray-400 space-y-1">
                         <div>
-                          <span className="font-medium">Zgłoszone przez:</span>{' '}
+                          <span className="font-medium">Zgłoszone przez:</span>{" "}
                           {report.reporter.full_name || report.reporter.email}
                         </div>
                         <div>
-                          <span className="font-medium">Data:</span>{' '}
-                          {new Date(report.created_at).toLocaleString('pl-PL')}
+                          <span className="font-medium">Data:</span>{" "}
+                          {new Date(report.created_at).toLocaleString("pl-PL")}
                         </div>
                         {report.reviewer && (
                           <div>
-                            <span className="font-medium">Sprawdzone przez:</span>{' '}
+                            <span className="font-medium">Sprawdzone przez:</span>{" "}
                             {report.reviewer.full_name || report.reviewer.email}
                           </div>
                         )}
                       </div>
                     </div>
                     <div className="flex flex-col gap-2">
-                      {report.status === 'pending' && (
+                      {report.status === "pending" && (
                         <>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleUpdateStatus(report.id, 'reviewed')}
-                          >
+                          <Button size="sm" variant="outline" onClick={() => handleUpdateStatus(report.id, "reviewed")}>
                             Oznacz jako sprawdzone
                           </Button>
                           <Button
                             size="sm"
                             className="bg-green-600 hover:bg-green-700"
-                            onClick={() => handleUpdateStatus(report.id, 'resolved')}
+                            onClick={() => handleUpdateStatus(report.id, "resolved")}
                           >
                             Rozwiąż
                           </Button>
                         </>
                       )}
-                      {report.status === 'reviewed' && (
+                      {report.status === "reviewed" && (
                         <Button
                           size="sm"
                           className="bg-green-600 hover:bg-green-700"
-                          onClick={() => handleUpdateStatus(report.id, 'resolved')}
+                          onClick={() => handleUpdateStatus(report.id, "resolved")}
                         >
                           Rozwiąż
                         </Button>

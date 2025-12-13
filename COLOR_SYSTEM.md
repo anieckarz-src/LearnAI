@@ -7,6 +7,7 @@ Wszystkie kolory z landing page są dostępne globalnie jako zmienne CSS i klasy
 ### 🌑 Tła (Backgrounds)
 
 **CSS Variables:**
+
 ```css
 var(--background)         /* #0F172A - slate-900 (główne tło) */
 var(--background-darker)  /* #020617 - slate-950 (ciemniejsze tło) */
@@ -14,6 +15,7 @@ var(--background-purple)  /* #581C87 - purple-900 (akcentowe tło) */
 ```
 
 **Tailwind Classes:**
+
 ```html
 <div class="bg-background">Główne tło</div>
 <div class="bg-slate-900">Równoważne slate-900</div>
@@ -22,15 +24,15 @@ var(--background-purple)  /* #581C87 - purple-900 (akcentowe tło) */
 ```
 
 **Gradienty (jak w Hero Section):**
+
 ```html
-<div class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-  Hero gradient
-</div>
+<div class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">Hero gradient</div>
 ```
 
 ### 📝 Teksty (Foreground)
 
 **CSS Variables:**
+
 ```css
 var(--foreground)           /* white - główny tekst */
 var(--foreground-secondary) /* #E2E8F0 - gray-300 */
@@ -38,6 +40,7 @@ var(--foreground-muted)     /* #94A3B8 - gray-400 */
 ```
 
 **Tailwind Classes:**
+
 ```html
 <p class="text-foreground">Główny tekst (biały)</p>
 <p class="text-white">Równoważne white</p>
@@ -48,6 +51,7 @@ var(--foreground-muted)     /* #94A3B8 - gray-400 */
 ### 🔵 Primary (Niebieski Akcent)
 
 **CSS Variables:**
+
 ```css
 var(--primary)       /* #3B82F6 - blue-600 */
 var(--primary-hover) /* #2563EB - blue-700 */
@@ -56,6 +60,7 @@ var(--primary-glow)  /* blue-600 z opacity (dla efektów) */
 ```
 
 **Tailwind Classes:**
+
 ```html
 <!-- Tła -->
 <button class="bg-primary">Primary button</button>
@@ -75,6 +80,7 @@ var(--primary-glow)  /* blue-600 z opacity (dla efektów) */
 ### 🃏 Karty (Cards)
 
 **CSS Variables:**
+
 ```css
 var(--card)        /* slate-800 z opacity */
 var(--card-glass)  /* rgba(255,255,255,0.05) - glass-morphism */
@@ -82,26 +88,29 @@ var(--card-border) /* rgba(255,255,255,0.1) - border */
 ```
 
 **Tailwind Classes - Glass-morphism (jak w Features):**
+
 ```html
-<div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+<div
+  class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-white/10"
+>
   Glass-morphism card
 </div>
 
 <!-- Lub prościej: -->
-<div class="bg-card border border-card-border rounded-lg p-6">
-  Prosta karta
-</div>
+<div class="bg-card border border-card-border rounded-lg p-6">Prosta karta</div>
 ```
 
 ### 🔳 Borders & Inputs
 
 **CSS Variables:**
+
 ```css
 var(--border) /* rgba(255,255,255,0.1) */
 var(--input)  /* rgba(255,255,255,0.15) */
 ```
 
 **Tailwind Classes:**
+
 ```html
 <div class="border border-white/10">Element z border</div>
 <input class="border border-white/15 bg-transparent" />
@@ -113,12 +122,16 @@ var(--input)  /* rgba(255,255,255,0.15) */
 
 ```astro
 <!-- Primary Button -->
-<button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg hover:shadow-blue-500/50">
+<button
+  class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg hover:shadow-blue-500/50"
+>
   Wypróbuj za darmo
 </button>
 
 <!-- Secondary Button (Outline) -->
-<button class="border-2 border-white/30 hover:border-white/60 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all backdrop-blur-sm">
+<button
+  class="border-2 border-white/30 hover:border-white/60 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all backdrop-blur-sm"
+>
   Zobacz więcej
 </button>
 ```
@@ -126,9 +139,14 @@ var(--input)  /* rgba(255,255,255,0.15) */
 ### 2. Karta z Glass-morphism
 
 ```astro
-<div class="group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-white/10 transition-all duration-300 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1">
-  <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-  
+<div
+  class="group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-white/10 transition-all duration-300 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1"
+>
+  <div
+    class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+  >
+  </div>
+
   <div class="relative z-10">
     <h3 class="text-2xl font-bold text-white mb-4">Tytuł karty</h3>
     <p class="text-gray-300">Opis karty...</p>
@@ -173,8 +191,8 @@ var(--input)  /* rgba(255,255,255,0.15) */
 ### 6. Input Field
 
 ```astro
-<input 
-  type="text" 
+<input
+  type="text"
   class="w-full bg-slate-800/50 border border-white/15 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-colors"
   placeholder="Twój email..."
 />
@@ -183,10 +201,15 @@ var(--input)  /* rgba(255,255,255,0.15) */
 ### 7. Card z Hover Glow Effect
 
 ```astro
-<div class="relative bg-slate-800/50 rounded-xl p-6 border border-white/10 transition-all hover:border-blue-500/50 group">
+<div
+  class="relative bg-slate-800/50 rounded-xl p-6 border border-white/10 transition-all hover:border-blue-500/50 group"
+>
   <!-- Glow effect na hover -->
-  <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity -z-10"></div>
-  
+  <div
+    class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity -z-10"
+  >
+  </div>
+
   <h3 class="text-xl font-bold text-white mb-2">Tytuł</h3>
   <p class="text-gray-300">Treść karty...</p>
 </div>
@@ -195,35 +218,39 @@ var(--input)  /* rgba(255,255,255,0.15) */
 ## 🎨 Najczęściej Używane Kombinacje
 
 ### Hero Section Style
+
 ```html
 <section class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
   <h1 class="text-7xl font-bold text-white">
-    <span class="bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">
-      Gradient Text
-    </span>
+    <span class="bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text"> Gradient Text </span>
   </h1>
 </section>
 ```
 
 ### Feature Card Style
+
 ```html
-<div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-blue-500/50 transition-all">
+<div
+  class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-blue-500/50 transition-all"
+>
   <!-- Content -->
 </div>
 ```
 
 ### CTA Button Style
+
 ```html
-<button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-all transform hover:scale-105 shadow-lg hover:shadow-blue-500/50">
+<button
+  class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-all transform hover:scale-105 shadow-lg hover:shadow-blue-500/50"
+>
   Call to Action
 </button>
 ```
 
 ### Stats/Numbers Style
+
 ```html
-<div class="text-6xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">
-  10,000+
-</div>
+<div class="text-6xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">10,000+</div>
 <div class="text-xl text-gray-300">Użytkowników</div>
 ```
 
@@ -235,22 +262,22 @@ var(--input)  /* rgba(255,255,255,0.15) */
 ---
 // src/components/ui/Button.astro
 interface Props {
-  variant?: 'primary' | 'secondary' | 'outline';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: "primary" | "secondary" | "outline";
+  size?: "sm" | "md" | "lg";
 }
 
-const { variant = 'primary', size = 'md' } = Astro.props;
+const { variant = "primary", size = "md" } = Astro.props;
 
 const variants = {
-  primary: 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-blue-500/50',
-  secondary: 'bg-slate-800 hover:bg-slate-700 text-white',
-  outline: 'border-2 border-white/30 hover:border-white/60 text-white backdrop-blur-sm'
+  primary: "bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-blue-500/50",
+  secondary: "bg-slate-800 hover:bg-slate-700 text-white",
+  outline: "border-2 border-white/30 hover:border-white/60 text-white backdrop-blur-sm",
 };
 
 const sizes = {
-  sm: 'px-4 py-2 text-sm',
-  md: 'px-6 py-3 text-base',
-  lg: 'px-8 py-4 text-lg'
+  sm: "px-4 py-2 text-sm",
+  md: "px-6 py-3 text-base",
+  lg: "px-8 py-4 text-lg",
 };
 ---
 
@@ -272,11 +299,13 @@ interface Props {
 const { glass = false, hover = false } = Astro.props;
 ---
 
-<div class={`
+<div
+  class={`
   rounded-2xl p-8 border transition-all
-  ${glass ? 'bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border-white/10' : 'bg-slate-800 border-white/10'}
-  ${hover ? 'hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1' : ''}
-`}>
+  ${glass ? "bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border-white/10" : "bg-slate-800 border-white/10"}
+  ${hover ? "hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1" : ""}
+`}
+>
   <slot />
 </div>
 ```
@@ -284,6 +313,7 @@ const { glass = false, hover = false } = Astro.props;
 ## 💡 Tips & Tricks
 
 ### 1. Używaj Opacity dla Subtelności
+
 ```html
 <!-- Zamiast nowych kolorów, użyj opacity -->
 <div class="bg-white/5">Subtelne tło</div>
@@ -292,12 +322,14 @@ const { glass = false, hover = false } = Astro.props;
 ```
 
 ### 2. Backdrop Blur dla Glass Effect
+
 ```html
 <div class="backdrop-blur-sm bg-white/5">Glass morphism</div>
 <div class="backdrop-blur-md bg-slate-800/50">Stronger blur</div>
 ```
 
 ### 3. Gradient Overlays
+
 ```html
 <div class="relative">
   <!-- Gradient overlay -->
@@ -308,6 +340,7 @@ const { glass = false, hover = false } = Astro.props;
 ```
 
 ### 4. Konsystentne Shadows
+
 ```html
 <!-- Primary button shadow -->
 <button class="shadow-lg hover:shadow-blue-500/50">Button</button>
@@ -341,6 +374,7 @@ const { glass = false, hover = false } = Astro.props;
 ---
 
 **Wszystkie kolory są dostępne zarówno jako:**
+
 - CSS Variables (`var(--primary)`)
 - Tailwind Classes (`bg-blue-600`)
 - Inline styles (gdy potrzebne)

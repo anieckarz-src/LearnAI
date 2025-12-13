@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import type { User, UserRole } from '@/types';
-import { X } from 'lucide-react';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import type { User, UserRole } from "@/types";
+import { X } from "lucide-react";
 
 interface UserModalProps {
   user: User;
@@ -12,7 +12,7 @@ interface UserModalProps {
 }
 
 export function UserModal({ user, isOpen, onClose, onSuccess }: UserModalProps) {
-  const [fullName, setFullName] = useState(user.full_name || '');
+  const [fullName, setFullName] = useState(user.full_name || "");
   const [role, setRole] = useState<UserRole>(user.role);
   const [isBlocked, setIsBlocked] = useState(user.is_blocked);
   const [saving, setSaving] = useState(false);
@@ -27,8 +27,8 @@ export function UserModal({ user, isOpen, onClose, onSuccess }: UserModalProps) 
 
     try {
       const response = await fetch(`/api/admin/users/${user.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           full_name: fullName,
           role,
@@ -41,10 +41,10 @@ export function UserModal({ user, isOpen, onClose, onSuccess }: UserModalProps) 
       if (result.success) {
         onSuccess();
       } else {
-        setError(result.error || 'Nie udało się zaktualizować użytkownika');
+        setError(result.error || "Nie udało się zaktualizować użytkownika");
       }
     } catch (err) {
-      setError('Wystąpił błąd podczas zapisywania');
+      setError("Wystąpił błąd podczas zapisywania");
       console.error(err);
     } finally {
       setSaving(false);
@@ -57,11 +57,7 @@ export function UserModal({ user, isOpen, onClose, onSuccess }: UserModalProps) 
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/10">
           <h2 className="text-xl font-semibold text-white">Edytuj użytkownika</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
-            aria-label="Zamknij"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors" aria-label="Zamknij">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -69,9 +65,7 @@ export function UserModal({ user, isOpen, onClose, onSuccess }: UserModalProps) 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/50 text-red-400 text-sm">
-              {error}
-            </div>
+            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/50 text-red-400 text-sm">{error}</div>
           )}
 
           <div>
@@ -133,20 +127,11 @@ export function UserModal({ user, isOpen, onClose, onSuccess }: UserModalProps) 
 
           {/* Actions */}
           <div className="flex items-center justify-end gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              disabled={saving}
-            >
+            <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
               Anuluj
             </Button>
-            <Button
-              type="submit"
-              disabled={saving}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              {saving ? 'Zapisywanie...' : 'Zapisz zmiany'}
+            <Button type="submit" disabled={saving} className="bg-blue-600 hover:bg-blue-700">
+              {saving ? "Zapisywanie..." : "Zapisz zmiany"}
             </Button>
           </div>
         </form>

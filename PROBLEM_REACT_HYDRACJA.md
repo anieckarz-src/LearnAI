@@ -1,28 +1,33 @@
 # 🔧 Problem z hydracją React - ROZWIĄZANY
 
 ## Problem
+
 React komponenty nie renderowały się w panelu admina. Widoczny był tylko header i ciemne tło, ale brakowało:
+
 - Sidebar z lewej strony
 - Kart ze statystykami
 - Całej zawartości dashboardu
 - Menu nawigacji
 
 ## Przyczyna
+
 Komponenty React były montowane **ręcznie przez clientside `<script>` tagi** zamiast używać **natywnych Astro client directives**. Powodowało to problemy z:
+
 - Hydracją komponentów
 - Ładowaniem JavaScript
 - Renderowaniem po stronie klienta
 
 ### Stary sposób (nieprawidłowy):
+
 ```astro
 <div id="admin-dashboard"></div>
 
 <script>
-  import { DashboardContent } from '@/components/admin/DashboardContent';
-  import { createElement } from 'react';
-  import { createRoot } from 'react-dom/client';
+  import { DashboardContent } from "@/components/admin/DashboardContent";
+  import { createElement } from "react";
+  import { createRoot } from "react-dom/client";
 
-  const dashboardEl = document.getElementById('admin-dashboard');
+  const dashboardEl = document.getElementById("admin-dashboard");
   if (dashboardEl) {
     const root = createRoot(dashboardEl);
     root.render(createElement(DashboardContent));
@@ -33,11 +38,12 @@ Komponenty React były montowane **ręcznie przez clientside `<script>` tagi** z
 ## Rozwiązanie
 
 ### ✅ Nowy sposób (prawidłowy):
+
 Używamy **Astro client directives** (`client:load`):
 
 ```astro
 ---
-import { DashboardContent } from '@/components/admin/DashboardContent';
+import { DashboardContent } from "@/components/admin/DashboardContent";
 ---
 
 <DashboardContent client:load />
@@ -46,6 +52,7 @@ import { DashboardContent } from '@/components/admin/DashboardContent';
 ## Co zostało naprawione
 
 ### 1. **AdminLayout.astro**
+
 ```diff
 ---
 import type { User } from '@/types';
@@ -63,6 +70,7 @@ import '@/styles/global.css';
 ```
 
 ### 2. **dashboard.astro**
+
 ```diff
 ---
 import AdminLayout from '@/layouts/AdminLayout.astro';
@@ -79,7 +87,9 @@ import AdminLayout from '@/layouts/AdminLayout.astro';
 ```
 
 ### 3. **Wszystkie pozostałe strony admina**
+
 Podobnie naprawiono:
+
 - ✅ `admin/users/index.astro` → `<UsersManagement client:load />`
 - ✅ `admin/courses/index.astro` → `<CoursesManagement client:load />`
 - ✅ `admin/quizzes/index.astro` → `<QuizzesManagement client:load />`
@@ -89,33 +99,42 @@ Podobnie naprawiono:
 ## Astro Client Directives
 
 ### `client:load` (używamy tego)
+
 Najbardziej zalecany dla interaktywnych komponentów:
+
 ```astro
 <Component client:load />
 ```
+
 - Komponent ładuje się **natychmiast po załadowaniu strony**
 - Idealne dla krytycznych UI (sidebary, dashboardy)
 
 ### Inne opcje (alternatywy):
 
 #### `client:idle`
+
 ```astro
 <Component client:idle />
 ```
+
 - Ładuje się gdy **przeglądarka jest bezczynna**
 - Dobre dla mniej ważnych komponentów
 
 #### `client:visible`
+
 ```astro
 <Component client:visible />
 ```
+
 - Ładuje się gdy **komponent wchodzi w viewport**
 - Świetne dla treści poniżej fold
 
 #### `client:only="react"`
+
 ```astro
 <Component client:only="react" />
 ```
+
 - **Tylko client-side**, brak SSR
 - Używaj gdy komponent wymaga `window` lub `document`
 
@@ -131,6 +150,7 @@ Najbardziej zalecany dla interaktywnych komponentów:
 Po odświeżeniu strony zobaczysz:
 
 ### ✅ Sidebar (lewa strona):
+
 - Niebieski gradient background
 - Logo "LearnAI Admin" na górze
 - Menu nawigacji z ikonami:
@@ -143,6 +163,7 @@ Po odświeżeniu strony zobaczysz:
 - Przycisk "Wyloguj się" na dole
 
 ### ✅ Dashboard (główna zawartość):
+
 - **4 karty statystyk** w górnym rzędzie:
   - Użytkownicy (niebieska)
   - Kursy (fioletowa)
@@ -155,6 +176,7 @@ Po odświeżeniu strony zobaczysz:
   - Linki do różnych sekcji admina
 
 ### ✅ Header (górna belka):
+
 - Tytuł strony ("Dashboard")
 - Avatar użytkownika po prawej
 - Nazwa i rola ("Administrator")
@@ -170,6 +192,7 @@ Po odświeżeniu strony zobaczysz:
 ### Typowe problemy:
 
 #### Komponent nie renderuje się:
+
 ```astro
 <!-- ❌ Źle - brak client directive -->
 <MyComponent />
@@ -179,32 +202,28 @@ Po odświeżeniu strony zobaczysz:
 ```
 
 #### Import nie działa:
+
 ```astro
 <!-- ❌ Źle - import w <script> -->
 <script>
-  import { MyComponent } from './Component';
+  import { MyComponent } from "./Component";
 </script>
 
-<!-- ✅ Dobrze - import w frontmatter -->
----
-import { MyComponent } from './Component';
----
+<!-- ✅ Dobrze - import w frontmatter -->--- import {MyComponent} from './Component'; ---
 <MyComponent client:load />
 ```
 
 #### Props nie przekazują się:
+
 ```astro
 <!-- ✅ Dobrze - props działają normalnie -->
-<MyComponent 
-  data={myData} 
-  count={42}
-  client:load 
-/>
+<MyComponent data={myData} count={42} client:load />
 ```
 
 ## 📚 Dodatkowe zasoby
 
 ### Astro Docs:
+
 - [Client Directives](https://docs.astro.build/en/reference/directives-reference/#client-directives)
 - [React in Astro](https://docs.astro.build/en/guides/integrations-guide/react/)
 - [Islands Architecture](https://docs.astro.build/en/concepts/islands/)
@@ -224,6 +243,7 @@ import { MyComponent } from './Component';
 **Problem rozwiązany!** Wszystkie strony admina używają teraz prawidłowych Astro client directives.
 
 ### Naprawione pliki:
+
 - ✅ `src/layouts/AdminLayout.astro`
 - ✅ `src/pages/admin/dashboard.astro`
 - ✅ `src/pages/admin/users/index.astro`

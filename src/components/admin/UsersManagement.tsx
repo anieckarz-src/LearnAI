@@ -1,27 +1,29 @@
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import type { User, PaginatedResponse, UserRole } from "@/types";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import type { User, PaginatedResponse, UserRole } from '@/types';
-import { Search, ChevronLeft, ChevronRight, Shield, ShieldCheck, User as UserIcon, Ban, CheckCircle } from 'lucide-react';
-import { UserModal } from './UserModal';
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  Shield,
+  ShieldCheck,
+  User as UserIcon,
+  Ban,
+  CheckCircle,
+} from "lucide-react";
+import { UserModal } from "./UserModal";
 
 export function UsersManagement() {
   const [users, setUsers] = useState<User[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState<UserRole | ''>('');
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState<UserRole | "">("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -39,8 +41,8 @@ export function UsersManagement() {
         limit: limit.toString(),
       });
 
-      if (search) params.append('search', search);
-      if (roleFilter) params.append('role', roleFilter);
+      if (search) params.append("search", search);
+      if (roleFilter) params.append("role", roleFilter);
 
       const response = await fetch(`/api/admin/users?${params}`);
       const result = await response.json();
@@ -50,39 +52,39 @@ export function UsersManagement() {
         setTotal(result.data.total);
       }
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error("Error fetching users:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleBlockUser = async (userId: string) => {
-    if (!confirm('Czy na pewno chcesz zmienić status blokady tego użytkownika?')) {
+    if (!confirm("Czy na pewno chcesz zmienić status blokady tego użytkownika?")) {
       return;
     }
 
     try {
       const response = await fetch(`/api/admin/users/${userId}/block`, {
-        method: 'POST',
+        method: "POST",
       });
       const result = await response.json();
 
       if (result.success) {
         fetchUsers();
       } else {
-        alert(result.error || 'Nie udało się zmienić statusu blokady');
+        alert(result.error || "Nie udało się zmienić statusu blokady");
       }
     } catch (error) {
-      console.error('Error blocking user:', error);
-      alert('Wystąpił błąd');
+      console.error("Error blocking user:", error);
+      alert("Wystąpił błąd");
     }
   };
 
   const getRoleBadge = (role: UserRole) => {
-    const variants: Record<UserRole, { variant: 'default' | 'secondary' | 'success'; icon: React.ReactNode }> = {
-      admin: { variant: 'default', icon: <ShieldCheck className="w-3 h-3" /> },
-      instructor: { variant: 'secondary', icon: <Shield className="w-3 h-3" /> },
-      student: { variant: 'success', icon: <UserIcon className="w-3 h-3" /> },
+    const variants: Record<UserRole, { variant: "default" | "secondary" | "success"; icon: React.ReactNode }> = {
+      admin: { variant: "default", icon: <ShieldCheck className="w-3 h-3" /> },
+      instructor: { variant: "secondary", icon: <Shield className="w-3 h-3" /> },
+      student: { variant: "success", icon: <UserIcon className="w-3 h-3" /> },
     };
 
     const config = variants[role];
@@ -90,7 +92,7 @@ export function UsersManagement() {
     return (
       <Badge variant={config.variant} className="flex items-center gap-1">
         {config.icon}
-        {role === 'admin' ? 'Administrator' : role === 'instructor' ? 'Instruktor' : 'Student'}
+        {role === "admin" ? "Administrator" : role === "instructor" ? "Instruktor" : "Student"}
       </Badge>
     );
   };
@@ -121,7 +123,7 @@ export function UsersManagement() {
             <select
               value={roleFilter}
               onChange={(e) => {
-                setRoleFilter(e.target.value as UserRole | '');
+                setRoleFilter(e.target.value as UserRole | "");
                 setPage(1);
               }}
               className="px-4 py-2 rounded-md bg-slate-700/50 border border-white/10 text-white"
@@ -142,9 +144,7 @@ export function UsersManagement() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
             </div>
           ) : users.length === 0 ? (
-            <div className="text-center py-12 text-gray-400">
-              Nie znaleziono użytkowników
-            </div>
+            <div className="text-center py-12 text-gray-400">Nie znaleziono użytkowników</div>
           ) : (
             <>
               <div className="overflow-x-auto">
@@ -163,7 +163,7 @@ export function UsersManagement() {
                     {users.map((user) => (
                       <TableRow key={user.id} className="border-white/10 hover:bg-slate-700/50">
                         <TableCell className="text-white font-medium">{user.email}</TableCell>
-                        <TableCell className="text-gray-300">{user.full_name || '-'}</TableCell>
+                        <TableCell className="text-gray-300">{user.full_name || "-"}</TableCell>
                         <TableCell>{getRoleBadge(user.role)}</TableCell>
                         <TableCell>
                           {user.is_blocked ? (
@@ -179,7 +179,7 @@ export function UsersManagement() {
                           )}
                         </TableCell>
                         <TableCell className="text-gray-300">
-                          {new Date(user.created_at).toLocaleDateString('pl-PL')}
+                          {new Date(user.created_at).toLocaleDateString("pl-PL")}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-2">
@@ -195,10 +195,10 @@ export function UsersManagement() {
                             </Button>
                             <Button
                               size="sm"
-                              variant={user.is_blocked ? 'secondary' : 'destructive'}
+                              variant={user.is_blocked ? "secondary" : "destructive"}
                               onClick={() => handleBlockUser(user.id)}
                             >
-                              {user.is_blocked ? 'Odblokuj' : 'Zablokuj'}
+                              {user.is_blocked ? "Odblokuj" : "Zablokuj"}
                             </Button>
                           </div>
                         </TableCell>

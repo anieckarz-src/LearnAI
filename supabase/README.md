@@ -19,16 +19,19 @@ PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ### Option 1: Using Supabase CLI (Recommended)
 
 1. Install Supabase CLI:
+
 ```bash
 npm install -g supabase
 ```
 
 2. Link to your project:
+
 ```bash
 supabase link --project-ref your_project_ref
 ```
 
 3. Push migrations:
+
 ```bash
 supabase db push
 ```
@@ -82,6 +85,7 @@ You can test the connection by creating a test API endpoint or using the Supabas
 ## Row Level Security (RLS)
 
 All tables have RLS enabled. The policies ensure:
+
 - Admins have full access to all data
 - Instructors can manage their own courses
 - Students can view published content and their own data
@@ -90,6 +94,7 @@ All tables have RLS enabled. The policies ensure:
 ## Next Steps
 
 After setting up the database:
+
 1. Configure authentication in Astro middleware
 2. Create API routes for admin operations
 3. Build the admin UI components

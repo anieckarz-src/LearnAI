@@ -6,122 +6,123 @@
 :root {
   /* Landing Page Colors - Light Mode (dla kompatybilności) */
   --radius: 0.625rem;
-  
+
   /* Główne tło i tekst - jasny motyw */
   --background: oklch(0.99 0 0); /* #F8FAFC - slate-50 */
-  --foreground: oklch(0.20 0 0); /* #1E293B - slate-900 */
-  
+  --foreground: oklch(0.2 0 0); /* #1E293B - slate-900 */
+
   /* Karty */
   --card: oklch(1 0 0); /* white */
-  --card-foreground: oklch(0.20 0 0); /* slate-900 */
-  
+  --card-foreground: oklch(0.2 0 0); /* slate-900 */
+
   /* Popover */
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.20 0 0);
-  
+  --popover-foreground: oklch(0.2 0 0);
+
   /* Primary - niebieski akcent */
   --primary: oklch(0.55 0.22 250); /* #3B82F6 - blue-600 */
   --primary-foreground: oklch(1 0 0); /* white */
   --primary-hover: oklch(0.48 0.24 255); /* #2563EB - blue-700 */
-  --primary-light: oklch(0.68 0.20 245); /* #60A5FA - blue-400 */
-  
+  --primary-light: oklch(0.68 0.2 245); /* #60A5FA - blue-400 */
+
   /* Secondary */
   --secondary: oklch(0.88 0 0); /* #E2E8F0 - gray-300 */
-  --secondary-foreground: oklch(0.20 0 0);
-  
+  --secondary-foreground: oklch(0.2 0 0);
+
   /* Muted */
   --muted: oklch(0.95 0 0); /* light gray */
-  --muted-foreground: oklch(0.50 0 0); /* #64748B - slate-500 */
-  
+  --muted-foreground: oklch(0.5 0 0); /* #64748B - slate-500 */
+
   /* Accent */
-  --accent: oklch(0.60 0.23 280); /* purple accent */
+  --accent: oklch(0.6 0.23 280); /* purple accent */
   --accent-foreground: oklch(1 0 0);
-  
+
   /* Destructive */
   --destructive: oklch(0.577 0.245 27.325); /* red */
-  
+
   /* Borders */
-  --border: oklch(0.90 0 0); /* light border */
-  --input: oklch(0.90 0 0);
+  --border: oklch(0.9 0 0); /* light border */
+  --input: oklch(0.9 0 0);
   --ring: oklch(0.55 0.22 250); /* blue-600 */
-  
+
   /* Charts */
   --chart-1: oklch(0.55 0.22 250); /* blue */
-  --chart-2: oklch(0.60 0.23 280); /* purple */
-  --chart-3: oklch(0.68 0.20 245); /* light blue */
-  --chart-4: oklch(0.50 0.18 260); /* darker blue */
+  --chart-2: oklch(0.6 0.23 280); /* purple */
+  --chart-3: oklch(0.68 0.2 245); /* light blue */
+  --chart-4: oklch(0.5 0.18 260); /* darker blue */
   --chart-5: oklch(0.65 0.21 250); /* mid blue */
-  
+
   /* Sidebar */
   --sidebar: oklch(0.99 0 0);
-  --sidebar-foreground: oklch(0.20 0 0);
+  --sidebar-foreground: oklch(0.2 0 0);
   --sidebar-primary: oklch(0.55 0.22 250);
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.95 0 0);
-  --sidebar-accent-foreground: oklch(0.20 0 0);
-  --sidebar-border: oklch(0.90 0 0);
+  --sidebar-accent-foreground: oklch(0.2 0 0);
+  --sidebar-border: oklch(0.9 0 0);
   --sidebar-ring: oklch(0.55 0.22 250);
 }
 
-.dark, :root {
+.dark,
+:root {
   /* Landing Page Colors - Dark Mode (domyślny dla całej aplikacji) */
-  
+
   /* Główne tło - ciemny gradient slate/purple */
   --background: oklch(0.15 0.02 265); /* #0F172A - slate-900 */
   --background-darker: oklch(0.08 0.02 265); /* #020617 - slate-950 */
-  --background-purple: oklch(0.20 0.08 290); /* #581C87 - purple-900 */
-  
+  --background-purple: oklch(0.2 0.08 290); /* #581C87 - purple-900 */
+
   /* Główny tekst */
   --foreground: oklch(1 0 0); /* white */
   --foreground-secondary: oklch(0.88 0 0); /* #E2E8F0 - gray-300 */
   --foreground-muted: oklch(0.65 0 0); /* #94A3B8 - gray-400 */
-  
+
   /* Karty - glass-morphism */
-  --card: oklch(0.20 0.02 265); /* slate-800 z opacity */
+  --card: oklch(0.2 0.02 265); /* slate-800 z opacity */
   --card-foreground: oklch(1 0 0);
-  --card-glass: oklch(0.20 0 0 / 0.05); /* rgba(255,255,255,0.05) */
+  --card-glass: oklch(0.2 0 0 / 0.05); /* rgba(255,255,255,0.05) */
   --card-border: oklch(1 0 0 / 0.1); /* rgba(255,255,255,0.1) */
-  
+
   /* Popover */
-  --popover: oklch(0.20 0.02 265);
+  --popover: oklch(0.2 0.02 265);
   --popover-foreground: oklch(1 0 0);
-  
+
   /* Primary - niebieski akcent (główny kolor landing page) */
   --primary: oklch(0.55 0.22 250); /* #3B82F6 - blue-600 */
   --primary-foreground: oklch(1 0 0);
   --primary-hover: oklch(0.48 0.24 255); /* #2563EB - blue-700 */
-  --primary-light: oklch(0.68 0.20 245); /* #60A5FA - blue-400 */
+  --primary-light: oklch(0.68 0.2 245); /* #60A5FA - blue-400 */
   --primary-glow: oklch(0.55 0.22 250 / 0.5); /* blue glow effect */
-  
+
   /* Secondary */
   --secondary: oklch(0.25 0 0); /* slate-800 */
   --secondary-foreground: oklch(1 0 0);
-  
+
   /* Muted */
   --muted: oklch(0.25 0 0);
   --muted-foreground: oklch(0.65 0 0); /* gray-400 */
-  
+
   /* Accent - purple dla gradientów */
-  --accent: oklch(0.60 0.23 280); /* purple */
+  --accent: oklch(0.6 0.23 280); /* purple */
   --accent-foreground: oklch(1 0 0);
-  
+
   /* Destructive */
   --destructive: oklch(0.704 0.191 22.216);
-  
+
   /* Borders */
   --border: oklch(1 0 0 / 10%); /* white with low opacity */
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.55 0.22 250); /* blue-600 */
-  
+
   /* Charts */
   --chart-1: oklch(0.55 0.22 250); /* blue */
-  --chart-2: oklch(0.60 0.23 280); /* purple */
-  --chart-3: oklch(0.68 0.20 245); /* light blue */
-  --chart-4: oklch(0.50 0.18 260); /* darker blue */
+  --chart-2: oklch(0.6 0.23 280); /* purple */
+  --chart-3: oklch(0.68 0.2 245); /* light blue */
+  --chart-4: oklch(0.5 0.18 260); /* darker blue */
   --chart-5: oklch(0.65 0.21 250); /* mid blue */
-  
+
   /* Sidebar */
-  --sidebar: oklch(0.20 0.02 265);
+  --sidebar: oklch(0.2 0.02 265);
   --sidebar-foreground: oklch(1 0 0);
   --sidebar-primary: oklch(0.55 0.22 250);
   --sidebar-primary-foreground: oklch(1 0 0);
@@ -129,10 +130,10 @@
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.55 0.22 250);
-  
+
   /* Dodatkowe kolory landing page */
   --gradient-from: oklch(0.15 0.02 265); /* slate-900 */
-  --gradient-via: oklch(0.20 0.08 290); /* purple-900 */
+  --gradient-via: oklch(0.2 0.08 290); /* purple-900 */
   --gradient-to: oklch(0.15 0.03 250); /* blue-dark */
 }
 
@@ -142,7 +143,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  
+
   /* Base Colors */
   --color-background: var(--background);
   --color-background-darker: var(--background-darker);
@@ -150,51 +151,51 @@
   --color-foreground: var(--foreground);
   --color-foreground-secondary: var(--foreground-secondary);
   --color-foreground-muted: var(--foreground-muted);
-  
+
   /* Cards */
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-card-glass: var(--card-glass);
   --color-card-border: var(--card-border);
-  
+
   /* Popover */
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  
+
   /* Primary (Blue) */
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary-hover: var(--primary-hover);
   --color-primary-light: var(--primary-light);
   --color-primary-glow: var(--primary-glow);
-  
+
   /* Secondary */
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  
+
   /* Muted */
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  
+
   /* Accent */
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-  
+
   /* Destructive */
   --color-destructive: var(--destructive);
-  
+
   /* Borders & Input */
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  
+
   /* Charts */
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  
+
   /* Sidebar */
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
@@ -204,7 +205,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  
+
   /* Gradients */
   --color-gradient-from: var(--gradient-from);
   --color-gradient-via: var(--gradient-via);
@@ -218,7 +219,7 @@
   body {
     @apply bg-background text-foreground;
   }
-  
+
   /* Domyślnie aplikacja używa ciemnego motywu (jak landing page) */
   html {
     color-scheme: dark;
@@ -282,7 +283,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
   }
   50% {

@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import type { Quiz } from '@/types';
-import { Trash2, Eye, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import type { Quiz } from "@/types";
+import { Trash2, Eye, ChevronLeft, ChevronRight, Sparkles, Plus, Edit } from "lucide-react";
 
 interface QuizWithLesson extends Quiz {
   lesson: {
@@ -45,31 +45,31 @@ export function QuizzesManagement() {
         setTotal(result.data.total);
       }
     } catch (error) {
-      console.error('Error fetching quizzes:', error);
+      console.error("Error fetching quizzes:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (quizId: string) => {
-    if (!confirm('Czy na pewno chcesz usunąć ten quiz?')) {
+    if (!confirm("Czy na pewno chcesz usunąć ten quiz?")) {
       return;
     }
 
     try {
       const response = await fetch(`/api/admin/quizzes/${quizId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
       const result = await response.json();
 
       if (result.success) {
         fetchQuizzes();
       } else {
-        alert(result.error || 'Nie udało się usunąć quizu');
+        alert(result.error || "Nie udało się usunąć quizu");
       }
     } catch (error) {
-      console.error('Error deleting quiz:', error);
-      alert('Wystąpił błąd');
+      console.error("Error deleting quiz:", error);
+      alert("Wystąpił błąd");
     }
   };
 
@@ -77,15 +77,21 @@ export function QuizzesManagement() {
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div></div>
+        <Button onClick={() => (window.location.href = "/admin/quizzes/new")} className="bg-blue-600 hover:bg-blue-700">
+          <Plus className="w-4 h-4 mr-2" />
+          Dodaj nowy quiz
+        </Button>
+      </div>
+
       {loading ? (
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
       ) : quizzes.length === 0 ? (
         <Card className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
-          <CardContent className="text-center py-12 text-gray-400">
-            Nie znaleziono quizów
-          </CardContent>
+          <CardContent className="text-center py-12 text-gray-400">Nie znaleziono quizów</CardContent>
         </Card>
       ) : (
         <>
@@ -96,9 +102,7 @@ export function QuizzesManagement() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <CardTitle className="text-white text-lg">
-                          {quiz.title}
-                        </CardTitle>
+                        <CardTitle className="text-white text-lg">{quiz.title}</CardTitle>
                         {quiz.ai_generated && (
                           <Badge variant="secondary" className="flex items-center gap-1">
                             <Sparkles className="w-3 h-3" />
@@ -122,16 +126,16 @@ export function QuizzesManagement() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => setSelectedQuiz(quiz)}
+                        onClick={() => (window.location.href = `/admin/quizzes/${quiz.id}`)}
                       >
+                        <Edit className="w-3 h-3 mr-1" />
+                        Edytuj
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => setSelectedQuiz(quiz)}>
                         <Eye className="w-3 h-3 mr-1" />
                         Podgląd
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleDelete(quiz.id)}
-                      >
+                      <Button size="sm" variant="destructive" onClick={() => handleDelete(quiz.id)}>
                         <Trash2 className="w-3 h-3" />
                       </Button>
                     </div>
@@ -179,11 +183,7 @@ export function QuizzesManagement() {
             <CardHeader className="border-b border-white/10 sticky top-0 bg-slate-800 z-10">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-white">{selectedQuiz.title}</CardTitle>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setSelectedQuiz(null)}
-                >
+                <Button size="sm" variant="ghost" onClick={() => setSelectedQuiz(null)}>
                   Zamknij
                 </Button>
               </div>
@@ -200,8 +200,8 @@ export function QuizzesManagement() {
                         key={optIndex}
                         className={`text-sm px-3 py-2 rounded ${
                           optIndex === q.correct_answer
-                            ? 'bg-green-600/20 text-green-400 border border-green-600/50'
-                            : 'bg-slate-700/50 text-gray-300'
+                            ? "bg-green-600/20 text-green-400 border border-green-600/50"
+                            : "bg-slate-700/50 text-gray-300"
                         }`}
                       >
                         {String.fromCharCode(65 + optIndex)}. {option}

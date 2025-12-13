@@ -1,7 +1,10 @@
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { DashboardStats } from '@/types';
-import { Users, BookOpen, FileQuestion, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { DashboardStats } from "@/types";
+import { Users, BookOpen, FileQuestion, TrendingUp, AlertCircle, CheckCircle } from "lucide-react";
+import { ActivityChart } from "./ActivityChart";
+import { CourseProgressChart } from "./CourseProgressChart";
+import { QuizResultsChart } from "./QuizResultsChart";
 
 export function DashboardContent() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -15,16 +18,16 @@ export function DashboardContent() {
   const fetchStats = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/admin/stats/overview');
+      const response = await fetch("/api/admin/stats/overview");
       const data = await response.json();
-      
+
       if (data.success) {
         setStats(data.data);
       } else {
-        setError(data.error || 'Failed to load stats');
+        setError(data.error || "Failed to load stats");
       }
     } catch (err) {
-      setError('Failed to fetch dashboard data');
+      setError("Failed to fetch dashboard data");
       console.error(err);
     } finally {
       setLoading(false);
@@ -56,32 +59,32 @@ export function DashboardContent() {
 
   const statCards = [
     {
-      title: 'Użytkownicy',
+      title: "Użytkownicy",
       value: stats.total_users,
       change: `+${stats.new_users_this_month} w tym miesiącu`,
       icon: Users,
-      color: 'from-blue-500 to-blue-600',
+      color: "from-blue-500 to-blue-600",
     },
     {
-      title: 'Kursy',
+      title: "Kursy",
       value: stats.total_courses,
       change: `${stats.published_courses} opublikowanych`,
       icon: BookOpen,
-      color: 'from-purple-500 to-purple-600',
+      color: "from-purple-500 to-purple-600",
     },
     {
-      title: 'Aktywni studenci',
+      title: "Aktywni studenci",
       value: stats.active_students,
       change: `${stats.total_enrollments} zapisów`,
       icon: TrendingUp,
-      color: 'from-green-500 to-green-600',
+      color: "from-green-500 to-green-600",
     },
     {
-      title: 'Quizy',
+      title: "Quizy",
       value: stats.total_quizzes,
       change: `${stats.total_quiz_attempts} podejść`,
       icon: FileQuestion,
-      color: 'from-orange-500 to-orange-600',
+      color: "from-orange-500 to-orange-600",
     },
   ];
 
@@ -94,9 +97,7 @@ export function DashboardContent() {
           return (
             <Card key={stat.title} className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-300">
-                  {stat.title}
-                </CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-300">{stat.title}</CardTitle>
                 <div className={`p-2 rounded-lg bg-gradient-to-br ${stat.color}`}>
                   <Icon className="h-4 w-4 text-white" />
                 </div>
@@ -118,9 +119,7 @@ export function DashboardContent() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
-              <div className="text-4xl font-bold text-white">
-                {stats.avg_quiz_score.toFixed(1)}%
-              </div>
+              <div className="text-4xl font-bold text-white">{stats.avg_quiz_score.toFixed(1)}%</div>
               <CheckCircle className="w-8 h-8 text-green-500" />
             </div>
           </CardContent>
@@ -132,18 +131,11 @@ export function DashboardContent() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
-              <div className="text-4xl font-bold text-white">
-                {stats.pending_reports}
-              </div>
-              {stats.pending_reports > 0 && (
-                <AlertCircle className="w-8 h-8 text-yellow-500" />
-              )}
+              <div className="text-4xl font-bold text-white">{stats.pending_reports}</div>
+              {stats.pending_reports > 0 && <AlertCircle className="w-8 h-8 text-yellow-500" />}
             </div>
             {stats.pending_reports > 0 && (
-              <a 
-                href="/admin/reports" 
-                className="text-sm text-blue-400 hover:text-blue-300 mt-2 inline-block"
-              >
+              <a href="/admin/reports" className="text-sm text-blue-400 hover:text-blue-300 mt-2 inline-block">
                 Zobacz zgłoszenia →
               </a>
             )}
@@ -189,6 +181,20 @@ export function DashboardContent() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Analytics Charts */}
+      <div className="space-y-6">
+        <h2 className="text-2xl font-bold text-white">Analityka</h2>
+
+        {/* Activity Chart */}
+        <ActivityChart />
+
+        {/* Course Progress Chart */}
+        <CourseProgressChart />
+
+        {/* Quiz Results Charts */}
+        <QuizResultsChart />
+      </div>
     </div>
   );
 }

@@ -1,0 +1,58 @@
+---
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import { QuizForm } from "@/components/admin/QuizForm";
+import type { Quiz } from "@/types";
+
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect("/login");
+}
+
+if (user.role !== "admin") {
+  return Astro.redirect("/unauthorized");
+}
+
+const { id } = Astro.params;
+
+if (!id) {
+  return Astro.redirect("/admin/quizzes");
+}
+
+// Fetch quiz data
+let quiz: Quiz | null = null;
+let error: string | null = null;
+
+try {
+  const response = await fetch(`${Astro.url.origin}/api/admin/quizzes/${id}`, {
+    headers: {
+      Cookie: Astro.request.headers.get("Cookie") || "",
+    },
+  });
+
+  const result = await response.json();
+
+  if (result.success) {
+    quiz = result.data;
+  } else {
+    error = result.error || "Nie znaleziono quizu";
+  }
+} catch (err) {
+  console.error("Error fetching quiz:", err);
+  error = "Wystąpił błąd podczas pobierania danych quizu";
+}
+
+// If quiz not found, redirect to quizzes list
+if (!quiz || error) {
+  return Astro.redirect("/admin/quizzes");
+}
+---
+
+<AdminLayout
+  title={`Edytuj quiz: ${quiz.title}`}
+  description="Edytuj quiz"
+  user={user}
+  currentPath={Astro.url.pathname}
+>
+  <QuizForm client:load quiz={quiz} />
+</AdminLayout>

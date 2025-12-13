@@ -3,10 +3,12 @@
 ## 🎉 Co zostało naprawione?
 
 ### Problem 1: Brak stylów CSS
+
 **Przyczyna:** `AdminLayout.astro` nie importował `global.css`  
 **Rozwiązanie:** ✅ Dodano `import '@/styles/global.css';`
 
 ### Problem 2: React komponenty się nie renderują
+
 **Przyczyna:** Używano ręcznego montowania przez `<script>` zamiast Astro client directives  
 **Rozwiązanie:** ✅ Zmieniono na `<Component client:load />`
 
@@ -30,6 +32,7 @@ http://localhost:3001/login
 ### 3️⃣ **Zaloguj się**
 
 Użyj swojego admina:
+
 - Email: `admin@learnai.com` (lub twój email)
 - Hasło: `admin123` (lub twoje hasło)
 
@@ -42,6 +45,7 @@ Po zalogowaniu zobaczysz **KOMPLETNY PANEL ADMINA**:
 ## 🌟 Co zobaczysz po naprawie:
 
 ### ✅ **Sidebar (lewa strona)**
+
 ```
 ┌─────────────────────────┐
 │   LearnAI Admin         │ ← Logo z gradientem
@@ -58,6 +62,7 @@ Po zalogowaniu zobaczysz **KOMPLETNY PANEL ADMINA**:
 ```
 
 ### ✅ **Dashboard (główna zawartość)**
+
 ```
 ┌──────────────────────────────────────────────────────┐
 │ Dashboard                          Admin User    [A] │
@@ -92,6 +97,7 @@ Po zalogowaniu zobaczysz **KOMPLETNY PANEL ADMINA**:
 ## 🎨 Wygląd wizualny:
 
 ### Kolory:
+
 - **Tło:** Ciemne (prawie czarne) - `#020617`
 - **Sidebar:** Niebieski gradient - `#1e40af` → `#2563eb`
 - **Karty:** Półprzezroczyste z blur - `rgba(30, 41, 59, 0.5)`
@@ -99,6 +105,7 @@ Po zalogowaniu zobaczysz **KOMPLETNY PANEL ADMINA**:
 - **Tekst:** Biały i odcienie szarości
 
 ### Efekty:
+
 - ✨ Glass-morphism (szkło)
 - 🌫️ Backdrop blur
 - 🎭 Cienie i gradient
@@ -110,6 +117,7 @@ Po zalogowaniu zobaczysz **KOMPLETNY PANEL ADMINA**:
 ## 🔍 Sprawdź poprawność:
 
 ### ✅ **Powinno działać:**
+
 1. Sidebar widoczny z lewej strony
 2. Wszystkie 4 karty statystyk widoczne
 3. Kolory i gradienty
@@ -120,18 +128,21 @@ Po zalogowaniu zobaczysz **KOMPLETNY PANEL ADMINA**:
 ### ❌ **Jeśli nadal nie działa:**
 
 #### Problem: Białe tło, brak stylów
+
 ```bash
 # Rozwiązanie: Hard refresh
 Ctrl + Shift + R
 ```
 
 #### Problem: Brak sidebara i kart
+
 ```bash
 # Rozwiązanie: Sprawdź Console (F12)
 # Szukaj błędów JavaScript
 ```
 
 #### Problem: Port 3000 vs 3001
+
 ```bash
 # Upewnij się że łączysz na PRAWIDŁOWY PORT:
 http://localhost:3001   ← DOBRY (aktualny)
@@ -143,9 +154,11 @@ http://localhost:3000   ← ZŁY (stary, może być zajęty)
 ## 📝 Naprawione pliki:
 
 ### Dodano import CSS:
+
 - ✅ `src/layouts/AdminLayout.astro`
 
 ### Zmieniono na client:load:
+
 - ✅ `src/layouts/AdminLayout.astro` (Sidebar)
 - ✅ `src/pages/admin/dashboard.astro`
 - ✅ `src/pages/admin/users/index.astro`
@@ -159,11 +172,13 @@ http://localhost:3000   ← ZŁY (stary, może być zajęty)
 ## 🆘 Jeśli potrzebujesz pomocy:
 
 ### Sprawdź DevTools:
+
 1. Naciśnij `F12`
 2. Zakładka **Console** - sprawdź błędy
 3. Zakładka **Network** - sprawdź czy CSS i JS się ładują
 
 ### Restart serwera (jeśli trzeba):
+
 ```bash
 # W terminalu:
 Ctrl + C       # Zatrzymaj
@@ -175,6 +190,7 @@ npm run dev    # Uruchom ponownie
 ## 🎯 NASTĘPNE KROKI:
 
 ### 1. **Przetestuj wszystkie strony:**
+
 - `/admin/dashboard` ✓
 - `/admin/users` - Zarządzanie użytkownikami
 - `/admin/courses` - Zarządzanie kursami
@@ -183,11 +199,13 @@ npm run dev    # Uruchom ponownie
 - `/admin/settings` - Ustawienia systemu
 
 ### 2. **Zacznij używać panelu:**
+
 - Dodaj nowych użytkowników
 - Stwórz pierwszy kurs
 - Skonfiguruj ustawienia platformy
 
 ### 3. **Customizuj:**
+
 - Zmień nazwę z "LearnAI" na swoją
 - Ustaw swój email kontaktowy
 - Dostosuj kolory (jeśli chcesz)
@@ -197,6 +215,7 @@ npm run dev    # Uruchom ponownie
 ## ✅ Podsumowanie:
 
 ### Było (ŹLE):
+
 - ❌ Białe tło
 - ❌ Czarny tekst
 - ❌ Brak sidebara
@@ -204,6 +223,7 @@ npm run dev    # Uruchom ponownie
 - ❌ React się nie renderował
 
 ### Jest (DOBRZE):
+
 - ✅ Ciemny motyw
 - ✅ Kolorowe gradienty
 - ✅ Sidebar z menu

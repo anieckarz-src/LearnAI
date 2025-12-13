@@ -7,6 +7,7 @@ A modern, full-stack educational platform with landing page and admin panel, bui
 This starter now includes:
 
 ### 🎓 **Complete Admin Panel**
+
 - Full-featured admin dashboard for managing educational platform
 - User management (roles, permissions, blocking)
 - Course and lesson management (CRUD operations)
@@ -17,6 +18,7 @@ This starter now includes:
 [📖 Full Admin Panel Documentation](./ADMIN_PANEL.md)
 
 ### 🌟 **Professional Landing Page**
+
 - Modern dark theme with animated gradients
 - Fully responsive (mobile-first design)
 - Accessibility-first approach (WCAG AA compliant)
@@ -29,6 +31,7 @@ This starter now includes:
 ## Tech Stack
 
 ### Frontend
+
 - [Astro](https://astro.build/) v5.13.7 - Modern web framework for building fast, content-focused websites
 - [React](https://react.dev/) v19.1.1 - UI library for building interactive components
 - [TypeScript](https://www.typescriptlang.org/) v5 - Type-safe JavaScript
@@ -36,11 +39,13 @@ This starter now includes:
 - [shadcn/ui](https://ui.shadcn.com/) - Re-usable UI components
 
 ### Backend
+
 - [Supabase](https://supabase.com/) - Backend-as-a-Service (Auth, Database, Storage)
 - PostgreSQL - Database with Row Level Security
 - Astro API Routes - Server-side endpoints
 
 ### Additional Libraries
+
 - recharts - Data visualization
 - react-hook-form + zod - Form validation
 - date-fns - Date formatting
@@ -91,6 +96,7 @@ npm run build
 ## Key Features
 
 ### Admin Panel (`/admin/dashboard`)
+
 - **Dashboard:** Overview with key metrics and statistics
 - **User Management:** CRUD operations, role assignment, account blocking
 - **Course Management:** Create, edit, publish courses and lessons
@@ -100,6 +106,7 @@ npm run build
 - **Audit Logging:** Track all admin actions
 
 ### Authentication & Security
+
 - Supabase authentication integration
 - Role-based access control (Admin, Instructor, Student)
 - Row Level Security (RLS) policies
@@ -107,6 +114,7 @@ npm run build
 - Session management
 
 ### Database Schema
+
 - Users (with roles and blocking)
 - Courses, Lessons, Quizzes
 - Course Enrollments
@@ -153,6 +161,7 @@ npm run build
 ## Landing Page Features
 
 ### Sections
+
 1. **Navigation** - Sticky navbar with mobile menu
 2. **Hero** - Eye-catching hero with animated gradient background
 3. **Scrolling Banner** - Infinite scroll with key benefits
@@ -163,6 +172,7 @@ npm run build
 8. **Footer** - Complete footer with links and social media
 
 ### Key Features
+
 - ✅ Fully responsive (mobile, tablet, desktop)
 - ✅ Accessibility optimized (ARIA labels, semantic HTML)
 - ✅ SEO-ready (meta tags, Open Graph, Twitter Cards)
@@ -183,12 +193,12 @@ Wszystkie kolory z landing page są dostępne globalnie jako zmienne CSS i klasy
 
 ```html
 <!-- Primary button (jak na landing page) -->
-<button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg">
-  Przycisk
-</button>
+<button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg">Przycisk</button>
 
 <!-- Glass-morphism card (jak w Features) -->
-<div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+<div
+  class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-white/10"
+>
   Karta
 </div>
 
@@ -220,16 +230,21 @@ Wszystkie kolory z landing page są dostępne globalnie jako zmienne CSS i klasy
 ## Customization
 
 ### Change Platform Name
+
 Edit the following files:
+
 - `src/components/landing/Navbar.astro`
 - `src/components/landing/Footer.astro`
 - `src/layouts/Layout.astro`
 
 ### Update Statistics
+
 Edit `src/components/landing/StatsSection.astro` and update the `data-counter` attributes.
 
 ### Modify Colors
+
 Colors are defined using Tailwind classes. Main colors:
+
 - Primary: `blue-600` (#3B82F6)
 - Dark backgrounds: `slate-900`, `slate-950`
 - Text: `white`, `gray-300`, `gray-400`

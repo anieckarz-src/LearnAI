@@ -11,7 +11,11 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
       <!-- Stat 1 -->
       <div class="text-center border-b md:border-b-0 md:border-r border-white/10 pb-8 md:pb-0">
-        <div class="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text mb-3 sm:mb-4" data-counter="5000" aria-live="polite">
+        <div
+          class="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text mb-3 sm:mb-4"
+          data-counter="5000"
+          aria-live="polite"
+        >
           5,000+
         </div>
         <div class="text-lg sm:text-xl text-gray-300 font-semibold mb-1 sm:mb-2">Aktywnych</div>
@@ -20,7 +24,10 @@
 
       <!-- Stat 2 -->
       <div class="text-center border-b md:border-b-0 md:border-r border-white/10 pb-8 md:pb-0">
-        <div class="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text mb-3 sm:mb-4" data-counter="50">
+        <div
+          class="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text mb-3 sm:mb-4"
+          data-counter="50"
+        >
           50+
         </div>
         <div class="text-lg sm:text-xl text-gray-300 font-semibold mb-1 sm:mb-2">Dostępnych</div>
@@ -29,7 +36,10 @@
 
       <!-- Stat 3 -->
       <div class="text-center">
-        <div class="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text mb-3 sm:mb-4" data-counter="100000">
+        <div
+          class="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text mb-3 sm:mb-4"
+          data-counter="100000"
+        >
           100,000+
         </div>
         <div class="text-lg sm:text-xl text-gray-300 font-semibold mb-1 sm:mb-2">Wygenerowanych</div>
@@ -41,40 +51,43 @@
 
 <script>
   // Counter animation on scroll into view
-  const counters = document.querySelectorAll('[data-counter]');
-  
+  const counters = document.querySelectorAll("[data-counter]");
+
   const animateCounter = (element: Element) => {
-    const target = parseInt(element.getAttribute('data-counter') || '0');
+    const target = parseInt(element.getAttribute("data-counter") || "0");
     const duration = 2000;
     const increment = target / (duration / 16);
     let current = 0;
-    
+
     const updateCounter = () => {
       current += increment;
       if (current < target) {
         const formatted = Math.floor(current).toLocaleString();
-        const plus = element.textContent?.includes('+') ? '+' : '';
+        const plus = element.textContent?.includes("+") ? "+" : "";
         element.textContent = formatted + plus;
         requestAnimationFrame(updateCounter);
       } else {
         const formatted = target.toLocaleString();
-        const plus = element.textContent?.includes('+') ? '+' : '';
+        const plus = element.textContent?.includes("+") ? "+" : "";
         element.textContent = formatted + plus;
       }
     };
-    
+
     updateCounter();
   };
 
   // Intersection Observer for triggering animation
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        animateCounter(entry.target);
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.5 });
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          animateCounter(entry.target);
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.5 }
+  );
 
-  counters.forEach(counter => observer.observe(counter));
+  counters.forEach((counter) => observer.observe(counter));
 </script>

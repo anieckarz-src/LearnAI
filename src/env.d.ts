@@ -12,8 +12,8 @@ interface ImportMeta {
 
 declare namespace App {
   interface Locals {
-    supabase: import('./db/supabase.client').SupabaseClient;
-    session: import('@supabase/supabase-js').Session | null;
-    user: import('./types').User | null;
+    supabase: import("./db/supabase.client").SupabaseClient;
+    session: import("@supabase/supabase-js").Session | null;
+    user: import("./types").User | null;
   }
 }

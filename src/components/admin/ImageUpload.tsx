@@ -1,7 +1,7 @@
-import { useState, useRef, useCallback } from 'react';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { useState, useRef, useCallback } from "react";
+import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface ImageUploadProps {
   value: string;
@@ -20,16 +20,16 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
       setError(null);
 
       // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
       if (!allowedTypes.includes(file.type)) {
-        setError('Dozwolone są tylko pliki JPEG, PNG i WebP');
+        setError("Dozwolone są tylko pliki JPEG, PNG i WebP");
         return;
       }
 
       // Validate file size (5MB)
       const maxSize = 5 * 1024 * 1024;
       if (file.size > maxSize) {
-        setError('Plik nie może być większy niż 5MB');
+        setError("Plik nie może być większy niż 5MB");
         return;
       }
 
@@ -37,23 +37,23 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
         setUploading(true);
 
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append("file", file);
 
-        const response = await fetch('/api/admin/courses/upload-thumbnail', {
-          method: 'POST',
+        const response = await fetch("/api/admin/courses/upload-thumbnail", {
+          method: "POST",
           body: formData,
         });
 
         const result = await response.json();
 
         if (!result.success) {
-          throw new Error(result.error || 'Nie udało się przesłać pliku');
+          throw new Error(result.error || "Nie udało się przesłać pliku");
         }
 
         onChange(result.data.url);
       } catch (err) {
-        console.error('Upload error:', err);
-        setError(err instanceof Error ? err.message : 'Wystąpił błąd podczas przesyłania');
+        console.error("Upload error:", err);
+        setError(err instanceof Error ? err.message : "Wystąpił błąd podczas przesyłania");
       } finally {
         setUploading(false);
       }
@@ -65,9 +65,9 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (e.type === 'dragenter' || e.type === 'dragover') {
+    if (e.type === "dragenter" || e.type === "dragover") {
       setDragActive(true);
-    } else if (e.type === 'dragleave') {
+    } else if (e.type === "dragleave") {
       setDragActive(false);
     }
   }, []);
@@ -95,10 +95,10 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
   );
 
   const handleRemove = useCallback(() => {
-    onChange('');
+    onChange("");
     setError(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   }, [onChange]);
 
@@ -107,7 +107,7 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
   }, []);
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn("space-y-2", className)}>
       {value ? (
         <div className="relative rounded-lg overflow-hidden border border-white/10 bg-slate-700/50">
           <img src={value} alt="Thumbnail" className="w-full h-48 object-cover" />
@@ -130,11 +130,11 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
           onDrop={handleDrop}
           onClick={handleClick}
           className={cn(
-            'relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
+            "relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors",
             dragActive
-              ? 'border-blue-500 bg-blue-500/10'
-              : 'border-white/20 bg-slate-700/30 hover:border-white/40 hover:bg-slate-700/50',
-            uploading && 'opacity-50 cursor-not-allowed'
+              ? "border-blue-500 bg-blue-500/10"
+              : "border-white/20 bg-slate-700/30 hover:border-white/40 hover:bg-slate-700/50",
+            uploading && "opacity-50 cursor-not-allowed"
           )}
         >
           <input
@@ -158,9 +158,7 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
                   <ImageIcon className="h-8 w-8 text-gray-400" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white mb-1">
-                    Przeciągnij i upuść lub kliknij aby wybrać
-                  </p>
+                  <p className="text-sm font-medium text-white mb-1">Przeciągnij i upuść lub kliknij aby wybrać</p>
                   <p className="text-xs text-gray-400">PNG, JPG, WebP (max. 5MB)</p>
                 </div>
               </>
@@ -170,9 +168,7 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
       )}
 
       {error && (
-        <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-md p-2">
-          {error}
-        </div>
+        <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-md p-2">{error}</div>
       )}
     </div>
   );

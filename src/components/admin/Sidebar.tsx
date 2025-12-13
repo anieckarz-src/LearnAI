@@ -1,36 +1,26 @@
-import { 
-  LayoutDashboard, 
-  Users, 
-  BookOpen, 
-  FileQuestion, 
-  Flag, 
-  Settings,
-  LogOut,
-  Menu,
-  X
-} from 'lucide-react';
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
+import { LayoutDashboard, Users, BookOpen, FileQuestion, Flag, Settings, LogOut, Menu, X } from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface SidebarProps {
   currentPath: string;
 }
 
 const navigation = [
-  { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-  { name: 'Użytkownicy', href: '/admin/users', icon: Users },
-  { name: 'Kursy', href: '/admin/courses', icon: BookOpen },
-  { name: 'Quizy', href: '/admin/quizzes', icon: FileQuestion },
-  { name: 'Zgłoszenia', href: '/admin/reports', icon: Flag },
-  { name: 'Ustawienia', href: '/admin/settings', icon: Settings },
+  { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+  { name: "Użytkownicy", href: "/admin/users", icon: Users },
+  { name: "Kursy", href: "/admin/courses", icon: BookOpen },
+  { name: "Quizy", href: "/admin/quizzes", icon: FileQuestion },
+  { name: "Zgłoszenia", href: "/admin/reports", icon: Flag },
+  { name: "Ustawienia", href: "/admin/settings", icon: Settings },
 ];
 
 export function Sidebar({ currentPath }: SidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const handleSignOut = async () => {
-    await fetch('/api/auth/signout', { method: 'POST' });
-    window.location.href = '/';
+    await fetch("/api/auth/signout", { method: "POST" });
+    window.location.href = "/";
   };
 
   return (
@@ -47,10 +37,7 @@ export function Sidebar({ currentPath }: SidebarProps) {
 
       {/* Overlay for mobile */}
       {isMobileOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={() => setIsMobileOpen(false)}
-        />
+        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setIsMobileOpen(false)} />
       )}
 
       {/* Sidebar */}
@@ -73,7 +60,7 @@ export function Sidebar({ currentPath }: SidebarProps) {
             {navigation.map((item) => {
               const isActive = currentPath.startsWith(item.href);
               const Icon = item.icon;
-              
+
               return (
                 <a
                   key={item.name}
@@ -84,7 +71,7 @@ export function Sidebar({ currentPath }: SidebarProps) {
                       ? "bg-blue-600 text-white shadow-lg shadow-blue-500/50"
                       : "text-gray-300 hover:bg-slate-800 hover:text-white"
                   )}
-                  aria-current={isActive ? 'page' : undefined}
+                  aria-current={isActive ? "page" : undefined}
                 >
                   <Icon className="w-5 h-5 shrink-0" />
                   {item.name}

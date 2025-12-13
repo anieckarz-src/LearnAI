@@ -5,12 +5,14 @@ Kompleksowy panel administracyjny dla platformy edukacyjnej LearnAI, zbudowany z
 ## 🎯 Funkcjonalności
 
 ### 1. Dashboard
+
 - Przegląd kluczowych statystyk platformy
 - Liczba użytkowników, kursów, aktywnych studentów
 - Statystyki quizów i zgłoszeń
 - Szybkie akcje do najważniejszych sekcji
 
 ### 2. Zarządzanie użytkownikami
+
 - Lista wszystkich użytkowników z paginacją
 - Filtrowanie po roli (admin/instructor/student)
 - Wyszukiwanie po email lub nazwie
@@ -20,6 +22,7 @@ Kompleksowy panel administracyjny dla platformy edukacyjnej LearnAI, zbudowany z
 - Historia logowań
 
 ### 3. Zarządzanie kursami
+
 - Przeglądanie wszystkich kursów w widoku siatki
 - Filtrowanie po statusie (published/draft/archived)
 - Tworzenie nowych kursów
@@ -29,6 +32,7 @@ Kompleksowy panel administracyjny dla platformy edukacyjnej LearnAI, zbudowany z
 - Zarządzanie lekcjami w ramach kursu
 
 ### 4. Zarządzanie quizami
+
 - Lista wszystkich quizów
 - Podgląd pytań i odpowiedzi
 - Wskaźnik quizów wygenerowanych przez AI
@@ -36,6 +40,7 @@ Kompleksowy panel administracyjny dla platformy edukacyjnej LearnAI, zbudowany z
 - Usuwanie quizów
 
 ### 5. Moderacja treści
+
 - Lista zgłoszeń użytkowników
 - Filtrowanie po statusie (pending/reviewed/resolved)
 - Filtrowanie po typie treści (course/lesson/comment)
@@ -43,6 +48,7 @@ Kompleksowy panel administracyjny dla platformy edukacyjnej LearnAI, zbudowany z
 - Historia moderacji
 
 ### 6. Ustawienia systemu
+
 - **Ogólne:** nazwa platformy, email kontaktowy
 - **AI Chatbot:** model, temperature, max tokens, system prompt
 - **Quizy:** domyślna liczba pytań, poziom trudności
@@ -120,6 +126,7 @@ supabase/
 ### 1. Instalacja zależności
 
 Wszystkie wymagane pakiety zostały już zainstalowane:
+
 - @supabase/supabase-js
 - recharts (dla wykresów)
 - @tanstack/react-table (dla zaawansowanych tabel)
@@ -133,10 +140,12 @@ Szczegółowe instrukcje znajdują się w `supabase/README.md`. W skrócie:
 
 1. Utwórz projekt w Supabase
 2. Dodaj zmienne środowiskowe do `.env`:
+
 ```env
 PUBLIC_SUPABASE_URL=twój_url
 PUBLIC_SUPABASE_ANON_KEY=twój_klucz
 ```
+
 3. Uruchom migracje SQL w kolejności (001, 002, 003)
 4. Utwórz pierwszego użytkownika admina
 
@@ -151,20 +160,25 @@ Panel administracyjny będzie dostępny pod adresem `/admin/dashboard`.
 ## 🔒 Bezpieczeństwo
 
 ### Middleware
+
 - Automatyczna weryfikacja sesji Supabase
 - Sprawdzanie roli administratora dla ścieżek `/admin/*`
 - Przekierowanie nieautoryzowanych użytkowników
 - Blokowanie dostępu dla zablokowanych kont
 
 ### Row Level Security (RLS)
+
 Wszystkie tabele mają włączone RLS z politykami:
+
 - Admini: pełny dostęp do wszystkich danych
 - Instructorzy: dostęp do swoich kursów
 - Studenci: odczyt opublikowanych kursów
 - Użytkownicy mogą edytować swoje profile (z ograniczeniami)
 
 ### Audit Log
+
 Wszystkie ważne akcje administratora są logowane:
+
 - Tworzenie/edycja/usuwanie kursów
 - Modyfikacje użytkowników
 - Zmiana ustawień systemu
@@ -182,7 +196,9 @@ Panel admina wykorzystuje istniejący system kolorów z landing page:
 - **Text:** `white`, `gray-300`, `gray-400`
 
 ### Komponenty UI
+
 Wykorzystuje shadcn/ui:
+
 - Button, Card, Input, Table
 - Badge (dla statusów i ról)
 - Dialog/Modal (dla formularzy)
@@ -190,6 +206,7 @@ Wykorzystuje shadcn/ui:
 ## 📱 Responsywność
 
 Panel jest w pełni responsywny:
+
 - Desktop: pełny layout z sidebar
 - Tablet: sidebar zwijany
 - Mobile: hamburger menu, optymalizowane widoki tabel
@@ -207,6 +224,7 @@ Panel jest w pełni responsywny:
 ### Dodawanie nowej sekcji
 
 1. **Stwórz API endpoint:**
+
 ```typescript
 // src/pages/api/admin/your-section/index.ts
 export const GET: APIRoute = async ({ locals }) => {
@@ -215,6 +233,7 @@ export const GET: APIRoute = async ({ locals }) => {
 ```
 
 2. **Stwórz komponent React:**
+
 ```tsx
 // src/components/admin/YourSection.tsx
 export function YourSection() {
@@ -223,6 +242,7 @@ export function YourSection() {
 ```
 
 3. **Stwórz stronę Astro:**
+
 ```astro
 <!-- src/pages/admin/your-section/index.astro -->
 <AdminLayout title="Your Section" user={user} currentPath={Astro.url.pathname}>
@@ -234,11 +254,12 @@ export function YourSection() {
 ```
 
 4. **Dodaj do nawigacji:**
+
 ```tsx
 // src/components/admin/Sidebar.tsx
 const navigation = [
   // ... existing items
-  { name: 'Your Section', href: '/admin/your-section', icon: YourIcon },
+  { name: "Your Section", href: "/admin/your-section", icon: YourIcon },
 ];
 ```
 
@@ -247,12 +268,14 @@ const navigation = [
 Pełna dokumentacja API:
 
 ### Users
+
 - `GET /api/admin/users` - lista użytkowników
 - `GET /api/admin/users/[id]` - szczegóły użytkownika
 - `PATCH /api/admin/users/[id]` - edycja użytkownika
 - `POST /api/admin/users/[id]/block` - blokowanie/odblokowanie
 
 ### Courses
+
 - `GET /api/admin/courses` - lista kursów
 - `POST /api/admin/courses` - tworzenie kursu
 - `GET /api/admin/courses/[id]` - szczegóły kursu
@@ -260,26 +283,31 @@ Pełna dokumentacja API:
 - `DELETE /api/admin/courses/[id]` - usuwanie kursu
 
 ### Lessons
+
 - `GET /api/admin/lessons` - lista lekcji
 - `POST /api/admin/lessons` - tworzenie lekcji
 - `PATCH /api/admin/lessons/[id]` - edycja lekcji
 - `DELETE /api/admin/lessons/[id]` - usuwanie lekcji
 
 ### Quizzes
+
 - `GET /api/admin/quizzes` - lista quizów
 - `POST /api/admin/quizzes` - tworzenie quizu
 - `GET /api/admin/quizzes/[id]` - szczegóły quizu
 - `DELETE /api/admin/quizzes/[id]` - usuwanie quizu
 
 ### Reports
+
 - `GET /api/admin/reports` - lista zgłoszeń
 - `PATCH /api/admin/reports/[id]` - aktualizacja statusu
 
 ### Settings
+
 - `GET /api/admin/settings` - wszystkie ustawienia
 - `PATCH /api/admin/settings` - aktualizacja ustawień
 
 ### Stats
+
 - `GET /api/admin/stats/overview` - statystyki dashboard
 
 ## 🐛 Debugging
@@ -303,6 +331,7 @@ W przypadku problemów:
 ## 🤝 Contributing
 
 Przy dodawaniu nowych funkcjonalności:
+
 1. Zachowaj istniejący styl kodu
 2. Dodaj odpowiednie typy TypeScript
 3. Implementuj obsługę błędów

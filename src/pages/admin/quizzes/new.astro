@@ -1,0 +1,18 @@
+---
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import { QuizForm } from "@/components/admin/QuizForm";
+
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect("/login");
+}
+
+if (user.role !== "admin") {
+  return Astro.redirect("/unauthorized");
+}
+---
+
+<AdminLayout title="Nowy quiz" description="Utwórz nowy quiz" user={user} currentPath={Astro.url.pathname}>
+  <QuizForm client:load />
+</AdminLayout>

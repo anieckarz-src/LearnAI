@@ -5,6 +5,7 @@
 Utwórz plik `.env` w głównym katalogu projektu:
 
 ```
+
 ```
 
 ## ✅ KROK 2: Przejdź do Supabase Dashboard
@@ -347,6 +348,7 @@ Zaloguj się emailem i hasłem z kroku 3A.
 Teraz masz dostęp do panelu admina: http://localhost:3000/admin/dashboard
 
 **Możesz:**
+
 - Zarządzać użytkownikami
 - Tworzyć kursy i lekcje
 - Przeglądać quizy
@@ -362,6 +364,7 @@ Teraz masz dostęp do panelu admina: http://localhost:3000/admin/dashboard
 
 **"Unauthorized"**
 → Sprawdź czy użytkownik ma rolę 'admin':
+
 ```sql
 SELECT * FROM public.users WHERE email = 'twoj@email.com';
 ```

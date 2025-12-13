@@ -1,22 +1,23 @@
 ---
-import AdminLayout from '@/layouts/AdminLayout.astro';
-import { CourseForm } from '@/components/admin/CourseForm';
-import type { Course } from '@/types';
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import { CourseForm } from "@/components/admin/CourseForm";
+import { LessonsManager } from "@/components/admin/LessonsManager";
+import type { Course } from "@/types";
 
 const user = Astro.locals.user;
 
 if (!user) {
-  return Astro.redirect('/login');
+  return Astro.redirect("/login");
 }
 
-if (user.role !== 'admin') {
-  return Astro.redirect('/unauthorized');
+if (user.role !== "admin") {
+  return Astro.redirect("/unauthorized");
 }
 
 const { id } = Astro.params;
 
 if (!id) {
-  return Astro.redirect('/admin/courses');
+  return Astro.redirect("/admin/courses");
 }
 
 // Fetch course data
@@ -26,7 +27,7 @@ let error: string | null = null;
 try {
   const response = await fetch(`${Astro.url.origin}/api/admin/courses/${id}`, {
     headers: {
-      Cookie: Astro.request.headers.get('Cookie') || '',
+      Cookie: Astro.request.headers.get("Cookie") || "",
     },
   });
 
@@ -35,16 +36,16 @@ try {
   if (result.success) {
     course = result.data;
   } else {
-    error = result.error || 'Nie znaleziono kursu';
+    error = result.error || "Nie znaleziono kursu";
   }
 } catch (err) {
-  console.error('Error fetching course:', err);
-  error = 'Wystąpił błąd podczas pobierania danych kursu';
+  console.error("Error fetching course:", err);
+  error = "Wystąpił błąd podczas pobierania danych kursu";
 }
 
 // If course not found, redirect to courses list
 if (!course || error) {
-  return Astro.redirect('/admin/courses');
+  return Astro.redirect("/admin/courses");
 }
 ---
 
@@ -54,5 +55,8 @@ if (!course || error) {
   user={user}
   currentPath={Astro.url.pathname}
 >
-  <CourseForm client:load course={course} />
+  <div class="space-y-6">
+    <CourseForm client:load course={course} />
+    <LessonsManager client:load courseId={course.id} />
+  </div>
 </AdminLayout>

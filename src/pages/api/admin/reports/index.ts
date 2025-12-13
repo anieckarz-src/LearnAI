@@ -1,41 +1,42 @@
-import type { APIRoute } from 'astro';
-import type { ReportFilters } from '@/types';
+import type { APIRoute } from "astro";
+import type { ReportFilters } from "@/types";
 
 export const GET: APIRoute = async ({ locals, url }) => {
   const { supabase, user } = locals;
 
-  if (!user || user.role !== 'admin') {
-    return new Response(
-      JSON.stringify({ success: false, error: 'Unauthorized' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    );
+  if (!user || user.role !== "admin") {
+    return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   try {
-    const page = parseInt(url.searchParams.get('page') || '1');
-    const limit = parseInt(url.searchParams.get('limit') || '10');
-    const status = url.searchParams.get('status') as ReportFilters['status'];
-    const contentType = url.searchParams.get('content_type') as ReportFilters['content_type'];
+    const page = parseInt(url.searchParams.get("page") || "1");
+    const limit = parseInt(url.searchParams.get("limit") || "10");
+    const status = url.searchParams.get("status") as ReportFilters["status"];
+    const contentType = url.searchParams.get("content_type") as ReportFilters["content_type"];
 
     const offset = (page - 1) * limit;
 
-    let query = supabase
-      .from('content_reports')
-      .select(`
+    let query = supabase.from("content_reports").select(
+      `
         *,
         reporter:users!content_reports_reported_by_fkey(id, email, full_name),
         reviewer:users!content_reports_reviewed_by_fkey(id, email, full_name)
-      `, { count: 'exact' });
+      `,
+      { count: "exact" }
+    );
 
     if (status) {
-      query = query.eq('status', status);
+      query = query.eq("status", status);
     }
 
     if (contentType) {
-      query = query.eq('content_type', contentType);
+      query = query.eq("content_type", contentType);
     }
 
-    query = query.order('created_at', { ascending: false }).range(offset, offset + limit - 1);
+    query = query.order("created_at", { ascending: false }).range(offset, offset + limit - 1);
 
     const { data: reports, error, count } = await query;
 
@@ -56,13 +57,13 @@ export const GET: APIRoute = async ({ locals, url }) => {
           total_pages: totalPages,
         },
       }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+      { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error('Error fetching reports:', error);
-    return new Response(
-      JSON.stringify({ success: false, error: 'Failed to fetch reports' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    console.error("Error fetching reports:", error);
+    return new Response(JSON.stringify({ success: false, error: "Failed to fetch reports" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 };

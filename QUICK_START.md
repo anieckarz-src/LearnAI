@@ -19,6 +19,7 @@ supabase db push
 ### 2. Environment Variables
 
 Create `.env` file:
+
 ```env
 PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 PUBLIC_SUPABASE_ANON_KEY=your-anon-key
@@ -94,7 +95,7 @@ Admin Panel Features:
 
 ## 🔐 Security Features
 
-- ✅ Middleware protection for /admin/* routes
+- ✅ Middleware protection for /admin/\* routes
 - ✅ Row Level Security on all database tables
 - ✅ Role-based access control
 - ✅ Audit logging for all admin actions
@@ -104,6 +105,7 @@ Admin Panel Features:
 ## 🎨 Design System
 
 Uses existing landing page colors:
+
 - Primary: Blue (#3B82F6)
 - Background: Dark slate (#0F172A, #020617)
 - Cards: Glass-morphism with backdrop blur
@@ -118,16 +120,19 @@ Uses existing landing page colors:
 ## 🐛 Troubleshooting
 
 **Can't access /admin/dashboard?**
+
 - Check if you're logged in
 - Verify user has 'admin' role in users table
 - Check console for middleware errors
 
 **Database errors?**
+
 - Verify Supabase connection in .env
 - Run all 3 migration files in order
 - Check RLS policies are enabled
 
 **Blank pages?**
+
 - Open browser console for errors
 - Check terminal for server errors
 - Verify React components are mounting
@@ -160,6 +165,7 @@ Uses existing landing page colors:
 ## 🤝 Need Help?
 
 Check these files:
+
 - Technical details → `ADMIN_PANEL.md`
 - Database schema → `supabase/migrations/*.sql`
 - API routes → `src/pages/api/admin/**/*.ts`

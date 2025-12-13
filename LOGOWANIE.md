@@ -7,16 +7,19 @@ System wykorzystuje Supabase Authentication do zarządzania sesjami użytkownik�
 ## 📝 Proces logowania
 
 ### 1. Strona logowania (`/login`)
+
 - Formularz z emailem i hasłem
 - POST do `/api/auth/signin`
 
 ### 2. API Endpoint (`/api/auth/signin`)
+
 - Wysyła request do Supabase Auth API
 - Otrzymuje access_token i refresh_token
 - Zapisuje tokeny w cookies (httpOnly, secure)
 - Przekierowuje do panelu admina
 
 ### 3. Middleware (`src/middleware/index.ts`)
+
 - Na każdym requestcie sprawdza cookies
 - Waliduje sesję w Supabase
 - Ładuje profil użytkownika z tabeli `users`
@@ -24,6 +27,7 @@ System wykorzystuje Supabase Authentication do zarządzania sesjami użytkownik�
 - Blokuje dostęp jeśli brak uprawnień
 
 ### 4. Wylogowanie (`/api/auth/signout`)
+
 - Usuwa cookies z tokenami
 - Przekierowuje do `/login`
 
@@ -66,10 +70,12 @@ VALUES (
 ### Cookies
 
 Tokeny są przechowywane w cookies:
+
 - `sb-access-token` - ważny 7 dni
 - `sb-refresh-token` - ważny 30 dni
 
 Ustawienia cookies:
+
 - `httpOnly: true` - zabezpieczenie przed XSS
 - `secure: true` (produkcja) - tylko HTTPS
 - `sameSite: 'lax'` - zabezpieczenie przed CSRF
@@ -78,6 +84,7 @@ Ustawienia cookies:
 ### Environment Variables
 
 Wymagane w `.env`:
+
 ```
 PUBLIC_SUPABASE_URL=https://zcpdsrpyiprtcdsxuprk.supabase.co
 PUBLIC_SUPABASE_ANON_KEY=twoj-anon-key
@@ -86,28 +93,34 @@ PUBLIC_SUPABASE_ANON_KEY=twoj-anon-key
 ## 🐛 Rozwiązywanie problemów
 
 ### "Invalid credentials"
+
 - Sprawdź czy użytkownik istnieje w Authentication → Users
 - Sprawdź czy hasło jest poprawne
 - Sprawdź czy Email Confirmation jest wyłączone w Supabase
 
 ### "Unauthorized" po zalogowaniu
+
 - Sprawdź czy użytkownik ma rekord w tabeli `public.users`
 - Sprawdź czy UUID się zgadza:
+
 ```sql
-SELECT u.id, u.email, u.role 
+SELECT u.id, u.email, u.role
 FROM public.users u
 WHERE u.email = 'admin@example.com';
 ```
 
 ### "User not found"
+
 - Użytkownik istnieje w auth.users ale nie w public.users
 - Uruchom INSERT do dodania użytkownika z rolą admin
 
 ### Przekierowanie do `/api/auth/signin`
+
 - Ten problem został naprawiony
 - Endpoint `/api/auth/signin` został utworzony
 
 ### Cookies nie działają
+
 - Sprawdź czy `npm run dev` działa na http://localhost:3000
 - W produkcji upewnij się że używasz HTTPS
 - Sprawdź DevTools → Application → Cookies
@@ -134,9 +147,11 @@ WHERE u.email = 'admin@example.com';
 ## 📚 API Endpoints
 
 ### POST /api/auth/signin
+
 Logowanie użytkownika
 
 **Body (form-data):**
+
 ```
 email: string
 password: string
@@ -144,20 +159,24 @@ redirect?: string (opcjonalne, domyślnie /admin/dashboard)
 ```
 
 **Response:**
+
 - Success: Redirect 302 do dashboard
 - Error: Redirect 302 do /login?error=...
 
 **Error codes:**
+
 - `missing_credentials` - brak email/hasła
 - `invalid_credentials` - złe dane logowania
 - `server_error` - błąd serwera
 
 ### POST /api/auth/signout
+
 ### GET /api/auth/signout
 
 Wylogowanie użytkownika
 
 **Response:**
+
 - Redirect 302 do /login
 
 ## 🎯 Następne kroki

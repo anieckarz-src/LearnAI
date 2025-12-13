@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Save, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Save, AlertCircle, CheckCircle2 } from "lucide-react";
 
 interface Settings {
   platform_name?: string;
@@ -21,7 +21,7 @@ export function SettingsManagement() {
   const [settings, setSettings] = useState<Settings>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
     fetchSettings();
@@ -30,7 +30,7 @@ export function SettingsManagement() {
   const fetchSettings = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/admin/settings');
+      const response = await fetch("/api/admin/settings");
       const result = await response.json();
 
       if (result.success) {
@@ -42,7 +42,7 @@ export function SettingsManagement() {
         setSettings(extractedSettings);
       }
     } catch (error) {
-      console.error('Error fetching settings:', error);
+      console.error("Error fetching settings:", error);
     } finally {
       setLoading(false);
     }
@@ -54,22 +54,22 @@ export function SettingsManagement() {
     setSaving(true);
 
     try {
-      const response = await fetch('/api/admin/settings', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),
       });
 
       const result = await response.json();
 
       if (result.success) {
-        setMessage({ type: 'success', text: 'Ustawienia zostały zapisane pomyślnie' });
+        setMessage({ type: "success", text: "Ustawienia zostały zapisane pomyślnie" });
       } else {
-        setMessage({ type: 'error', text: result.error || 'Nie udało się zapisać ustawień' });
+        setMessage({ type: "error", text: result.error || "Nie udało się zapisać ustawień" });
       }
     } catch (error) {
-      console.error('Error saving settings:', error);
-      setMessage({ type: 'error', text: 'Wystąpił błąd podczas zapisywania' });
+      console.error("Error saving settings:", error);
+      setMessage({ type: "error", text: "Wystąpił błąd podczas zapisywania" });
     } finally {
       setSaving(false);
     }
@@ -92,16 +92,12 @@ export function SettingsManagement() {
       {message && (
         <div
           className={`p-4 rounded-lg flex items-center gap-2 ${
-            message.type === 'success'
-              ? 'bg-green-500/10 border border-green-500/50 text-green-400'
-              : 'bg-red-500/10 border border-red-500/50 text-red-400'
+            message.type === "success"
+              ? "bg-green-500/10 border border-green-500/50 text-green-400"
+              : "bg-red-500/10 border border-red-500/50 text-red-400"
           }`}
         >
-          {message.type === 'success' ? (
-            <CheckCircle2 className="w-5 h-5" />
-          ) : (
-            <AlertCircle className="w-5 h-5" />
-          )}
+          {message.type === "success" ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
           {message.text}
         </div>
       )}
@@ -110,9 +106,7 @@ export function SettingsManagement() {
       <Card className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-white">Ustawienia ogólne</CardTitle>
-          <CardDescription className="text-gray-400">
-            Podstawowa konfiguracja platformy
-          </CardDescription>
+          <CardDescription className="text-gray-400">Podstawowa konfiguracja platformy</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -122,8 +116,8 @@ export function SettingsManagement() {
             <Input
               id="platform_name"
               type="text"
-              value={settings.platform_name || ''}
-              onChange={(e) => updateSetting('platform_name', e.target.value)}
+              value={settings.platform_name || ""}
+              onChange={(e) => updateSetting("platform_name", e.target.value)}
               className="bg-slate-700/50 border-white/10 text-white"
             />
           </div>
@@ -134,8 +128,8 @@ export function SettingsManagement() {
             <Input
               id="platform_email"
               type="email"
-              value={settings.platform_email || ''}
-              onChange={(e) => updateSetting('platform_email', e.target.value)}
+              value={settings.platform_email || ""}
+              onChange={(e) => updateSetting("platform_email", e.target.value)}
               className="bg-slate-700/50 border-white/10 text-white"
             />
           </div>
@@ -146,9 +140,7 @@ export function SettingsManagement() {
       <Card className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-white">Ustawienia AI Chatbot</CardTitle>
-          <CardDescription className="text-gray-400">
-            Konfiguracja chatbota edukacyjnego
-          </CardDescription>
+          <CardDescription className="text-gray-400">Konfiguracja chatbota edukacyjnego</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -157,8 +149,8 @@ export function SettingsManagement() {
             </label>
             <select
               id="ai_chatbot_model"
-              value={settings.ai_chatbot_model || 'gpt-4'}
-              onChange={(e) => updateSetting('ai_chatbot_model', e.target.value)}
+              value={settings.ai_chatbot_model || "gpt-4"}
+              onChange={(e) => updateSetting("ai_chatbot_model", e.target.value)}
               className="w-full px-3 py-2 rounded-md bg-slate-700/50 border border-white/10 text-white"
             >
               <option value="gpt-4">GPT-4</option>
@@ -176,7 +168,7 @@ export function SettingsManagement() {
               min="0"
               max="1"
               value={settings.ai_chatbot_temperature || 0.7}
-              onChange={(e) => updateSetting('ai_chatbot_temperature', parseFloat(e.target.value))}
+              onChange={(e) => updateSetting("ai_chatbot_temperature", parseFloat(e.target.value))}
               className="bg-slate-700/50 border-white/10 text-white"
             />
           </div>
@@ -188,7 +180,7 @@ export function SettingsManagement() {
               id="ai_chatbot_max_tokens"
               type="number"
               value={settings.ai_chatbot_max_tokens || 2000}
-              onChange={(e) => updateSetting('ai_chatbot_max_tokens', parseInt(e.target.value))}
+              onChange={(e) => updateSetting("ai_chatbot_max_tokens", parseInt(e.target.value))}
               className="bg-slate-700/50 border-white/10 text-white"
             />
           </div>
@@ -199,8 +191,8 @@ export function SettingsManagement() {
             <textarea
               id="ai_chatbot_system_prompt"
               rows={4}
-              value={settings.ai_chatbot_system_prompt || ''}
-              onChange={(e) => updateSetting('ai_chatbot_system_prompt', e.target.value)}
+              value={settings.ai_chatbot_system_prompt || ""}
+              onChange={(e) => updateSetting("ai_chatbot_system_prompt", e.target.value)}
               className="w-full px-3 py-2 rounded-md bg-slate-700/50 border border-white/10 text-white resize-none"
             />
           </div>
@@ -211,9 +203,7 @@ export function SettingsManagement() {
       <Card className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-white">Ustawienia quizów</CardTitle>
-          <CardDescription className="text-gray-400">
-            Domyślne parametry generowania quizów
-          </CardDescription>
+          <CardDescription className="text-gray-400">Domyślne parametry generowania quizów</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -226,7 +216,7 @@ export function SettingsManagement() {
               min="1"
               max="20"
               value={settings.quiz_default_questions || 5}
-              onChange={(e) => updateSetting('quiz_default_questions', parseInt(e.target.value))}
+              onChange={(e) => updateSetting("quiz_default_questions", parseInt(e.target.value))}
               className="bg-slate-700/50 border-white/10 text-white"
             />
           </div>
@@ -236,8 +226,8 @@ export function SettingsManagement() {
             </label>
             <select
               id="quiz_default_difficulty"
-              value={settings.quiz_default_difficulty || 'medium'}
-              onChange={(e) => updateSetting('quiz_default_difficulty', e.target.value)}
+              value={settings.quiz_default_difficulty || "medium"}
+              onChange={(e) => updateSetting("quiz_default_difficulty", e.target.value)}
               className="w-full px-3 py-2 rounded-md bg-slate-700/50 border border-white/10 text-white"
             >
               <option value="easy">Łatwy</option>
@@ -252,9 +242,7 @@ export function SettingsManagement() {
       <Card className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-white">Ustawienia bezpieczeństwa</CardTitle>
-          <CardDescription className="text-gray-400">
-            Parametry dotyczące sesji i limitów
-          </CardDescription>
+          <CardDescription className="text-gray-400">Parametry dotyczące sesji i limitów</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -267,7 +255,7 @@ export function SettingsManagement() {
               min="15"
               max="1440"
               value={settings.session_timeout_minutes || 60}
-              onChange={(e) => updateSetting('session_timeout_minutes', parseInt(e.target.value))}
+              onChange={(e) => updateSetting("session_timeout_minutes", parseInt(e.target.value))}
               className="bg-slate-700/50 border-white/10 text-white"
             />
           </div>
@@ -281,7 +269,7 @@ export function SettingsManagement() {
               min="10"
               max="1000"
               value={settings.rate_limit_per_minute || 60}
-              onChange={(e) => updateSetting('rate_limit_per_minute', parseInt(e.target.value))}
+              onChange={(e) => updateSetting("rate_limit_per_minute", parseInt(e.target.value))}
               className="bg-slate-700/50 border-white/10 text-white"
             />
           </div>
@@ -290,13 +278,9 @@ export function SettingsManagement() {
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button
-          type="submit"
-          disabled={saving}
-          className="bg-blue-600 hover:bg-blue-700 px-8"
-        >
+        <Button type="submit" disabled={saving} className="bg-blue-600 hover:bg-blue-700 px-8">
           <Save className="w-4 h-4 mr-2" />
-          {saving ? 'Zapisywanie...' : 'Zapisz ustawienia'}
+          {saving ? "Zapisywanie..." : "Zapisz ustawienia"}
         </Button>
       </div>
     </form>
