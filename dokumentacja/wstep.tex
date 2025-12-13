@@ -1,0 +1,46 @@
+\chapter*{Wstęp}
+
+\section*{1. Tło i kontekst problemu}
+
+W ostatnich latach obserwujemy dynamiczny rozwój edukacji zdalnej oraz narzędzi wspierających proces nauczania online. Zmiany w sposobie przyswajania wiedzy, rosnące oczekiwania użytkowników wobec interfejsów edukacyjnych oraz popularyzacja technologii takich jak sztuczna inteligencja czy chatboty powodują, że klasyczne platformy edukacyjne przestają być wystarczające. Brakuje nowoczesnych rozwiązań, które nie tylko udostępniają materiały edukacyjne, ale także aktywnie wspierają użytkownika w nauce np. poprzez generowanie quizów, analizę postępów czy interaktywną komunikację z czatbotem.
+
+W odpowiedzi na te potrzeby powstała koncepcja inteligentnej platformy edukacyjnej, łączącej tradycyjne funkcje LMS z możliwościami AI. Głównym celem aplikacji jest stworzenie środowiska sprzyjającego efektywnemu, samodzielnemu zdobywaniu wiedzy.
+
+\section*{2. Motywacja i cel pracy}
+
+Według raportu UNESCO z 2022 roku, ponad 90\% systemów edukacyjnych na świecie było zmuszonych do przejścia na tryb zdalny w czasie pandemii COVID-19, co znacząco przyspieszyło rozwój edukacji online \cite{unesco2022}. Mimo to wiele obecnych rozwiązań nadal nie odpowiada na współczesne potrzeby użytkowników. Z kolei badania Holmesa i Bialika (2019) pokazują, że integracja narzędzi opartych na sztucznej inteligencji może poprawić efektywność nauki nawet o 30–40\% \cite{holmes2019ai}. 
+
+Na rynku dominują obecnie trzy grupy rozwiązań:
+\begin{itemize}
+    \item \textbf{Moodle} – rozbudowany, ale trudny w obsłudze system open-source, wymagający dużej wiedzy technicznej.
+    \item \textbf{Google Classroom} – prosta platforma edukacyjna, silnie zintegrowana z pakietem Google, ale z ograniczonymi funkcjami i brakiem personalizacji.
+    \item \textbf{Udemy} – komercyjny portal kursów online, który nie oferuje otwartości ani kontroli nad strukturą i funkcjonalnością platformy.
+\end{itemize}
+
+Każde z tych rozwiązań realizuje tylko wycinek potrzeb współczesnego użytkownika – brakuje systemu, który w sposób nowoczesny i kompleksowy wspierałby zarówno proces nauczania, jak i personalizacji nauki z pomocą AI.
+
+Celem niniejszej pracy jest zaprojektowanie i implementacja webowej platformy edukacyjnej, która w przeciwieństwie do wymienionych rozwiązań:
+\begin{itemize}
+    \item pozwala twórcom kursów generować quizy automatycznie na podstawie treści lekcji przy użyciu AI,
+    \item zawiera wbudowanego czatbota edukacyjnego wspierającego użytkownika w czasie nauki,
+    \item oferuje pełną kontrolę nad strukturą treści,
+    \item jest dostosowana do użytku zarówno komercyjnego, jak i instytucjonalnego.
+\end{itemize}
+
+Proponowane rozwiązanie stanowi odpowiedź na realne luki w dostępnych systemach edukacyjnych – łącząc prostotę, elastyczność i nowoczesność z funkcjonalnościami inteligentnego wsparcia użytkownika, których brakuje w obecnie popularnych platformach.
+
+\section*{3. Zastosowane technologie}
+
+Aplikacja została zaprojektowana w oparciu o architekturę klient-serwer. Po stronie backendu wykorzystano środowisko \textbf{.NET 8} wraz z \textbf{Entity Framework Core} do obsługi logiki biznesowej i komunikacji z bazą danych \textbf{PostgreSQL}. 
+
+Frontend został stworzony przy użyciu \textbf{React} i \textbf{TypeScript}, co umożliwiło stworzenie nowoczesnego i responsywnego interfejsu użytkownika. W zakresie funkcjonalności AI wykorzystano rozwiązania oparte na \textbf{modelach językowych} wspierających generowanie quizów oraz komunikację za pomocą czatbota.
+
+\section*{4. Zakres pracy}
+
+W ramach pracy inżynierskiej wykonano pełen cykl wytwarzania aplikacji webowej, obejmujący:
+\begin{itemize}
+    \item implementację backendu (logowanie, rejestracja, kursy, quizy, API),
+    \item stworzenie frontendowej części aplikacji (formularze, widoki kursów, obsługa quizów),
+    \item wdrożenie funkcji opartych na AI (chatbot, generowanie quizów),
+    \item przeprowadzenie testów użyteczności z udziałem rzeczywistych użytkowników.
+\end{itemize}

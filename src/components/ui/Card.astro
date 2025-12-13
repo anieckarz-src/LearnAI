@@ -1,0 +1,38 @@
+---
+// Przykładowy komponent Card używający globalnych kolorów landing page
+interface Props {
+  variant?: 'default' | 'glass' | 'gradient';
+  hover?: boolean;
+  glow?: boolean;
+  class?: string;
+}
+
+const { 
+  variant = 'default',
+  hover = false,
+  glow = false,
+  class: className = ''
+} = Astro.props;
+
+const baseClasses = 'rounded-2xl p-6 border transition-all duration-300';
+
+const variants = {
+  default: 'bg-slate-800 border-white/10',
+  glass: 'bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border-white/10',
+  gradient: 'bg-gradient-to-br from-slate-800 to-slate-900 border-white/10'
+};
+
+const hoverClasses = hover 
+  ? 'hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1 cursor-pointer' 
+  : '';
+
+const classes = `${baseClasses} ${variants[variant]} ${hoverClasses} ${className}`;
+---
+
+<div class={`relative group ${classes}`}>
+  {glow && (
+    <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity -z-10"></div>
+  )}
+  
+  <slot />
+</div>

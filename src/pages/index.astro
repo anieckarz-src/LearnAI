@@ -1,0 +1,30 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/landing/Navbar.astro";
+import HeroSection from "../components/landing/HeroSection.astro";
+import ScrollingBanner from "../components/landing/ScrollingBanner.astro";
+import ValueSection from "../components/landing/ValueSection.astro";
+import StatsSection from "../components/landing/StatsSection.astro";
+import FeaturesSection from "../components/landing/FeaturesSection.astro";
+import ControlSection from "../components/landing/ControlSection.astro";
+import Footer from "../components/landing/Footer.astro";
+---
+
+<Layout title="LearnAI - Platforma Edukacyjna z AI">
+  <Navbar />
+  <main>
+    <HeroSection />
+    <ScrollingBanner />
+    <ValueSection />
+    <StatsSection />
+    <FeaturesSection />
+    <ControlSection />
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  html {
+    scroll-behavior: smooth;
+  }
+</style>

@@ -1,0 +1,46 @@
+% **** Szablon pracy magisterskiej, licencjackiej lub inżynierskiej ****
+
+\documentclass[polish,12pt,twoside,a4paper]{report}
+
+\input{style.tex}
+
+%definicja przydatnych poleceń
+\newcommand{\wydzial}{KOLEGIUM INFORMATYKI STOSOWANEJ}
+\newcommand{\kierunek}{Kierunek: INFORMATYKA}
+\newcommand{\specjalnosc}{Specjalność: Technologie Internetowe i Mobilne}
+\newcommand{\autor}{Adrian Nieckarz}
+\newcommand{\album}{Nr albumu studenta w65553}
+\newcommand{\temat}{System zarzadzania platformą edukacji komplementarnej}
+\newcommand{\promotor}{dr hab. inż, prof. Teresa Mroczek}
+\newcommand{\typpracy}{Praca Inżynierska}
+\newcommand{\miasto}{Rzeszów}
+\newcommand{\rok}{2025}
+
+\begin{document}
+
+% *************** Włączenie definicji pierwszych stron ***************
+\input{front.tex}
+
+
+% *************** Część główna pracy ***************
+\input{wstep.tex}
+\addcontentsline{toc}{chapter}{Wstęp}
+\newpage
+\input{R1.tex}
+\newpage
+
+% *************** Bibliografia ***************
+\begin{thebibliography}{6}
+\addcontentsline{toc}{chapter}{Bibliografia}
+%dodanie wpisu do spisu bibliograficznego
+
+\bibitem{unesco2022} UNESCO, \textit{Education: From disruption to recovery}, dostęp online: \url{https://www.unesco.org/en/covid-19/education-response}, dostęp z dnia 8.07.2025.
+
+\bibitem{holmes2019ai} W. Holmes, M. Bialik, C. Fadel, \textit{Artificial Intelligence in Education: Promises and Implications for Teaching and Learning}, OECD, 2019.
+
+\end{thebibliography}
+\newpage
+
+
+\end{document}
+% *************** Koniec pliku szablon.tex ***************
