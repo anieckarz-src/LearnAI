@@ -108,19 +108,48 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
 
   return (
     <div className={cn("space-y-2", className)}>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/jpg,image/png,image/webp"
+        onChange={handleFileChange}
+        disabled={uploading}
+        className="hidden"
+      />
+
       {value ? (
-        <div className="relative rounded-lg overflow-hidden border border-white/10 bg-slate-700/50">
-          <img src={value} alt="Thumbnail" className="w-full h-48 object-cover" />
-          <Button
-            type="button"
-            variant="destructive"
-            size="sm"
-            onClick={handleRemove}
-            disabled={uploading}
-            className="absolute top-2 right-2"
-          >
-            <X className="h-4 w-4" />
-          </Button>
+        <div className="flex items-start gap-4 p-4 rounded-lg border border-white/10 bg-slate-700/30">
+          <div className="relative group flex-shrink-0">
+            <img src={value} alt="Thumbnail" className="w-32 h-32 object-cover rounded-lg border border-white/10" />
+            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={handleRemove}
+                disabled={uploading}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                <X className="h-4 w-4 mr-1" />
+                Usuń
+              </Button>
+            </div>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-white mb-1">Miniatura przesłana</p>
+            <p className="text-xs text-gray-400 mb-3">Najedź na obraz aby usunąć</p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleClick}
+              disabled={uploading}
+              className="text-xs"
+            >
+              <Upload className="h-3 w-3 mr-1" />
+              Zmień miniaturę
+            </Button>
+          </div>
         </div>
       ) : (
         <div
@@ -130,35 +159,26 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
           onDrop={handleDrop}
           onClick={handleClick}
           className={cn(
-            "relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors",
+            "relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors",
             dragActive
               ? "border-blue-500 bg-blue-500/10"
               : "border-white/20 bg-slate-700/30 hover:border-white/40 hover:bg-slate-700/50",
             uploading && "opacity-50 cursor-not-allowed"
           )}
         >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/jpg,image/png,image/webp"
-            onChange={handleFileChange}
-            disabled={uploading}
-            className="hidden"
-          />
-
-          <div className="flex flex-col items-center gap-3">
+          <div className="flex flex-col items-center gap-2">
             {uploading ? (
               <>
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
                 <p className="text-sm text-gray-400">Przesyłanie...</p>
               </>
             ) : (
               <>
-                <div className="rounded-full bg-slate-600/50 p-4">
-                  <ImageIcon className="h-8 w-8 text-gray-400" />
+                <div className="rounded-full bg-slate-600/50 p-3">
+                  <ImageIcon className="h-6 w-6 text-gray-400" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white mb-1">Przeciągnij i upuść lub kliknij aby wybrać</p>
+                  <p className="text-sm font-medium text-white mb-0.5">Przeciągnij i upuść lub kliknij</p>
                   <p className="text-xs text-gray-400">PNG, JPG, WebP (max. 5MB)</p>
                 </div>
               </>

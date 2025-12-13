@@ -152,7 +152,7 @@ export function CourseForm({ course }: CourseFormProps) {
           <CardTitle className="text-white">{isEditMode ? "Edytuj kurs" : "Utwórz nowy kurs"}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Title */}
+          {/* Title - Full Width */}
           <div className="space-y-2">
             <Label htmlFor="title" className="text-white">
               Tytuł kursu <span className="text-red-400">*</span>
@@ -166,7 +166,77 @@ export function CourseForm({ course }: CourseFormProps) {
             {errors.title && <p className="text-sm text-red-400">{errors.title.message}</p>}
           </div>
 
-          {/* Description */}
+          {/* Instructor and Status - Side by Side */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Instructor */}
+            <div className="space-y-2">
+              <Label htmlFor="instructor" className="text-white">
+                Instruktor <span className="text-red-400">*</span>
+              </Label>
+              {loadingInstructors ? (
+                <div className="flex items-center gap-2 text-sm text-gray-400">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
+                  Ładowanie instruktorów...
+                </div>
+              ) : (
+                <Select value={instructor_id} onValueChange={(value) => setValue("instructor_id", value)}>
+                  <SelectTrigger className="bg-slate-700/50 border-white/10 text-white">
+                    <SelectValue placeholder="Wybierz instruktora" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-800 border-white/10">
+                    {instructors.map((instructor) => (
+                      <SelectItem
+                        key={instructor.id}
+                        value={instructor.id}
+                        className="text-white focus:bg-slate-700 focus:text-white"
+                      >
+                        {instructor.full_name || instructor.email}
+                        <span className="ml-2 text-xs text-gray-400">
+                          ({instructor.role === "admin" ? "Administrator" : "Instruktor"})
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+              {errors.instructor_id && <p className="text-sm text-red-400">{errors.instructor_id.message}</p>}
+            </div>
+
+            {/* Status */}
+            <div className="space-y-2">
+              <Label htmlFor="status" className="text-white">
+                Status <span className="text-red-400">*</span>
+              </Label>
+              <Select value={status} onValueChange={(value) => setValue("status", value as CourseStatus)}>
+                <SelectTrigger className="bg-slate-700/50 border-white/10 text-white">
+                  <SelectValue placeholder="Wybierz status" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-white/10">
+                  <SelectItem value="draft" className="text-white focus:bg-slate-700 focus:text-white">
+                    Szkic
+                  </SelectItem>
+                  <SelectItem value="published" className="text-white focus:bg-slate-700 focus:text-white">
+                    Opublikowany
+                  </SelectItem>
+                  <SelectItem value="archived" className="text-white focus:bg-slate-700 focus:text-white">
+                    Zarchiwizowany
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.status && <p className="text-sm text-red-400">{errors.status.message}</p>}
+            </div>
+          </div>
+
+          {/* Thumbnail - Full Width */}
+          <div className="space-y-2">
+            <Label htmlFor="thumbnail" className="text-white">
+              Miniatura kursu
+            </Label>
+            <ImageUpload value={thumbnail_url} onChange={(url) => setValue("thumbnail_url", url)} />
+            {errors.thumbnail_url && <p className="text-sm text-red-400">{errors.thumbnail_url.message}</p>}
+          </div>
+
+          {/* Description - Full Width at the End */}
           <div className="space-y-2">
             <Label htmlFor="description" className="text-white">
               Opis kursu
@@ -177,73 +247,6 @@ export function CourseForm({ course }: CourseFormProps) {
               placeholder="Wprowadź szczegółowy opis kursu..."
             />
             {errors.description && <p className="text-sm text-red-400">{errors.description.message}</p>}
-          </div>
-
-          {/* Instructor */}
-          <div className="space-y-2">
-            <Label htmlFor="instructor" className="text-white">
-              Instruktor <span className="text-red-400">*</span>
-            </Label>
-            {loadingInstructors ? (
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
-                Ładowanie instruktorów...
-              </div>
-            ) : (
-              <Select value={instructor_id} onValueChange={(value) => setValue("instructor_id", value)}>
-                <SelectTrigger className="bg-slate-700/50 border-white/10 text-white">
-                  <SelectValue placeholder="Wybierz instruktora" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-white/10">
-                  {instructors.map((instructor) => (
-                    <SelectItem
-                      key={instructor.id}
-                      value={instructor.id}
-                      className="text-white focus:bg-slate-700 focus:text-white"
-                    >
-                      {instructor.full_name || instructor.email}
-                      <span className="ml-2 text-xs text-gray-400">
-                        ({instructor.role === "admin" ? "Administrator" : "Instruktor"})
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-            {errors.instructor_id && <p className="text-sm text-red-400">{errors.instructor_id.message}</p>}
-          </div>
-
-          {/* Status */}
-          <div className="space-y-2">
-            <Label htmlFor="status" className="text-white">
-              Status <span className="text-red-400">*</span>
-            </Label>
-            <Select value={status} onValueChange={(value) => setValue("status", value as CourseStatus)}>
-              <SelectTrigger className="bg-slate-700/50 border-white/10 text-white">
-                <SelectValue placeholder="Wybierz status" />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-white/10">
-                <SelectItem value="draft" className="text-white focus:bg-slate-700 focus:text-white">
-                  Szkic
-                </SelectItem>
-                <SelectItem value="published" className="text-white focus:bg-slate-700 focus:text-white">
-                  Opublikowany
-                </SelectItem>
-                <SelectItem value="archived" className="text-white focus:bg-slate-700 focus:text-white">
-                  Zarchiwizowany
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.status && <p className="text-sm text-red-400">{errors.status.message}</p>}
-          </div>
-
-          {/* Thumbnail */}
-          <div className="space-y-2">
-            <Label htmlFor="thumbnail" className="text-white">
-              Miniatura kursu
-            </Label>
-            <ImageUpload value={thumbnail_url} onChange={(url) => setValue("thumbnail_url", url)} />
-            {errors.thumbnail_url && <p className="text-sm text-red-400">{errors.thumbnail_url.message}</p>}
           </div>
         </CardContent>
       </Card>
