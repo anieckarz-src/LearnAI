@@ -5,8 +5,6 @@
 Utwórz plik `.env` w głównym katalogu projektu:
 
 ```
-PUBLIC_SUPABASE_URL=https://zcpdsrpyiprtcdsxuprk.supabase.co
-PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjcGRzcnB5aXBydGNkc3h1cHJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MTU0NTEsImV4cCI6MjA4MTE5MTQ1MX0.alPXogbyNbzObVN-nRLzvBLP4v6QXs2_wemHKe5QnWo
 ```
 
 ## ✅ KROK 2: Przejdź do Supabase Dashboard

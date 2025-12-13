@@ -1,0 +1,58 @@
+---
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import { CourseForm } from '@/components/admin/CourseForm';
+import type { Course } from '@/types';
+
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+if (user.role !== 'admin') {
+  return Astro.redirect('/unauthorized');
+}
+
+const { id } = Astro.params;
+
+if (!id) {
+  return Astro.redirect('/admin/courses');
+}
+
+// Fetch course data
+let course: Course | null = null;
+let error: string | null = null;
+
+try {
+  const response = await fetch(`${Astro.url.origin}/api/admin/courses/${id}`, {
+    headers: {
+      Cookie: Astro.request.headers.get('Cookie') || '',
+    },
+  });
+
+  const result = await response.json();
+
+  if (result.success) {
+    course = result.data;
+  } else {
+    error = result.error || 'Nie znaleziono kursu';
+  }
+} catch (err) {
+  console.error('Error fetching course:', err);
+  error = 'Wystąpił błąd podczas pobierania danych kursu';
+}
+
+// If course not found, redirect to courses list
+if (!course || error) {
+  return Astro.redirect('/admin/courses');
+}
+---
+
+<AdminLayout
+  title={`Edytuj kurs: ${course.title}`}
+  description="Edytuj szczegóły kursu"
+  user={user}
+  currentPath={Astro.url.pathname}
+>
+  <CourseForm client:load course={course} />
+</AdminLayout>

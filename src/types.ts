@@ -184,3 +184,12 @@ export interface ReportFilters extends PaginationParams {
   status?: ReportStatus;
   content_type?: ContentType;
 }
+
+// Course form types
+export interface CourseFormData {
+  title: string;
+  description: string;
+  instructor_id: string;
+  status: CourseStatus;
+  thumbnail_url: string;
+}

@@ -1,0 +1,23 @@
+---
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import { CourseForm } from '@/components/admin/CourseForm';
+
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+if (user.role !== 'admin') {
+  return Astro.redirect('/unauthorized');
+}
+---
+
+<AdminLayout
+  title="Nowy kurs"
+  description="Utwórz nowy kurs edukacyjny"
+  user={user}
+  currentPath={Astro.url.pathname}
+>
+  <CourseForm client:load />
+</AdminLayout>
