@@ -44,13 +44,13 @@ export const GET: APIRoute = async ({ locals }) => {
       .from("course_enrollments")
       .select("*", { count: "exact", head: true });
 
-    // Get active students (students with at least one enrollment)
-    const { data: activeStudentsData } = await supabase
+    // Get active users (users with at least one enrollment)
+    const { data: activeUsersData } = await supabase
       .from("course_enrollments")
       .select("user_id")
       .not("user_id", "is", null);
 
-    const activeStudents = activeStudentsData ? new Set(activeStudentsData.map((e) => e.user_id)).size : 0;
+    const activeUsers = activeUsersData ? new Set(activeUsersData.map((e) => e.user_id)).size : 0;
 
     // Get total quizzes
     const { count: totalQuizzes } = await supabase.from("quizzes").select("*", { count: "exact", head: true });
@@ -75,7 +75,7 @@ export const GET: APIRoute = async ({ locals }) => {
       published_courses: publishedCourses || 0,
       draft_courses: draftCourses || 0,
       total_enrollments: totalEnrollments || 0,
-      active_students: activeStudents,
+      active_students: activeUsers,
       total_quizzes: totalQuizzes || 0,
       total_quiz_attempts: totalQuizAttempts || 0,
       avg_quiz_score: avgQuizScore,

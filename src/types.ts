@@ -1,5 +1,5 @@
 // User types
-export type UserRole = "admin" | "instructor" | "student";
+export type UserRole = "admin" | "user";
 
 export interface User {
   id: string;
@@ -18,7 +18,6 @@ export interface Course {
   id: string;
   title: string;
   description: string | null;
-  instructor_id: string;
   status: CourseStatus;
   thumbnail_url: string | null;
   lesson_access_mode?: "sequential" | "all_access";
@@ -27,11 +26,6 @@ export interface Course {
   price?: number | null;
   stripe_product_id?: string | null;
   stripe_price_id?: string | null;
-}
-
-export interface CourseWithInstructor extends Course {
-  instructor: User;
-  enrollment_count?: number;
 }
 
 export interface CourseWithPrice extends Course {
@@ -47,11 +41,38 @@ export interface CourseWithProgress extends Course {
   lesson_access_mode: "sequential" | "all_access";
   next_lesson_id?: string | null;
   enrolled_at?: string;
-  instructor?: User;
+  enrollment_count?: number;
+}
+
+// Module types
+export interface Module {
+  id: string;
+  course_id: string;
+  title: string;
+  description: string | null;
+  order_index: number;
+  created_at: string;
+}
+
+export interface ModuleWithLessons extends Module {
+  lessons: LessonWithProgress[];
 }
 
 // Lesson types
-export type LessonMaterialType = "pdf" | "image"; // Removed "video" - we use video_url instead
+export type LessonType = "quiz" | "content";
+
+export type LessonFileType = "pdf" | "image" | "document";
+
+export interface LessonFile {
+  id: string;
+  type: LessonFileType;
+  url: string;
+  name: string;
+  size: number;
+}
+
+// Legacy type for backward compatibility
+export type LessonMaterialType = "pdf" | "image";
 
 export interface LessonMaterial {
   id: string;
@@ -64,11 +85,15 @@ export interface LessonMaterial {
 export interface Lesson {
   id: string;
   course_id: string;
+  module_id: string;
   title: string;
+  type: LessonType;
   content: string | null;
   video_url?: string | null; // External video URL (Vimeo, YouTube)
+  files: LessonFile[];
   order_index: number;
   created_at: string;
+  // Legacy field for backward compatibility
   materials?: LessonMaterial[];
 }
 
@@ -76,6 +101,18 @@ export interface LessonWithProgress extends Lesson {
   completed: boolean;
   completed_at?: string | null;
   is_accessible: boolean;
+  quiz?: Quiz; // Included if type is 'quiz'
+}
+
+// Quiz lesson - must have associated quiz
+export interface QuizLesson extends Lesson {
+  type: "quiz";
+  quiz?: Quiz;
+}
+
+// Content lesson - must have at least one: video_url, content, or files
+export interface ContentLesson extends Lesson {
+  type: "content";
 }
 
 // Lesson Progress types
@@ -271,7 +308,6 @@ export interface UserFilters extends PaginationParams {
 
 export interface CourseFilters extends PaginationParams {
   status?: CourseStatus;
-  instructor_id?: string;
   search?: string;
 }
 
@@ -279,7 +315,6 @@ export interface CourseFilters extends PaginationParams {
 export interface CourseFormData {
   title: string;
   description: string;
-  instructor_id: string;
   status: CourseStatus;
   thumbnail_url: string;
   price?: number | null;
@@ -287,9 +322,13 @@ export interface CourseFormData {
 
 // Lesson form types
 export interface LessonFormData {
+  module_id: string;
   title: string;
-  content: string;
-  materials: LessonMaterial[];
+  type: LessonType;
+  content?: string;
+  video_url?: string;
+  files?: LessonFile[];
+  quiz_id?: string; // For quiz type lessons
 }
 
 // Quiz form types

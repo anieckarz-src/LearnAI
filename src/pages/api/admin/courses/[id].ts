@@ -15,7 +15,7 @@ export const GET: APIRoute = async ({ locals, params }) => {
 
     const { data: course, error } = await supabase
       .from("courses")
-      .select("*, instructor:users!courses_instructor_id_fkey(id, email, full_name)")
+      .select("*")
       .eq("id", id)
       .single();
 
@@ -55,7 +55,7 @@ export const PATCH: APIRoute = async ({ locals, params, request }) => {
   try {
     const { id } = params;
     const body = await request.json();
-    const { title, description, thumbnail_url, status, price, instructor_id } = body;
+    const { title, description, thumbnail_url, status, price } = body;
 
     const { data: oldCourse } = await supabase.from("courses").select("*").eq("id", id).single();
 
@@ -100,10 +100,6 @@ export const PATCH: APIRoute = async ({ locals, params, request }) => {
       thumbnail_url,
       status,
     };
-
-    if (instructor_id !== undefined) {
-      updateData.instructor_id = instructor_id;
-    }
 
     if (price !== undefined) {
       updateData.price = price;

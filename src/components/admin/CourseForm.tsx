@@ -15,7 +15,6 @@ import { ArrowLeft, Save } from "lucide-react";
 const courseSchema = z.object({
   title: z.string().min(3, "Tytuł musi mieć co najmniej 3 znaki").max(200, "Tytuł może mieć maksymalnie 200 znaków"),
   description: z.string(),
-  instructor_id: z.string().uuid("Wybierz instruktora"),
   status: z.enum(["draft", "published", "archived"] as const),
   thumbnail_url: z.string(),
   lesson_access_mode: z.enum(["sequential", "all_access"] as const).default("all_access"),
@@ -36,10 +35,8 @@ interface CourseFormProps {
 }
 
 export function CourseForm({ course }: CourseFormProps) {
-  const [instructors, setInstructors] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [loadingInstructors, setLoadingInstructors] = useState(true);
 
   const isEditMode = !!course;
 
@@ -54,7 +51,6 @@ export function CourseForm({ course }: CourseFormProps) {
     defaultValues: {
       title: course?.title || "",
       description: course?.description || "",
-      instructor_id: course?.instructor_id || "",
       status: (course?.status as CourseStatus) || "draft",
       thumbnail_url: course?.thumbnail_url || "",
       lesson_access_mode: (course?.lesson_access_mode as "sequential" | "all_access") || "all_access",
@@ -66,58 +62,13 @@ export function CourseForm({ course }: CourseFormProps) {
   useEffect(() => {
     register("status");
     register("lesson_access_mode");
-    register("instructor_id");
   }, [register]);
 
   const description = watch("description");
   const thumbnail_url = watch("thumbnail_url");
   const status = watch("status");
-  const instructor_id = watch("instructor_id");
   const lesson_access_mode = watch("lesson_access_mode");
   const price = watch("price");
-
-  // Fetch instructors (both instructors and admins can be instructors)
-  useEffect(() => {
-    const fetchInstructors = async () => {
-      try {
-        setLoadingInstructors(true);
-
-        // Fetch both instructors and admins
-        const [instructorsResponse, adminsResponse] = await Promise.all([
-          fetch("/api/admin/users?role=instructor&limit=100"),
-          fetch("/api/admin/users?role=admin&limit=100"),
-        ]);
-
-        const instructorsResult = await instructorsResponse.json();
-        const adminsResult = await adminsResponse.json();
-
-        const allInstructors: User[] = [];
-
-        if (instructorsResult.success) {
-          allInstructors.push(...instructorsResult.data.data);
-        }
-
-        if (adminsResult.success) {
-          allInstructors.push(...adminsResult.data.data);
-        }
-
-        // Sort by full_name or email
-        allInstructors.sort((a, b) => {
-          const nameA = (a.full_name || a.email).toLowerCase();
-          const nameB = (b.full_name || b.email).toLowerCase();
-          return nameA.localeCompare(nameB);
-        });
-
-        setInstructors(allInstructors);
-      } catch (err) {
-        console.error("Error fetching instructors:", err);
-      } finally {
-        setLoadingInstructors(false);
-      }
-    };
-
-    fetchInstructors();
-  }, []);
 
   const onSubmit = async (data: CourseFormData) => {
     try {
@@ -186,71 +137,31 @@ export function CourseForm({ course }: CourseFormProps) {
             {errors.title && <p className="text-sm text-red-400">{errors.title.message}</p>}
           </div>
 
-          {/* Instructor and Status - Side by Side */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Instructor */}
-            <div className="space-y-2">
-              <Label htmlFor="instructor" className="text-white">
-                Instruktor <span className="text-red-400">*</span>
-              </Label>
-              {loadingInstructors ? (
-                <div className="flex items-center gap-2 text-sm text-gray-400">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
-                  Ładowanie instruktorów...
-                </div>
-              ) : (
-                <Select 
-                  value={instructor_id || undefined} 
-                  onValueChange={(value) => setValue("instructor_id", value, { shouldValidate: true })}
-                >
-                  <SelectTrigger className="bg-slate-700/50 border-white/10 text-white">
-                    <SelectValue placeholder="Wybierz instruktora" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-white/10">
-                    {instructors.map((instructor) => (
-                      <SelectItem
-                        key={instructor.id}
-                        value={instructor.id}
-                        className="text-white focus:bg-slate-700 focus:text-white"
-                      >
-                        {instructor.full_name || instructor.email}
-                        <span className="ml-2 text-xs text-gray-400">
-                          ({instructor.role === "admin" ? "Administrator" : "Instruktor"})
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-              {errors.instructor_id && <p className="text-sm text-red-400">{errors.instructor_id.message}</p>}
-            </div>
-
-            {/* Status */}
-            <div className="space-y-2">
-              <Label htmlFor="status" className="text-white">
-                Status <span className="text-red-400">*</span>
-              </Label>
-              <Select 
-                value={status || "draft"} 
-                onValueChange={(value) => setValue("status", value as CourseStatus, { shouldValidate: true })}
-              >
-                <SelectTrigger className="bg-slate-700/50 border-white/10 text-white">
-                  <SelectValue placeholder="Wybierz status" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-white/10">
-                  <SelectItem value="draft" className="text-white focus:bg-slate-700 focus:text-white">
-                    Szkic
-                  </SelectItem>
-                  <SelectItem value="published" className="text-white focus:bg-slate-700 focus:text-white">
-                    Opublikowany
-                  </SelectItem>
-                  <SelectItem value="archived" className="text-white focus:bg-slate-700 focus:text-white">
-                    Zarchiwizowany
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.status && <p className="text-sm text-red-400">{errors.status.message}</p>}
-            </div>
+          {/* Status */}
+          <div className="space-y-2">
+            <Label htmlFor="status" className="text-white">
+              Status <span className="text-red-400">*</span>
+            </Label>
+            <Select 
+              value={status || "draft"} 
+              onValueChange={(value) => setValue("status", value as CourseStatus, { shouldValidate: true })}
+            >
+              <SelectTrigger className="bg-slate-700/50 border-white/10 text-white">
+                <SelectValue placeholder="Wybierz status" />
+              </SelectTrigger>
+              <SelectContent className="bg-slate-800 border-white/10">
+                <SelectItem value="draft" className="text-white focus:bg-slate-700 focus:text-white">
+                  Szkic
+                </SelectItem>
+                <SelectItem value="published" className="text-white focus:bg-slate-700 focus:text-white">
+                  Opublikowany
+                </SelectItem>
+                <SelectItem value="archived" className="text-white focus:bg-slate-700 focus:text-white">
+                  Zarchiwizowany
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.status && <p className="text-sm text-red-400">{errors.status.message}</p>}
           </div>
 
           {/* Price and Lesson Access Mode - Side by Side */}

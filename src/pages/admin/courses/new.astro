@@ -1,6 +1,6 @@
 ---
 import AdminLayout from "@/layouts/AdminLayout.astro";
-import { CourseForm } from "@/components/admin/CourseForm";
+import { CourseCreator } from "@/components/admin/CourseCreator";
 
 const user = Astro.locals.user;
 
@@ -13,6 +13,6 @@ if (user.role !== "admin") {
 }
 ---
 
-<AdminLayout title="Nowy kurs" description="Utwórz nowy kurs edukacyjny" user={user} currentPath={Astro.url.pathname}>
-  <CourseForm client:load />
+<AdminLayout title="Nowy kurs" description="Utwórz nowy kurs edukacyjny z modułami i lekcjami" user={user} currentPath={Astro.url.pathname}>
+  <CourseCreator client:load />
 </AdminLayout>

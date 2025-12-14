@@ -147,7 +147,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
           id: finalUserId,
           email: customerEmail,
           full_name: customerName || null,
-          role: "student",
+          role: "user",
           is_blocked: false,
         });
 
@@ -183,7 +183,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
         id: userId,
         email: customerEmail,
         full_name: customerName || null,
-        role: "student",
+        role: "user",
         is_blocked: false,
       });
 

@@ -81,10 +81,9 @@ export function UsersManagement() {
   };
 
   const getRoleBadge = (role: UserRole) => {
-    const variants: Record<UserRole, { variant: "default" | "secondary" | "success"; icon: React.ReactNode }> = {
+    const variants: Record<UserRole, { variant: "default" | "secondary"; icon: React.ReactNode }> = {
       admin: { variant: "default", icon: <ShieldCheck className="w-3 h-3" /> },
-      instructor: { variant: "secondary", icon: <Shield className="w-3 h-3" /> },
-      student: { variant: "success", icon: <UserIcon className="w-3 h-3" /> },
+      user: { variant: "secondary", icon: <UserIcon className="w-3 h-3" /> },
     };
 
     const config = variants[role];
@@ -92,7 +91,7 @@ export function UsersManagement() {
     return (
       <Badge variant={config.variant} className="flex items-center gap-1">
         {config.icon}
-        {role === "admin" ? "Administrator" : role === "instructor" ? "Instruktor" : "Student"}
+        {role === "admin" ? "Administrator" : "Użytkownik"}
       </Badge>
     );
   };
@@ -130,8 +129,7 @@ export function UsersManagement() {
             >
               <option value="">Wszystkie role</option>
               <option value="admin">Administrator</option>
-              <option value="instructor">Instruktor</option>
-              <option value="student">Student</option>
+              <option value="user">Użytkownik</option>
             </select>
           </div>
         </CardContent>

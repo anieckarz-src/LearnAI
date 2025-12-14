@@ -10,7 +10,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
     // Build query for published courses
     let query = supabase
       .from("courses")
-      .select("*, instructor:users!courses_instructor_id_fkey(id, email, full_name)")
+      .select("*")
       .eq("status", "published")
       .order("created_at", { ascending: false });
 

@@ -55,21 +55,74 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
   try {
     const body = await request.json();
-    const { course_id, title, content, order_index } = body;
+    const { course_id, module_id, title, type, content, video_url, files, order_index } = body;
 
-    if (!course_id || !title) {
-      return new Response(JSON.stringify({ success: false, error: "course_id and title are required" }), {
+    // Validation
+    if (!course_id || !module_id || !title || !type) {
+      return new Response(
+        JSON.stringify({ success: false, error: "course_id, module_id, title, and type are required" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Verify module exists and belongs to course
+    const { data: module, error: moduleError } = await supabase
+      .from("modules")
+      .select("course_id")
+      .eq("id", module_id)
+      .single();
+
+    if (moduleError || !module) {
+      return new Response(JSON.stringify({ success: false, error: "Module not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    if (module.course_id !== course_id) {
+      return new Response(JSON.stringify({ success: false, error: "Module does not belong to this course" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
+    }
+
+    // Type-specific validation
+    if (type === "content") {
+      // Content lesson must have at least one: video_url, content, or files
+      const hasContent = content && content.trim().length > 0;
+      const hasVideo = video_url && video_url.trim().length > 0;
+      const hasFiles = files && Array.isArray(files) && files.length > 0;
+
+      if (!hasContent && !hasVideo && !hasFiles) {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: "Content lesson must have at least one: content, video_url, or files",
+          }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
+    } else if (type === "quiz") {
+      // Quiz lesson - we'll check for quiz association later
+      // For now, just allow creation
     }
 
     const { data: lesson, error } = await supabase
       .from("lessons")
       .insert({
         course_id,
+        module_id,
         title,
-        content,
+        type,
+        content: content || null,
+        video_url: video_url || null,
+        files: files || [],
         order_index: order_index || 0,
       })
       .select()

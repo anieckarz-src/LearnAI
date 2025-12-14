@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PurchaseButton } from "./PurchaseButton";
-import type { Course, User, Lesson } from "@/types";
-import { BookOpen, User as UserIcon, Calendar, ArrowLeft, CheckCircle2, Lock } from "lucide-react";
+import type { Course, Lesson } from "@/types";
+import { BookOpen, Calendar, ArrowLeft, CheckCircle2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface CourseDetailProps {
@@ -11,7 +11,6 @@ interface CourseDetailProps {
 }
 
 interface CourseData extends Course {
-  instructor: User;
   has_access: boolean;
   is_enrolled: boolean;
   lessons: Lesson[] | null;
@@ -151,10 +150,6 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
 
               {/* Meta info */}
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 mb-4">
-                <div className="flex items-center gap-2">
-                  <UserIcon className="w-4 h-4" />
-                  <span>{course.instructor.full_name || course.instructor.email}</span>
-                </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
                   <span>{new Date(course.created_at).toLocaleDateString("pl-PL")}</span>

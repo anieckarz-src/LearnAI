@@ -13,11 +13,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LessonForm } from "./LessonForm";
 import { LessonPreview } from "./LessonPreview";
-import type { Lesson } from "@/types";
-import { Plus, Edit, Trash2, Eye, GripVertical, Loader2 } from "lucide-react";
+import type { Lesson, Module } from "@/types";
+import { Plus, Edit, Trash2, Eye, GripVertical, Loader2, ChevronDown, ChevronRight } from "lucide-react";
 
 interface LessonsManagerProps {
   courseId: string;
+}
+
+interface ModuleWithLessons extends Module {
+  lessons: Lesson[];
 }
 
 interface SortableLessonItemProps {
@@ -38,6 +42,10 @@ function SortableLessonItem({ lesson, onEdit, onDelete, onPreview }: SortableLes
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const getLessonTypeIcon = (type: string) => {
+    return type === "quiz" ? "❓" : "🎬";
+  };
+
   return (
     <div
       ref={setNodeRef}
@@ -48,9 +56,15 @@ function SortableLessonItem({ lesson, onEdit, onDelete, onPreview }: SortableLes
         <GripVertical className="w-5 h-5" />
       </div>
 
+      <span className="text-2xl">{getLessonTypeIcon(lesson.type)}</span>
+
       <div className="flex-1 min-w-0">
         <h4 className="text-white font-medium truncate">{lesson.title}</h4>
-        <p className="text-sm text-gray-400">Utworzono: {new Date(lesson.created_at).toLocaleDateString("pl-PL")}</p>
+        <div className="flex items-center gap-2 text-sm text-gray-400">
+          <span className="capitalize">{lesson.type === "quiz" ? "Quiz" : "Treść"}</span>
+          <span>•</span>
+          <span>Utworzono: {new Date(lesson.created_at).toLocaleDateString("pl-PL")}</span>
+        </div>
       </div>
 
       <div className="flex items-center gap-2">
@@ -74,11 +88,12 @@ function SortableLessonItem({ lesson, onEdit, onDelete, onPreview }: SortableLes
 }
 
 export function LessonsManager({ courseId }: LessonsManagerProps) {
-  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [modulesWithLessons, setModulesWithLessons] = useState<ModuleWithLessons[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
   const [previewLesson, setPreviewLesson] = useState<Lesson | null>(null);
+  const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -94,12 +109,33 @@ export function LessonsManager({ courseId }: LessonsManagerProps) {
   const fetchLessons = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/admin/lessons?course_id=${courseId}`);
-      const result = await response.json();
 
-      if (result.success) {
-        setLessons(result.data);
+      // Fetch modules
+      const modulesResponse = await fetch(`/api/admin/modules?course_id=${courseId}`);
+      const modulesResult = await modulesResponse.json();
+
+      if (!modulesResult.success) {
+        throw new Error(modulesResult.error);
       }
+
+      // Fetch lessons
+      const lessonsResponse = await fetch(`/api/admin/lessons?course_id=${courseId}`);
+      const lessonsResult = await lessonsResponse.json();
+
+      if (!lessonsResult.success) {
+        throw new Error(lessonsResult.error);
+      }
+
+      // Group lessons by module
+      const modulesData = modulesResult.data.map((module: Module) => ({
+        ...module,
+        lessons: lessonsResult.data.filter((lesson: Lesson) => lesson.module_id === module.id),
+      }));
+
+      setModulesWithLessons(modulesData);
+
+      // Expand all modules by default
+      setExpandedModules(new Set(modulesData.map((m: Module) => m.id)));
     } catch (error) {
       console.error("Error fetching lessons:", error);
     } finally {
@@ -111,11 +147,30 @@ export function LessonsManager({ courseId }: LessonsManagerProps) {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
+      // Find which module contains these lessons
+      let moduleIndex = -1;
+      let lessons: Lesson[] = [];
+
+      modulesWithLessons.forEach((module, idx) => {
+        const hasActive = module.lessons.some((l) => l.id === active.id);
+        const hasOver = module.lessons.some((l) => l.id === over.id);
+        if (hasActive && hasOver) {
+          moduleIndex = idx;
+          lessons = module.lessons;
+        }
+      });
+
+      if (moduleIndex === -1) return;
+
       const oldIndex = lessons.findIndex((l) => l.id === active.id);
       const newIndex = lessons.findIndex((l) => l.id === over.id);
 
       const newLessons = arrayMove(lessons, oldIndex, newIndex);
-      setLessons(newLessons);
+
+      // Update state optimistically
+      const newModulesWithLessons = [...modulesWithLessons];
+      newModulesWithLessons[moduleIndex].lessons = newLessons;
+      setModulesWithLessons(newModulesWithLessons);
 
       // Update order_index for all affected lessons
       try {
@@ -174,6 +229,16 @@ export function LessonsManager({ courseId }: LessonsManagerProps) {
     fetchLessons();
   };
 
+  const toggleModuleExpansion = (moduleId: string) => {
+    const newExpanded = new Set(expandedModules);
+    if (newExpanded.has(moduleId)) {
+      newExpanded.delete(moduleId);
+    } else {
+      newExpanded.add(moduleId);
+    }
+    setExpandedModules(newExpanded);
+  };
+
   if (showForm) {
     return (
       <LessonForm
@@ -189,7 +254,7 @@ export function LessonsManager({ courseId }: LessonsManagerProps) {
     <div className="space-y-4">
       <Card className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-white">Lekcje</CardTitle>
+          <CardTitle className="text-white">Lekcje pogrupowane po modułach</CardTitle>
           <Button onClick={handleAddNew} className="bg-blue-600 hover:bg-blue-700">
             <Plus className="w-4 h-4 mr-2" />
             Dodaj lekcję
@@ -200,27 +265,73 @@ export function LessonsManager({ courseId }: LessonsManagerProps) {
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
             </div>
-          ) : lessons.length === 0 ? (
+          ) : modulesWithLessons.length === 0 ? (
             <div className="text-center py-12 text-gray-400">
-              <p>Brak lekcji w tym kursie.</p>
-              <p className="text-sm mt-2">Kliknij &quot;Dodaj lekcję&quot; aby utworzyć pierwszą lekcję.</p>
+              <p>Brak modułów w tym kursie.</p>
+              <p className="text-sm mt-2">Najpierw utwórz moduł w zakładce &quot;Moduły&quot;.</p>
             </div>
           ) : (
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={lessons.map((l) => l.id)} strategy={verticalListSortingStrategy}>
-                <div className="space-y-2">
-                  {lessons.map((lesson) => (
-                    <SortableLessonItem
-                      key={lesson.id}
-                      lesson={lesson}
-                      onEdit={() => handleEdit(lesson)}
-                      onDelete={() => handleDelete(lesson.id)}
-                      onPreview={() => setPreviewLesson(lesson)}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
+            <div className="space-y-6">
+              {modulesWithLessons.map((module) => {
+                const isExpanded = expandedModules.has(module.id);
+                return (
+                  <div key={module.id} className="border border-white/10 rounded-lg overflow-hidden">
+                    {/* Module Header */}
+                    <div
+                      className="bg-slate-700/30 p-4 cursor-pointer hover:bg-slate-700/50 transition-colors"
+                      onClick={() => toggleModuleExpansion(module.id)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          {isExpanded ? (
+                            <ChevronDown className="w-5 h-5 text-gray-400" />
+                          ) : (
+                            <ChevronRight className="w-5 h-5 text-gray-400" />
+                          )}
+                          <div>
+                            <h3 className="text-lg font-semibold text-white">{module.title}</h3>
+                            {module.description && <p className="text-sm text-gray-400 mt-1">{module.description}</p>}
+                          </div>
+                        </div>
+                        <div className="text-sm text-gray-400">
+                          {module.lessons.length} {module.lessons.length === 1 ? "lekcja" : "lekcji"}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Module Lessons */}
+                    {isExpanded && (
+                      <div className="p-4">
+                        {module.lessons.length === 0 ? (
+                          <div className="text-center py-8 text-gray-400">
+                            <p className="text-sm">Brak lekcji w tym module.</p>
+                          </div>
+                        ) : (
+                          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                            <SortableContext
+                              items={module.lessons.map((l) => l.id)}
+                              strategy={verticalListSortingStrategy}
+                            >
+                              <div className="space-y-2">
+                                {module.lessons.map((lesson) => (
+                                  <SortableLessonItem
+                                    key={lesson.id}
+                                    lesson={lesson}
+                                    onEdit={() => handleEdit(lesson)}
+                                    onDelete={() => handleDelete(lesson.id)}
+                                    onPreview={() => setPreviewLesson(lesson)}
+                                  />
+                                ))}
+                              </div>
+                            </SortableContext>
+                          </DndContext>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           )}
         </CardContent>
       </Card>

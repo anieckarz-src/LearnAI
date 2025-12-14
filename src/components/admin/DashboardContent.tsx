@@ -80,7 +80,7 @@ export function DashboardContent() {
       color: "from-orange-500 to-orange-600",
     },
     {
-      title: "Aktywni studenci",
+      title: "Aktywni użytkownicy",
       value: stats.active_students,
       change: `${stats.total_enrollments} zapisów`,
       icon: TrendingUp,

@@ -8,7 +8,7 @@ export const GET: APIRoute = async ({ locals, params }) => {
     // Get course details
     const { data: course, error: courseError } = await supabase
       .from("courses")
-      .select("*, instructor:users!courses_instructor_id_fkey(id, email, full_name)")
+      .select("*")
       .eq("id", id)
       .eq("status", "published")
       .single();

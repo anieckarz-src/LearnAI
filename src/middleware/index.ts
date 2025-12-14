@@ -128,7 +128,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
 
-  // Quiz routes protection (student access)
+  // Quiz routes protection (user access)
   if (pathname.startsWith("/quizzes/") && !pathname.includes("/api/")) {
     // Require authentication for all quiz pages
     if (!session?.user) {
@@ -159,7 +159,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
 
-  // Course routes protection (student access)
+  // Course routes protection (user access)
   if (pathname.startsWith("/courses")) {
     // Require authentication for course pages
     if (!session?.user) {
@@ -173,7 +173,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
 
-  // Dashboard protection (student access)
+  // Dashboard protection (user access)
   if (pathname.startsWith("/dashboard")) {
     // Require authentication
     if (!session?.user) {

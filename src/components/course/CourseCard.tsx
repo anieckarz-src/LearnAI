@@ -1,11 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { Course, User } from "@/types";
+import type { Course } from "@/types";
 import { Check, DollarSign } from "lucide-react";
 
 interface CourseCardProps {
   course: Course & {
-    instructor: User;
     is_enrolled?: boolean;
   };
 }
@@ -59,13 +58,9 @@ export function CourseCard({ course }: CourseCardProps) {
         </CardHeader>
 
         <CardContent>
-          <p className="text-sm text-gray-400 line-clamp-3 mb-4">
+          <p className="text-sm text-gray-400 line-clamp-3">
             {course.description ? stripHtml(course.description) : "Brak opisu"}
           </p>
-          
-          <div className="flex items-center justify-between text-sm text-gray-500 border-t border-white/5 pt-3">
-            <span>{course.instructor.full_name || course.instructor.email}</span>
-          </div>
         </CardContent>
       </Card>
     </a>

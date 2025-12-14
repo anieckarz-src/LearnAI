@@ -106,8 +106,7 @@ export function UserModal({ user, isOpen, onClose, onSuccess }: UserModalProps) 
               onChange={(e) => setRole(e.target.value as UserRole)}
               className="w-full px-3 py-2 rounded-md bg-slate-700/50 border border-white/10 text-white"
             >
-              <option value="student">Student</option>
-              <option value="instructor">Instruktor</option>
+              <option value="user">Użytkownik</option>
               <option value="admin">Administrator</option>
             </select>
           </div>

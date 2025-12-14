@@ -1,7 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { LessonSidebar } from "@/components/course/LessonSidebar";
-import { LessonContent } from "@/components/course/LessonContent";
+import { ModulesList } from "@/components/course/ModulesList";
+import { LessonContent as NewLessonContent } from "@/components/course/LessonContent";
 
 const { courseId, lessonId } = Astro.params;
 
@@ -15,34 +15,20 @@ if (!user) {
   return Astro.redirect("/login");
 }
 
-// Fetch lesson details with full course data
+// Fetch lesson details with modules structure
 let lesson = null;
 let course = null;
-let allLessons: any[] = [];
-let lessonProgress: any[] = [];
-let quizzes = null;
+let modulesWithLessons: any[] = [];
 let error: string | null = null;
 let hasAccess = false;
 
 try {
   const { supabase } = Astro.locals;
 
-  // Fetch course with all lessons and access mode
+  // Fetch course
   const { data: courseData, error: courseError } = await supabase
     .from("courses")
-    .select(
-      `
-      *,
-      lessons (
-        id,
-        title,
-        content,
-        video_url,
-        order_index,
-        created_at
-      )
-    `
-    )
+    .select("*")
     .eq("id", courseId)
     .single();
 
@@ -50,69 +36,46 @@ try {
     error = "Nie znaleziono kursu";
   } else {
     course = courseData;
-    allLessons = courseData.lessons.sort((a: any, b: any) => a.order_index - b.order_index);
 
-    // Find current lesson
-    lesson = allLessons.find((l: any) => l.id === lessonId);
+    // Check access
+    const isFree = !course.price || course.price === 0;
+    const { data: enrollment } = await supabase
+      .from("course_enrollments")
+      .select("id")
+      .eq("course_id", courseId)
+      .eq("user_id", user.id)
+      .single();
 
-    if (!lesson) {
-      error = "Nie znaleziono lekcji";
-    } else {
-      // Check access
-      const isFree = !course.price || course.price === 0;
-      const { data: enrollment } = await supabase
-        .from("course_enrollments")
-        .select("id")
-        .eq("course_id", courseId)
-        .eq("user_id", user.id)
-        .single();
+    hasAccess = isFree || !!enrollment || user.role === "admin";
 
-      hasAccess = isFree || !!enrollment || course.instructor_id === user.id || user.role === "admin";
+    if (hasAccess) {
+      // Fetch modules with lessons using the new API endpoint
+      const modulesResponse = await fetch(
+        `${Astro.url.origin}/api/courses/${courseId}/modules`,
+        {
+          headers: {
+            cookie: Astro.request.headers.get("cookie") || "",
+          },
+        }
+      );
 
-      if (hasAccess) {
-        // Fetch lesson progress for all lessons
-        const { data: progressData } = await supabase
-          .from("lesson_progress")
-          .select("lesson_id, completed, completed_at")
-          .eq("course_id", courseId)
-          .eq("user_id", user.id);
+      if (modulesResponse.ok) {
+        const modulesResult = await modulesResponse.json();
+        if (modulesResult.success) {
+          modulesWithLessons = modulesResult.data;
 
-        lessonProgress = progressData || [];
+          // Find current lesson in modules
+          for (const module of modulesWithLessons) {
+            const foundLesson = module.lessons.find((l: any) => l.id === lessonId);
+            if (foundLesson) {
+              lesson = foundLesson;
+              break;
+            }
+          }
 
-        // Fetch quizzes for current lesson
-        const { data: quizzesData } = await supabase
-          .from("quizzes")
-          .select("*")
-          .eq("lesson_id", lessonId)
-          .order("created_at", { ascending: false });
-
-        if (quizzesData) {
-          // For each quiz, get user's attempts info
-          const quizzesWithAttempts = await Promise.all(
-            quizzesData.map(async (quiz) => {
-              const { data: attempts } = await supabase
-                .from("quiz_attempts")
-                .select("id, score, passed, completed_at")
-                .eq("quiz_id", quiz.id)
-                .eq("user_id", user.id)
-                .order("completed_at", { ascending: false });
-
-              const attemptsCount = attempts?.length || 0;
-              const bestScore = attempts && attempts.length > 0 ? Math.max(...attempts.map((a) => a.score)) : 0;
-              const hasPassed = attempts?.some((a) => a.passed) || false;
-              const canAttempt = quiz.max_attempts === null || attemptsCount < quiz.max_attempts;
-
-              return {
-                ...quiz,
-                user_attempts_count: attemptsCount,
-                user_best_score: bestScore,
-                user_has_passed: hasPassed,
-                can_attempt: canAttempt,
-              };
-            })
-          );
-
-          quizzes = quizzesWithAttempts;
+          if (!lesson) {
+            error = "Nie znaleziono lekcji";
+          }
         }
       }
     }
@@ -122,50 +85,22 @@ try {
   error = "Wystąpił błąd podczas pobierania lekcji";
 }
 
-// Calculate progress and lesson accessibility
-const progressMap = new Map(lessonProgress.map((p) => [p.lesson_id, p.completed]));
-const lessonsWithProgress = allLessons.map((l, index) => {
-  const completed = progressMap.get(l.id) || false;
-  
-  // Check if lesson is accessible based on sequential mode
-  let isAccessible = true;
-  if (course?.lesson_access_mode === "sequential" && index > 0) {
-    // Check if all previous lessons are completed
-    const previousLessons = allLessons.slice(0, index);
-    isAccessible = previousLessons.every((pl) => progressMap.get(pl.id) === true);
-  }
+// Calculate overall progress
+let totalLessons = 0;
+let completedLessons = 0;
 
-  return {
-    ...l,
-    completed,
-    is_accessible: isAccessible,
-  };
+modulesWithLessons.forEach((module) => {
+  totalLessons += module.lessons.length;
+  completedLessons += module.lessons.filter((l: any) => l.completed).length;
 });
 
-// Calculate overall progress
-const completedCount = lessonsWithProgress.filter((l) => l.completed).length;
-const totalCount = lessonsWithProgress.length;
-const progressPercentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+const progressPercentage = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
 const progress = {
-  completed: completedCount,
-  total: totalCount,
+  completed: completedLessons,
+  total: totalLessons,
   percentage: progressPercentage,
 };
-
-// Find previous and next lessons
-const currentIndex = lessonsWithProgress.findIndex((l) => l.id === lessonId);
-const previousLesson = currentIndex > 0 ? lessonsWithProgress[currentIndex - 1] : null;
-const nextLesson = currentIndex < lessonsWithProgress.length - 1 ? lessonsWithProgress[currentIndex + 1] : null;
-
-// Check if current lesson is completed
-const isCompleted = progressMap.get(lessonId) || false;
-
-// Add completed and is_accessible to current lesson
-if (lesson) {
-  lesson.completed = isCompleted;
-  lesson.is_accessible = lessonsWithProgress.find((l) => l.id === lessonId)?.is_accessible || false;
-}
 ---
 
 <Layout title={lesson ? `${lesson.title} - ${course.title}` : "Lekcja"}>
@@ -184,29 +119,109 @@ if (lesson) {
       </div>
     ) : (
       <div class="flex min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
-        {/* Sidebar */}
-        <LessonSidebar
-          courseId={courseId}
-          courseTitle={course.title}
-          currentLessonId={lessonId}
-          lessons={lessonsWithProgress}
-          progress={progress}
-          lessonAccessMode={course.lesson_access_mode || "all_access"}
-          client:load
-        />
+        {/* Sidebar with Modules */}
+        <aside class="w-80 bg-slate-900/50 border-r border-white/10 overflow-y-auto">
+          <div class="p-6">
+            <div class="mb-6">
+              <a
+                href={`/courses/${courseId}`}
+                class="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-2 mb-2"
+              >
+                ← Powrót do kursu
+              </a>
+              <h2 class="text-xl font-bold text-white truncate">{course.title}</h2>
+              <div class="mt-2 flex items-center gap-2">
+                <div class="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
+                  <div
+                    class="h-full bg-blue-500 transition-all"
+                    style={`width: ${progress.percentage}%`}
+                  />
+                </div>
+                <span class="text-sm text-gray-400">{progress.percentage}%</span>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">
+                {progress.completed} z {progress.total} lekcji ukończonych
+              </p>
+            </div>
+
+            <ModulesList
+              modules={modulesWithLessons}
+              currentLessonId={lessonId}
+              onLessonClick={(id: string) => {
+                window.location.href = `/courses/${courseId}/lessons/${id}`;
+              }}
+              client:load
+            />
+          </div>
+        </aside>
 
         {/* Main Content */}
-        <LessonContent
-          lesson={lesson}
-          courseId={courseId}
-          courseTitle={course.title}
-          quizzes={quizzes}
-          isCompleted={isCompleted}
-          previousLesson={previousLesson}
-          nextLesson={nextLesson}
-          client:load
-        />
+        <main class="flex-1 overflow-y-auto">
+          <div class="max-w-4xl mx-auto p-8">
+            {/* Lesson Header */}
+            <div class="mb-8">
+              <h1 class="text-3xl font-bold text-white mb-2">{lesson.title}</h1>
+              <div class="flex items-center gap-4 text-sm text-gray-400">
+                <span class="capitalize">
+                  {lesson.type === "quiz" ? "Lekcja Quiz" : "Lekcja Treściowa"}
+                </span>
+                {lesson.completed && (
+                  <span class="px-2 py-1 bg-green-500/20 text-green-400 rounded-md text-xs font-medium">
+                    ✓ Ukończone
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Lesson Content Component */}
+            <NewLessonContent lesson={lesson} client:load />
+
+            {/* Mark as Complete Button */}
+            {!lesson.completed && lesson.type === "content" && (
+              <div class="mt-8 flex justify-end">
+                <button
+                  id="markCompleteBtn"
+                  class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors"
+                >
+                  Oznacz jako ukończone
+                </button>
+              </div>
+            )}
+          </div>
+        </main>
       </div>
     )
   }
 </Layout>
+
+<script>
+  // Mark lesson as complete
+  const markCompleteBtn = document.getElementById("markCompleteBtn");
+  if (markCompleteBtn) {
+    markCompleteBtn.addEventListener("click", async () => {
+      const lessonId = window.location.pathname.split("/").pop();
+      const courseId = window.location.pathname.split("/")[2];
+
+      try {
+        const response = await fetch(`/api/lessons/${lessonId}/complete`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ course_id: courseId }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          window.location.reload();
+        } else {
+          alert(result.error || "Nie udało się oznaczyć lekcji jako ukończonej");
+        }
+      } catch (error) {
+        console.error("Error marking lesson as complete:", error);
+        alert("Wystąpił błąd");
+      }
+    });
+  }
+</script>

@@ -2,16 +2,15 @@ import { useEffect, useState } from "react";
 import { CourseCard } from "./CourseCard";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import type { Course, User } from "@/types";
+import type { Course } from "@/types";
 import { Search } from "lucide-react";
 
-interface CourseWithInstructor extends Course {
-  instructor: User;
+interface CourseWithEnrollment extends Course {
   is_enrolled?: boolean;
 }
 
 export function CourseCatalog() {
-  const [courses, setCourses] = useState<CourseWithInstructor[]>([]);
+  const [courses, setCourses] = useState<CourseWithEnrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "free" | "paid">("all");

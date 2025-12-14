@@ -4,18 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Course, CourseStatus, PaginatedResponse } from "@/types";
-import { Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight, User, Calendar, DollarSign } from "lucide-react";
-
-interface CourseWithInstructor extends Course {
-  instructor: {
-    id: string;
-    email: string;
-    full_name: string | null;
-  };
-}
+import { Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Calendar, DollarSign } from "lucide-react";
 
 export function CoursesManagement() {
-  const [courses, setCourses] = useState<CourseWithInstructor[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -191,14 +183,9 @@ export function CoursesManagement() {
                         <span className="text-blue-400 font-semibold">Darmowy</span>
                       )}
                     </div>
-                    {/* Instructor info */}
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
-                      <User className="w-4 h-4" />
-                      <span>{course.instructor.full_name || course.instructor.email}</span>
-                    </div>
                     {/* Creation date */}
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <Calendar className="w-3 h-3" />
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <Calendar className="w-4 h-4" />
                       <span>{new Date(course.created_at).toLocaleDateString("pl-PL")}</span>
                     </div>
                     {/* Action buttons */}

@@ -23,14 +23,8 @@ export const GET: APIRoute = async ({ locals }) => {
           title,
           description,
           thumbnail_url,
-          instructor_id,
           status,
-          lesson_access_mode,
-          instructor:users!courses_instructor_id_fkey (
-            id,
-            email,
-            full_name
-          )
+          lesson_access_mode
         )
       `
       )

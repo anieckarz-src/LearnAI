@@ -40,7 +40,7 @@ export interface Database {
           id: string;
           email: string;
           full_name: string | null;
-          role: "admin" | "instructor" | "student";
+          role: "admin" | "user";
           is_blocked: boolean;
           created_at: string;
           last_login: string | null;
@@ -49,7 +49,7 @@ export interface Database {
           id: string;
           email: string;
           full_name?: string | null;
-          role?: "admin" | "instructor" | "student";
+          role?: "admin" | "user";
           is_blocked?: boolean;
           created_at?: string;
           last_login?: string | null;
@@ -58,7 +58,7 @@ export interface Database {
           id?: string;
           email?: string;
           full_name?: string | null;
-          role?: "admin" | "instructor" | "student";
+          role?: "admin" | "user";
           is_blocked?: boolean;
           created_at?: string;
           last_login?: string | null;
@@ -69,7 +69,6 @@ export interface Database {
           id: string;
           title: string;
           description: string | null;
-          instructor_id: string;
           status: "draft" | "published" | "archived";
           thumbnail_url: string | null;
           lesson_access_mode: "sequential" | "all_access";
@@ -83,7 +82,6 @@ export interface Database {
           id?: string;
           title: string;
           description?: string | null;
-          instructor_id: string;
           status?: "draft" | "published" | "archived";
           thumbnail_url?: string | null;
           lesson_access_mode?: "sequential" | "all_access";
@@ -97,7 +95,6 @@ export interface Database {
           id?: string;
           title?: string;
           description?: string | null;
-          instructor_id?: string;
           status?: "draft" | "published" | "archived";
           thumbnail_url?: string | null;
           lesson_access_mode?: "sequential" | "all_access";
@@ -108,13 +105,12 @@ export interface Database {
           updated_at?: string;
         };
       };
-      lessons: {
+      modules: {
         Row: {
           id: string;
           course_id: string;
           title: string;
-          content: string | null;
-          video_url: string | null;
+          description: string | null;
           order_index: number;
           created_at: string;
         };
@@ -122,8 +118,7 @@ export interface Database {
           id?: string;
           course_id: string;
           title: string;
-          content?: string | null;
-          video_url?: string | null;
+          description?: string | null;
           order_index?: number;
           created_at?: string;
         };
@@ -131,8 +126,45 @@ export interface Database {
           id?: string;
           course_id?: string;
           title?: string;
+          description?: string | null;
+          order_index?: number;
+          created_at?: string;
+        };
+      };
+      lessons: {
+        Row: {
+          id: string;
+          course_id: string;
+          module_id: string;
+          title: string;
+          type: "quiz" | "content";
+          content: string | null;
+          video_url: string | null;
+          files: Json;
+          order_index: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          course_id: string;
+          module_id: string;
+          title: string;
+          type?: "quiz" | "content";
           content?: string | null;
           video_url?: string | null;
+          files?: Json;
+          order_index?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          course_id?: string;
+          module_id?: string;
+          title?: string;
+          type?: "quiz" | "content";
+          content?: string | null;
+          video_url?: string | null;
+          files?: Json;
           order_index?: number;
           created_at?: string;
         };

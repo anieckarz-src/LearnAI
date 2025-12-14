@@ -11,11 +11,6 @@ interface CourseWithProgress {
   thumbnail_url: string | null;
   status: string;
   lesson_access_mode: "sequential" | "all_access";
-  instructor: {
-    id: string;
-    email: string;
-    full_name: string | null;
-  };
   total_lessons: number;
   completed_lessons: number;
   progress_percentage: number;

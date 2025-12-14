@@ -21,7 +21,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
 
     let query = supabase
       .from("courses")
-      .select("*, instructor:users!courses_instructor_id_fkey(id, email, full_name)", { count: "exact" });
+      .select("*", { count: "exact" });
 
     if (status) {
       query = query.eq("status", status);
@@ -75,10 +75,10 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
   try {
     const body = await request.json();
-    const { title, description, instructor_id, thumbnail_url } = body;
+    const { title, description, thumbnail_url } = body;
 
-    if (!title || !instructor_id) {
-      return new Response(JSON.stringify({ success: false, error: "Title and instructor_id are required" }), {
+    if (!title) {
+      return new Response(JSON.stringify({ success: false, error: "Title is required" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
@@ -89,7 +89,6 @@ export const POST: APIRoute = async ({ locals, request }) => {
       .insert({
         title,
         description,
-        instructor_id,
         thumbnail_url,
         status: "draft",
       })
