@@ -1,10 +1,9 @@
 import type { APIRoute } from "astro";
-import { supabase } from "@/lib/supabase";
 
 // POST /api/admin/modules/reorder - Reorder modules within a course
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
-    const user = locals.user;
+    const { supabase, user } = locals;
     if (!user || user.role !== "admin") {
       return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
         status: 403,

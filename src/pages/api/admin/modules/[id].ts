@@ -1,10 +1,9 @@
 import type { APIRoute } from "astro";
-import { supabase } from "@/lib/supabase";
 
 // GET /api/admin/modules/:id - Get a single module
 export const GET: APIRoute = async ({ params, locals }) => {
   try {
-    const user = locals.user;
+    const { supabase, user } = locals;
     if (!user || user.role !== "admin") {
       return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
         status: 403,
@@ -49,7 +48,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
 // PATCH /api/admin/modules/:id - Update a module
 export const PATCH: APIRoute = async ({ params, request, locals }) => {
   try {
-    const user = locals.user;
+    const { supabase, user } = locals;
     if (!user || user.role !== "admin") {
       return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
         status: 403,
@@ -132,7 +131,7 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
 // DELETE /api/admin/modules/:id - Delete a module
 export const DELETE: APIRoute = async ({ params, locals }) => {
   try {
-    const user = locals.user;
+    const { supabase, user } = locals;
     if (!user || user.role !== "admin") {
       return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
         status: 403,

@@ -1,11 +1,10 @@
 import type { APIRoute } from "astro";
-import { supabase } from "@/lib/supabase";
 import type { ModuleWithLessons } from "@/types";
 
 // GET /api/courses/:id/modules - Get all modules with lessons for a course
 export const GET: APIRoute = async ({ params, locals }) => {
   try {
-    const user = locals.user;
+    const { supabase, user } = locals;
     if (!user) {
       return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
         status: 403,
