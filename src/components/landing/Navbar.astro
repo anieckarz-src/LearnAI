@@ -1,5 +1,6 @@
 ---
 // Navbar component with sticky positioning and backdrop blur
+const user = Astro.locals.user;
 ---
 
 <nav
@@ -21,18 +22,61 @@
 
       <!-- Desktop Navigation -->
       <div class="hidden md:flex items-center space-x-8">
-        <a href="#features" class="text-gray-300 hover:text-white transition-colors">Funkcje</a>
-        <a href="#dla-kogo" class="text-gray-300 hover:text-white transition-colors">Dla kogo</a>
-        <a href="#o-platformie" class="text-gray-300 hover:text-white transition-colors">O platformie</a>
-        <a href="#kontakt" class="text-gray-300 hover:text-white transition-colors">Kontakt</a>
+        {
+          user ? (
+            <>
+              <a href="/dashboard" class="text-gray-300 hover:text-white transition-colors">
+                Moje kursy
+              </a>
+              <a href="/courses" class="text-gray-300 hover:text-white transition-colors">
+                Katalog kursów
+              </a>
+            </>
+          ) : (
+            <>
+              <a href="#features" class="text-gray-300 hover:text-white transition-colors">
+                Funkcje
+              </a>
+              <a href="#dla-kogo" class="text-gray-300 hover:text-white transition-colors">
+                Dla kogo
+              </a>
+              <a href="#o-platformie" class="text-gray-300 hover:text-white transition-colors">
+                O platformie
+              </a>
+              <a href="#kontakt" class="text-gray-300 hover:text-white transition-colors">
+                Kontakt
+              </a>
+            </>
+          )
+        }
       </div>
 
       <!-- CTA Buttons -->
       <div class="hidden md:flex items-center space-x-4">
-        <a href="/login" class="text-gray-300 hover:text-white transition-colors px-4 py-2"> Zaloguj się </a>
-        <a href="/demo" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors">
-          Wypróbuj za darmo
-        </a>
+        {
+          user ? (
+            <>
+              <span class="text-gray-400 text-sm">{user.full_name || user.email}</span>
+              <form method="POST" action="/api/auth/signout">
+                <button
+                  type="submit"
+                  class="text-gray-300 hover:text-white transition-colors px-4 py-2 border border-white/10 rounded-lg hover:border-white/30"
+                >
+                  Wyloguj się
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <a href="/login" class="text-gray-300 hover:text-white transition-colors px-4 py-2">
+                Zaloguj się
+              </a>
+              <a href="/courses" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors">
+                Przeglądaj kursy
+              </a>
+            </>
+          )
+        }
       </div>
 
       <!-- Mobile menu button -->
@@ -52,31 +96,65 @@
   <!-- Mobile menu -->
   <div id="mobile-menu" class="hidden md:hidden bg-slate-900/95 backdrop-blur-md" role="menu">
     <div class="px-4 pt-2 pb-4 space-y-2">
-      <a href="#features" class="block text-gray-300 hover:text-white py-2 transition-colors" role="menuitem">Funkcje</a
-      >
-      <a href="#dla-kogo" class="block text-gray-300 hover:text-white py-2 transition-colors" role="menuitem"
-        >Dla kogo</a
-      >
-      <a href="#o-platformie" class="block text-gray-300 hover:text-white py-2 transition-colors" role="menuitem"
-        >O platformie</a
-      >
-      <a href="#kontakt" class="block text-gray-300 hover:text-white py-2 transition-colors" role="menuitem">Kontakt</a>
-      <div class="pt-4 space-y-2">
-        <a
-          href="/login"
-          class="block text-center text-gray-300 hover:text-white py-2 transition-colors border border-gray-600 rounded-lg"
-          role="menuitem"
-        >
-          Zaloguj się
-        </a>
-        <a
-          href="/demo"
-          class="block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors"
-          role="menuitem"
-        >
-          Wypróbuj za darmo
-        </a>
-      </div>
+      {
+        user ? (
+          <>
+            <span class="block text-gray-400 text-sm py-2">{user.full_name || user.email}</span>
+            <a href="/dashboard" class="block text-gray-300 hover:text-white py-2 transition-colors" role="menuitem">
+              Moje kursy
+            </a>
+            <a href="/courses" class="block text-gray-300 hover:text-white py-2 transition-colors" role="menuitem">
+              Katalog kursów
+            </a>
+            <div class="pt-4">
+              <form method="POST" action="/api/auth/signout">
+                <button
+                  type="submit"
+                  class="w-full text-center text-gray-300 hover:text-white py-2 transition-colors border border-gray-600 rounded-lg"
+                  role="menuitem"
+                >
+                  Wyloguj się
+                </button>
+              </form>
+            </div>
+          </>
+        ) : (
+          <>
+            <a href="#features" class="block text-gray-300 hover:text-white py-2 transition-colors" role="menuitem">
+              Funkcje
+            </a>
+            <a href="#dla-kogo" class="block text-gray-300 hover:text-white py-2 transition-colors" role="menuitem">
+              Dla kogo
+            </a>
+            <a
+              href="#o-platformie"
+              class="block text-gray-300 hover:text-white py-2 transition-colors"
+              role="menuitem"
+            >
+              O platformie
+            </a>
+            <a href="#kontakt" class="block text-gray-300 hover:text-white py-2 transition-colors" role="menuitem">
+              Kontakt
+            </a>
+            <div class="pt-4 space-y-2">
+              <a
+                href="/login"
+                class="block text-center text-gray-300 hover:text-white py-2 transition-colors border border-gray-600 rounded-lg"
+                role="menuitem"
+              >
+                Zaloguj się
+              </a>
+              <a
+                href="/courses"
+                class="block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors"
+                role="menuitem"
+              >
+                Przeglądaj kursy
+              </a>
+            </div>
+          </>
+        )
+      }
     </div>
   </div>
 </nav>

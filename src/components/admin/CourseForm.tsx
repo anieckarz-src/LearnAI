@@ -18,6 +18,15 @@ const courseSchema = z.object({
   instructor_id: z.string().uuid("Wybierz instruktora"),
   status: z.enum(["draft", "published", "archived"] as const),
   thumbnail_url: z.string(),
+  lesson_access_mode: z.enum(["sequential", "all_access"] as const).default("all_access"),
+  price: z
+    .string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return null;
+      const num = parseFloat(val);
+      return isNaN(num) ? null : num;
+    }),
 });
 
 type CourseFormData = z.infer<typeof courseSchema>;
@@ -46,15 +55,26 @@ export function CourseForm({ course }: CourseFormProps) {
       title: course?.title || "",
       description: course?.description || "",
       instructor_id: course?.instructor_id || "",
-      status: course?.status || "draft",
+      status: (course?.status as CourseStatus) || "draft",
       thumbnail_url: course?.thumbnail_url || "",
+      lesson_access_mode: (course?.lesson_access_mode as "sequential" | "all_access") || "all_access",
+      price: course?.price?.toString() || "",
     },
   });
+
+  // Ensure form fields are registered
+  useEffect(() => {
+    register("status");
+    register("lesson_access_mode");
+    register("instructor_id");
+  }, [register]);
 
   const description = watch("description");
   const thumbnail_url = watch("thumbnail_url");
   const status = watch("status");
   const instructor_id = watch("instructor_id");
+  const lesson_access_mode = watch("lesson_access_mode");
+  const price = watch("price");
 
   // Fetch instructors (both instructors and admins can be instructors)
   useEffect(() => {
@@ -179,7 +199,10 @@ export function CourseForm({ course }: CourseFormProps) {
                   Ładowanie instruktorów...
                 </div>
               ) : (
-                <Select value={instructor_id} onValueChange={(value) => setValue("instructor_id", value)}>
+                <Select 
+                  value={instructor_id || undefined} 
+                  onValueChange={(value) => setValue("instructor_id", value, { shouldValidate: true })}
+                >
                   <SelectTrigger className="bg-slate-700/50 border-white/10 text-white">
                     <SelectValue placeholder="Wybierz instruktora" />
                   </SelectTrigger>
@@ -207,7 +230,10 @@ export function CourseForm({ course }: CourseFormProps) {
               <Label htmlFor="status" className="text-white">
                 Status <span className="text-red-400">*</span>
               </Label>
-              <Select value={status} onValueChange={(value) => setValue("status", value as CourseStatus)}>
+              <Select 
+                value={status || "draft"} 
+                onValueChange={(value) => setValue("status", value as CourseStatus, { shouldValidate: true })}
+              >
                 <SelectTrigger className="bg-slate-700/50 border-white/10 text-white">
                   <SelectValue placeholder="Wybierz status" />
                 </SelectTrigger>
@@ -224,6 +250,58 @@ export function CourseForm({ course }: CourseFormProps) {
                 </SelectContent>
               </Select>
               {errors.status && <p className="text-sm text-red-400">{errors.status.message}</p>}
+            </div>
+          </div>
+
+          {/* Price and Lesson Access Mode - Side by Side */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Price */}
+            <div className="space-y-2">
+              <Label htmlFor="price" className="text-white">
+                Cena kursu (PLN)
+              </Label>
+              <Input
+                id="price"
+                type="number"
+                step="0.01"
+                min="0"
+                {...register("price")}
+                placeholder="0.00"
+                className="bg-slate-700/50 border-white/10 text-white placeholder:text-gray-400"
+              />
+              <p className="text-xs text-gray-400">Pozostaw puste dla darmowego kursu</p>
+              {errors.price && <p className="text-sm text-red-400">{errors.price.message}</p>}
+            </div>
+
+            {/* Lesson Access Mode */}
+            <div className="space-y-2">
+              <Label htmlFor="lesson_access_mode" className="text-white">
+                Tryb dostępu do lekcji <span className="text-red-400">*</span>
+              </Label>
+              <Select
+                value={lesson_access_mode || "all_access"}
+                onValueChange={(value) => setValue("lesson_access_mode", value as "sequential" | "all_access", { shouldValidate: true })}
+              >
+                <SelectTrigger className="bg-slate-700/50 border-white/10 text-white">
+                  <SelectValue placeholder="Wybierz tryb dostępu" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-white/10">
+                  <SelectItem value="all_access" className="text-white focus:bg-slate-700 focus:text-white">
+                    Pełny dostęp - wszystkie lekcje od razu
+                  </SelectItem>
+                  <SelectItem value="sequential" className="text-white focus:bg-slate-700 focus:text-white">
+                    Sekwencyjny - odblokowanie po kolei
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-400">
+                {lesson_access_mode === "sequential"
+                  ? "Użytkownicy muszą ukończyć lekcje po kolei"
+                  : "Użytkownicy mają dostęp do wszystkich lekcji od razu"}
+              </p>
+              {errors.lesson_access_mode && (
+                <p className="text-sm text-red-400">{errors.lesson_access_mode.message}</p>
+              )}
             </div>
           </div>
 

@@ -72,6 +72,10 @@ export interface Database {
           instructor_id: string;
           status: "draft" | "published" | "archived";
           thumbnail_url: string | null;
+          lesson_access_mode: "sequential" | "all_access";
+          price: number | null;
+          stripe_product_id: string | null;
+          stripe_price_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -82,6 +86,10 @@ export interface Database {
           instructor_id: string;
           status?: "draft" | "published" | "archived";
           thumbnail_url?: string | null;
+          lesson_access_mode?: "sequential" | "all_access";
+          price?: number | null;
+          stripe_product_id?: string | null;
+          stripe_price_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -92,6 +100,10 @@ export interface Database {
           instructor_id?: string;
           status?: "draft" | "published" | "archived";
           thumbnail_url?: string | null;
+          lesson_access_mode?: "sequential" | "all_access";
+          price?: number | null;
+          stripe_product_id?: string | null;
+          stripe_price_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -102,6 +114,7 @@ export interface Database {
           course_id: string;
           title: string;
           content: string | null;
+          video_url: string | null;
           order_index: number;
           created_at: string;
         };
@@ -110,6 +123,7 @@ export interface Database {
           course_id: string;
           title: string;
           content?: string | null;
+          video_url?: string | null;
           order_index?: number;
           created_at?: string;
         };
@@ -118,6 +132,7 @@ export interface Database {
           course_id?: string;
           title?: string;
           content?: string | null;
+          video_url?: string | null;
           order_index?: number;
           created_at?: string;
         };
@@ -215,6 +230,73 @@ export interface Database {
           user_id?: string;
           enrolled_at?: string;
           completed_at?: string | null;
+        };
+      };
+      payments: {
+        Row: {
+          id: string;
+          user_id: string;
+          course_id: string;
+          amount: number;
+          currency: string;
+          stripe_payment_intent_id: string | null;
+          stripe_checkout_session_id: string | null;
+          status: "pending" | "succeeded" | "failed" | "refunded";
+          created_at: string;
+          paid_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          course_id: string;
+          amount: number;
+          currency?: string;
+          stripe_payment_intent_id?: string | null;
+          stripe_checkout_session_id?: string | null;
+          status?: "pending" | "succeeded" | "failed" | "refunded";
+          created_at?: string;
+          paid_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          course_id?: string;
+          amount?: number;
+          currency?: string;
+          stripe_payment_intent_id?: string | null;
+          stripe_checkout_session_id?: string | null;
+          status?: "pending" | "succeeded" | "failed" | "refunded";
+          created_at?: string;
+          paid_at?: string | null;
+        };
+      };
+      lesson_progress: {
+        Row: {
+          id: string;
+          user_id: string;
+          lesson_id: string;
+          course_id: string;
+          completed: boolean;
+          completed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          lesson_id: string;
+          course_id: string;
+          completed?: boolean;
+          completed_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          lesson_id?: string;
+          course_id?: string;
+          completed?: boolean;
+          completed_at?: string | null;
+          created_at?: string;
         };
       };
     };

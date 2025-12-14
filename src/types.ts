@@ -21,8 +21,12 @@ export interface Course {
   instructor_id: string;
   status: CourseStatus;
   thumbnail_url: string | null;
+  lesson_access_mode?: "sequential" | "all_access";
   created_at: string;
   updated_at: string;
+  price?: number | null;
+  stripe_product_id?: string | null;
+  stripe_price_id?: string | null;
 }
 
 export interface CourseWithInstructor extends Course {
@@ -30,8 +34,24 @@ export interface CourseWithInstructor extends Course {
   enrollment_count?: number;
 }
 
+export interface CourseWithPrice extends Course {
+  price: number | null;
+  stripe_product_id: string | null;
+  stripe_price_id: string | null;
+}
+
+export interface CourseWithProgress extends Course {
+  total_lessons: number;
+  completed_lessons: number;
+  progress_percentage: number;
+  lesson_access_mode: "sequential" | "all_access";
+  next_lesson_id?: string | null;
+  enrolled_at?: string;
+  instructor?: User;
+}
+
 // Lesson types
-export type LessonMaterialType = "pdf" | "video" | "image";
+export type LessonMaterialType = "pdf" | "image"; // Removed "video" - we use video_url instead
 
 export interface LessonMaterial {
   id: string;
@@ -46,12 +66,32 @@ export interface Lesson {
   course_id: string;
   title: string;
   content: string | null;
+  video_url?: string | null; // External video URL (Vimeo, YouTube)
   order_index: number;
   created_at: string;
   materials?: LessonMaterial[];
 }
 
+export interface LessonWithProgress extends Lesson {
+  completed: boolean;
+  completed_at?: string | null;
+  is_accessible: boolean;
+}
+
+// Lesson Progress types
+export interface LessonProgress {
+  id: string;
+  user_id: string;
+  lesson_id: string;
+  course_id: string;
+  completed: boolean;
+  completed_at: string | null;
+  created_at: string;
+}
+
 // Quiz types
+export type QuizDifficulty = "easy" | "medium" | "hard";
+
 export interface QuizQuestion {
   id: string;
   question: string;
@@ -65,6 +105,9 @@ export interface Quiz {
   title: string;
   questions: QuizQuestion[];
   ai_generated: boolean;
+  passing_score: number;
+  max_attempts: number | null;
+  time_limit_minutes: number | null;
   created_at: string;
 }
 
@@ -74,7 +117,41 @@ export interface QuizAttempt {
   user_id: string;
   score: number;
   answers: Record<string, number>;
+  time_spent_seconds: number;
+  passed: boolean;
   completed_at: string;
+}
+
+export interface QuizAttemptWithDetails extends QuizAttempt {
+  quiz: Quiz;
+  total_attempts: number;
+  best_score: number;
+  can_retry: boolean;
+}
+
+export interface QuizWithAttemptInfo extends Quiz {
+  user_attempts_count: number;
+  user_best_score: number;
+  user_has_passed: boolean;
+  can_attempt: boolean;
+}
+
+export interface QuizFeedback {
+  question_id: string;
+  question: string;
+  options: string[];
+  user_answer: number;
+  correct_answer: number;
+  is_correct: boolean;
+}
+
+export interface QuizResult {
+  attempt: QuizAttempt;
+  quiz: Quiz;
+  feedback: QuizFeedback[];
+  total_questions: number;
+  correct_answers: number;
+  percentage: number;
 }
 
 // System settings types
@@ -92,6 +169,35 @@ export interface CourseEnrollment {
   user_id: string;
   enrolled_at: string;
   completed_at: string | null;
+}
+
+// Payment types
+export type PaymentStatus = "pending" | "succeeded" | "failed" | "refunded";
+
+export interface Payment {
+  id: string;
+  user_id: string;
+  course_id: string;
+  amount: number;
+  currency: string;
+  stripe_payment_intent_id: string | null;
+  stripe_checkout_session_id: string | null;
+  status: PaymentStatus;
+  created_at: string;
+  paid_at: string | null;
+}
+
+export interface PaymentWithDetails extends Payment {
+  user: User;
+  course: Course;
+}
+
+export interface PaymentFilters extends PaginationParams {
+  status?: PaymentStatus;
+  user_id?: string;
+  course_id?: string;
+  date_from?: string;
+  date_to?: string;
 }
 
 // Stats types
@@ -176,6 +282,7 @@ export interface CourseFormData {
   instructor_id: string;
   status: CourseStatus;
   thumbnail_url: string;
+  price?: number | null;
 }
 
 // Lesson form types
@@ -191,4 +298,19 @@ export interface QuizFormData {
   title: string;
   questions: QuizQuestion[];
   ai_generated?: boolean;
+  passing_score?: number;
+  max_attempts?: number | null;
+  time_limit_minutes?: number | null;
+}
+
+// AI Quiz Generation types
+export interface AIQuizGenerationOptions {
+  lesson_id: string;
+  num_questions: number;
+  difficulty: QuizDifficulty;
+}
+
+export interface AIQuizGenerationResult {
+  questions: QuizQuestion[];
+  lesson_title: string;
 }

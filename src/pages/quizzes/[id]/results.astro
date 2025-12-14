@@ -1,0 +1,299 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
+const { id } = Astro.params;
+const attemptId = Astro.url.searchParams.get("attempt");
+
+if (!id) {
+  return Astro.redirect("/courses");
+}
+
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect("/login");
+}
+
+// Fetch quiz attempt details
+let result = null;
+let error: string | null = null;
+
+try {
+  // If specific attempt provided, use it; otherwise get the latest attempt
+  let attemptData = null;
+
+  if (attemptId) {
+    const attemptResponse = await fetch(`${Astro.url.origin}/api/quizzes/${id}/attempts`, {
+      headers: {
+        Cookie: Astro.request.headers.get("Cookie") || "",
+      },
+    });
+    const attemptResult = await attemptResponse.json();
+
+    if (attemptResult.success) {
+      attemptData = attemptResult.data.attempts.find((a: any) => a.id === attemptId);
+    }
+  }
+
+  // If no specific attempt, get the latest one
+  if (!attemptData) {
+    const attemptsResponse = await fetch(`${Astro.url.origin}/api/quizzes/${id}/attempts`, {
+      headers: {
+        Cookie: Astro.request.headers.get("Cookie") || "",
+      },
+    });
+    const attemptsResult = await attemptsResponse.json();
+
+    if (attemptsResult.success && attemptsResult.data.attempts.length > 0) {
+      attemptData = attemptsResult.data.attempts[0]; // Latest attempt
+    }
+  }
+
+  if (!attemptData) {
+    error = "Nie znaleziono próby rozwiązania quizu";
+  } else {
+    // Fetch quiz to get questions with correct answers
+    const quizResponse = await fetch(`${Astro.url.origin}/api/admin/quizzes/${id}`, {
+      headers: {
+        Cookie: Astro.request.headers.get("Cookie") || "",
+      },
+    });
+
+    const quizResult = await quizResponse.json();
+
+    if (!quizResult.success) {
+      error = "Nie udało się pobrać szczegółów quizu";
+    } else {
+      const quiz = quizResult.data;
+      const questions = quiz.questions;
+
+      // Build feedback for each question
+      const feedback = questions.map((q: any) => {
+        const userAnswer = attemptData.answers[q.id];
+        return {
+          question_id: q.id,
+          question: q.question,
+          options: q.options,
+          user_answer: userAnswer,
+          correct_answer: q.correct_answer,
+          is_correct: userAnswer === q.correct_answer,
+        };
+      });
+
+      const correctAnswers = feedback.filter((f: any) => f.is_correct).length;
+
+      result = {
+        attempt: attemptData,
+        quiz: {
+          id: quiz.id,
+          title: quiz.title,
+          passing_score: quiz.passing_score,
+          max_attempts: quiz.max_attempts,
+        },
+        feedback,
+        total_questions: questions.length,
+        correct_answers: correctAnswers,
+        percentage: attemptData.score,
+        passed: attemptData.passed,
+      };
+
+      // Get attempts stats
+      const attemptsResponse = await fetch(`${Astro.url.origin}/api/quizzes/${id}/attempts`, {
+        headers: {
+          Cookie: Astro.request.headers.get("Cookie") || "",
+        },
+      });
+      const attemptsResult = await attemptsResponse.json();
+      if (attemptsResult.success) {
+        result.attempts_stats = attemptsResult.data.stats;
+      }
+    }
+  }
+} catch (err) {
+  console.error("Error fetching quiz results:", err);
+  error = "Wystąpił błąd podczas pobierania wyników";
+}
+---
+
+<Layout title={`Wyniki quizu - LearnAI Platform`}>
+  <div class="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+    <div class="container mx-auto px-4 py-12">
+      <div class="max-w-4xl mx-auto space-y-6">
+        {
+          error ? (
+            <Card className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
+              <CardContent className="text-center py-12">
+                <p class="text-red-400 text-lg">{error}</p>
+                <Button onclick="window.history.back()" className="mt-4">
+                  Wróć
+                </Button>
+              </CardContent>
+            </Card>
+          ) : result ? (
+            <>
+              {/* Results Header */}
+              <Card className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-white text-2xl">{result.quiz.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {/* Score */}
+                  <div class="text-center py-8">
+                    <div class="mb-4">
+                      <div
+                        class={`text-6xl font-bold ${result.passed ? "text-green-400" : "text-red-400"}`}
+                      >
+                        {result.percentage}%
+                      </div>
+                      <div class="text-gray-400 mt-2">
+                        {result.correct_answers} / {result.total_questions} poprawnych odpowiedzi
+                      </div>
+                    </div>
+
+                    <Badge
+                      className={`text-lg px-6 py-2 ${result.passed ? "bg-green-600 text-white" : "bg-red-600 text-white"}`}
+                    >
+                      {result.passed ? "✓ Zaliczony" : "✗ Niezaliczony"}
+                    </Badge>
+
+                    <div class="mt-4 text-sm text-gray-400">
+                      Próg zaliczenia: {result.quiz.passing_score}%
+                    </div>
+                  </div>
+
+                  {/* Stats */}
+                  {result.attempts_stats && (
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-lg bg-slate-700/30 border border-white/10">
+                      <div class="text-center">
+                        <div class="text-2xl font-bold text-white">{result.attempts_stats.total_attempts}</div>
+                        <div class="text-xs text-gray-400">Wszystkie próby</div>
+                      </div>
+                      <div class="text-center">
+                        <div class="text-2xl font-bold text-white">{result.attempts_stats.best_score}%</div>
+                        <div class="text-xs text-gray-400">Najlepszy wynik</div>
+                      </div>
+                      <div class="text-center">
+                        <div class="text-2xl font-bold text-white">{result.attempts_stats.avg_score}%</div>
+                        <div class="text-xs text-gray-400">Średnia</div>
+                      </div>
+                      <div class="text-center">
+                        <div
+                          class={`text-2xl font-bold ${result.attempts_stats.has_passed ? "text-green-400" : "text-gray-400"}`}
+                        >
+                          {result.attempts_stats.has_passed ? "TAK" : "NIE"}
+                        </div>
+                        <div class="text-xs text-gray-400">Zaliczony</div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Detailed Feedback */}
+              <Card className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-white">Szczegółowe wyniki</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {result.feedback.map((item: any, index: number) => (
+                    <div
+                      key={item.question_id}
+                      class={`p-4 rounded-lg border-2 ${
+                        item.is_correct
+                          ? "border-green-500/30 bg-green-500/5"
+                          : "border-red-500/30 bg-red-500/5"
+                      }`}
+                    >
+                      {/* Question */}
+                      <div class="flex items-start gap-3 mb-4">
+                        <Badge
+                          className={`flex-shrink-0 ${
+                            item.is_correct ? "bg-green-600 text-white" : "bg-red-600 text-white"
+                          }`}
+                        >
+                          {index + 1}
+                        </Badge>
+                        <div class="flex-1">
+                          <p class="text-white font-medium">{item.question}</p>
+                        </div>
+                        <Badge
+                          className={`flex-shrink-0 ${
+                            item.is_correct ? "bg-green-600 text-white" : "bg-red-600 text-white"
+                          }`}
+                        >
+                          {item.is_correct ? "✓ Poprawna" : "✗ Błędna"}
+                        </Badge>
+                      </div>
+
+                      {/* Options */}
+                      <div class="space-y-2 ml-12">
+                        {item.options.map((option: string, optionIndex: number) => {
+                          const isCorrect = optionIndex === item.correct_answer;
+                          const isUserAnswer = optionIndex === item.user_answer;
+
+                          return (
+                            <div
+                              key={optionIndex}
+                              class={`p-3 rounded-lg ${
+                                isCorrect
+                                  ? "bg-green-600/20 border-2 border-green-500/50"
+                                  : isUserAnswer
+                                    ? "bg-red-600/20 border-2 border-red-500/50"
+                                    : "bg-slate-700/20 border-2 border-transparent"
+                              }`}
+                            >
+                              <div class="flex items-center gap-2">
+                                <span class="text-white font-medium">{String.fromCharCode(65 + optionIndex)}.</span>
+                                <span class={isCorrect || isUserAnswer ? "text-white" : "text-gray-400"}>
+                                  {option}
+                                </span>
+                                {isCorrect && <Badge className="bg-green-600 text-white text-xs ml-auto">Poprawna</Badge>}
+                                {isUserAnswer && !isCorrect && (
+                                  <Badge className="bg-red-600 text-white text-xs ml-auto">Twoja odpowiedź</Badge>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Action Buttons */}
+              <Card className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
+                <CardContent className="py-4">
+                  <div class="flex items-center justify-between flex-wrap gap-4">
+                    <Button onclick="window.history.back()" variant="outline">
+                      Wróć do kursu
+                    </Button>
+                    <div class="flex gap-3">
+                      <Button
+                        onclick={`window.location.href='/quizzes/${id}/attempts'`}
+                        variant="outline"
+                      >
+                        Zobacz historię prób
+                      </Button>
+                      {result.attempts_stats?.can_retry && (
+                        <Button
+                          onclick={`window.location.href='/quizzes/${id}/take'`}
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          Spróbuj ponownie
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          ) : null
+        }
+      </div>
+    </div>
+  </div>
+</Layout>

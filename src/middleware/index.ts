@@ -5,6 +5,35 @@ import type { Database } from "./db/database.types";
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
+// Helper function to check course access
+export async function checkCourseAccess(
+  supabase: ReturnType<typeof createClient<Database>>,
+  userId: string,
+  courseId: string
+): Promise<boolean> {
+  // Get course details
+  const { data: course } = await supabase.from("courses").select("price").eq("id", courseId).single();
+
+  if (!course) {
+    return false;
+  }
+
+  // Free courses are accessible to everyone
+  if (!course.price || course.price <= 0) {
+    return true;
+  }
+
+  // Check if user has enrollment (via payment or admin grant)
+  const { data: enrollment } = await supabase
+    .from("course_enrollments")
+    .select("id")
+    .eq("course_id", courseId)
+    .eq("user_id", userId)
+    .single();
+
+  return !!enrollment;
+}
+
 export const onRequest = defineMiddleware(async (context, next) => {
   // Create Supabase client
   const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
@@ -49,6 +78,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // Protected routes check
   const pathname = context.url.pathname;
 
+  // Define public routes (accessible without authentication)
+  const publicRoutes = ["/", "/login", "/unauthorized", "/reset-password"];
+  const publicApiRoutes = ["/api/payments/webhook", "/api/auth/signin", "/api/auth/signout"];
+
+  const isPublicRoute = publicRoutes.includes(pathname) || publicRoutes.some((route) => pathname.startsWith(route));
+  const isPublicApiRoute = publicApiRoutes.some((route) => pathname.startsWith(route));
+
   // Admin routes protection
   if (pathname.startsWith("/admin")) {
     // Require authentication
@@ -85,6 +121,99 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
 
     if (context.locals.user.is_blocked) {
+      return new Response(JSON.stringify({ success: false, error: "Account blocked" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
+  // Quiz routes protection (student access)
+  if (pathname.startsWith("/quizzes/") && !pathname.includes("/api/")) {
+    // Require authentication for all quiz pages
+    if (!session?.user) {
+      return context.redirect("/login?redirect=" + encodeURIComponent(pathname));
+    }
+
+    // Check if user is blocked
+    if (context.locals.user && context.locals.user.is_blocked) {
+      await supabase.auth.signOut();
+      return context.redirect("/login?error=blocked");
+    }
+  }
+
+  // API quiz routes protection
+  if (pathname.startsWith("/api/quizzes/")) {
+    if (!session?.user) {
+      return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    if (context.locals.user && context.locals.user.is_blocked) {
+      return new Response(JSON.stringify({ success: false, error: "Account blocked" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
+  // Course routes protection (student access)
+  if (pathname.startsWith("/courses")) {
+    // Require authentication for course pages
+    if (!session?.user) {
+      return context.redirect("/login?redirect=" + encodeURIComponent(pathname));
+    }
+
+    // Check if user is blocked
+    if (context.locals.user && context.locals.user.is_blocked) {
+      await supabase.auth.signOut();
+      return context.redirect("/login?error=blocked");
+    }
+  }
+
+  // Dashboard protection (student access)
+  if (pathname.startsWith("/dashboard")) {
+    // Require authentication
+    if (!session?.user) {
+      return context.redirect("/login?redirect=" + encodeURIComponent(pathname));
+    }
+
+    // Check if user is blocked
+    if (context.locals.user && context.locals.user.is_blocked) {
+      await supabase.auth.signOut();
+      return context.redirect("/login?error=blocked");
+    }
+  }
+
+  // API user routes protection
+  if (pathname.startsWith("/api/user/")) {
+    if (!session?.user) {
+      return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    if (context.locals.user && context.locals.user.is_blocked) {
+      return new Response(JSON.stringify({ success: false, error: "Account blocked" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
+  // API courses routes protection (except webhook which is public)
+  if (pathname.startsWith("/api/courses/") && !isPublicApiRoute) {
+    if (!session?.user) {
+      return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    if (context.locals.user && context.locals.user.is_blocked) {
       return new Response(JSON.stringify({ success: false, error: "Account blocked" }), {
         status: 403,
         headers: { "Content-Type": "application/json" },

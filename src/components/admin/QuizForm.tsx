@@ -8,12 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { QuestionEditor } from "./QuestionEditor";
+import { QuizGeneratorModal } from "./QuizGeneratorModal";
 import type { Quiz, QuizQuestion, Lesson, Course } from "@/types";
 import { Save, X, Plus, ArrowLeft, Sparkles } from "lucide-react";
 
 const quizSchema = z.object({
   title: z.string().min(3, "Tytuł musi mieć co najmniej 3 znaki").max(200, "Tytuł może mieć maksymalnie 200 znaków"),
   lesson_id: z.string().uuid("Wybierz lekcję"),
+  passing_score: z.number().min(0).max(100),
+  max_attempts: z.number().min(1).nullable().optional(),
   questions: z
     .array(z.any())
     .min(1, "Quiz musi mieć co najmniej 1 pytanie")
@@ -45,6 +48,10 @@ export function QuizForm({ quiz }: QuizFormProps) {
   const [loading, setLoading] = useState(false);
   const [loadingLessons, setLoadingLessons] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAIModal, setShowAIModal] = useState(false);
+  const [passingScore, setPassingScore] = useState<number>(quiz?.passing_score || 70);
+  const [maxAttempts, setMaxAttempts] = useState<number | null>(quiz?.max_attempts || null);
+  const [aiGenerated, setAiGenerated] = useState<boolean>(quiz?.ai_generated || false);
 
   const isEditMode = !!quiz;
 
@@ -59,6 +66,8 @@ export function QuizForm({ quiz }: QuizFormProps) {
     defaultValues: {
       title: quiz?.title || "",
       lesson_id: quiz?.lesson_id || "",
+      passing_score: quiz?.passing_score || 70,
+      max_attempts: quiz?.max_attempts || null,
       questions: questions,
     },
   });
@@ -71,7 +80,9 @@ export function QuizForm({ quiz }: QuizFormProps) {
 
   useEffect(() => {
     setValue("questions", questions);
-  }, [questions, setValue]);
+    setValue("passing_score", passingScore);
+    setValue("max_attempts", maxAttempts);
+  }, [questions, passingScore, maxAttempts, setValue]);
 
   const fetchLessons = async () => {
     try {
@@ -104,6 +115,21 @@ export function QuizForm({ quiz }: QuizFormProps) {
     } finally {
       setLoadingLessons(false);
     }
+  };
+
+  const handleAIGenerate = (generatedQuestions: QuizQuestion[], suggestedTitle: string) => {
+    setQuestions(generatedQuestions);
+    setValue("title", suggestedTitle);
+    setAiGenerated(true);
+    setShowAIModal(false);
+  };
+
+  const openAIModal = () => {
+    if (!lesson_id) {
+      setError("Najpierw wybierz lekcję");
+      return;
+    }
+    setShowAIModal(true);
   };
 
   const addQuestion = () => {
@@ -162,7 +188,9 @@ export function QuizForm({ quiz }: QuizFormProps) {
         body: JSON.stringify({
           ...data,
           questions,
-          ai_generated: false,
+          passing_score: passingScore,
+          max_attempts: maxAttempts,
+          ai_generated: aiGenerated,
         }),
       });
 
@@ -181,6 +209,8 @@ export function QuizForm({ quiz }: QuizFormProps) {
       setLoading(false);
     }
   };
+
+  const selectedLesson = lessons.find((l) => l.id === lesson_id);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -248,22 +278,91 @@ export function QuizForm({ quiz }: QuizFormProps) {
             {errors.lesson_id && <p className="text-sm text-red-400">{errors.lesson_id.message}</p>}
           </div>
 
-          {/* AI Generation Placeholder */}
-          <div className="p-4 rounded-lg bg-slate-700/30 border border-white/10">
+          {/* AI Generation */}
+          <div className="p-4 rounded-lg bg-gradient-to-r from-purple-900/20 to-blue-900/20 border border-purple-500/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white font-medium">Generowanie quizu przez AI</p>
-                <p className="text-sm text-gray-400 mt-1">Ta funkcja będzie wkrótce dostępna</p>
+                <p className="text-white font-medium flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-purple-400" />
+                  Generowanie quizu przez AI
+                </p>
+                <p className="text-sm text-gray-400 mt-1">
+                  {lesson_id
+                    ? "Kliknij aby wygenerować pytania na podstawie treści lekcji"
+                    : "Najpierw wybierz lekcję"}
+                </p>
               </div>
               <Button
                 type="button"
-                disabled
-                className="bg-gradient-to-r from-purple-600 to-blue-600 opacity-50 cursor-not-allowed"
+                onClick={openAIModal}
+                disabled={!lesson_id || loadingLessons}
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
               >
                 <Sparkles className="w-4 h-4 mr-2" />
                 Generuj przez AI
               </Button>
             </div>
+          </div>
+
+          {/* Passing Score */}
+          <div className="space-y-2">
+            <Label htmlFor="passing_score" className="text-white">
+              Próg zaliczenia <span className="text-red-400">*</span>
+            </Label>
+            <div className="flex items-center gap-4">
+              <input
+                type="range"
+                id="passing_score"
+                min="0"
+                max="100"
+                step="5"
+                value={passingScore}
+                onChange={(e) => setPassingScore(parseInt(e.target.value))}
+                className="flex-1 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              />
+              <div className="w-16 text-center">
+                <span className="text-2xl font-bold text-white">{passingScore}%</span>
+              </div>
+            </div>
+            <p className="text-xs text-gray-400">
+              Student musi uzyskać co najmniej {passingScore}% punktów aby zaliczyć quiz
+            </p>
+          </div>
+
+          {/* Max Attempts */}
+          <div className="space-y-2">
+            <Label htmlFor="max_attempts" className="text-white">
+              Maksymalna liczba prób
+            </Label>
+            <div className="flex items-center gap-4">
+              <Select
+                value={maxAttempts === null ? "unlimited" : maxAttempts.toString()}
+                onValueChange={(value) => setMaxAttempts(value === "unlimited" ? null : parseInt(value))}
+              >
+                <SelectTrigger className="bg-slate-700/50 border-white/10 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-white/10">
+                  <SelectItem value="unlimited" className="text-white focus:bg-slate-700 focus:text-white">
+                    Bez limitu
+                  </SelectItem>
+                  {[1, 2, 3, 5, 10].map((num) => (
+                    <SelectItem
+                      key={num}
+                      value={num.toString()}
+                      className="text-white focus:bg-slate-700 focus:text-white"
+                    >
+                      {num} {num === 1 ? "próba" : num < 5 ? "próby" : "prób"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <p className="text-xs text-gray-400">
+              {maxAttempts === null
+                ? "Studenci mogą rozwiązywać quiz nieograniczoną liczbę razy"
+                : `Studenci mogą rozwiązać quiz maksymalnie ${maxAttempts} ${maxAttempts === 1 ? "raz" : "razy"}`}
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -271,7 +370,9 @@ export function QuizForm({ quiz }: QuizFormProps) {
       {/* Questions */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-white">Pytania ({questions.length})</h3>
+          <h3 className="text-lg font-semibold text-white">
+            Pytania ({questions.length}) {aiGenerated && <span className="text-purple-400 text-sm ml-2">★ Wygenerowane przez AI</span>}
+          </h3>
           <Button type="button" onClick={addQuestion} variant="outline" size="sm" disabled={questions.length >= 50}>
             <Plus className="w-4 h-4 mr-2" />
             Dodaj pytanie
@@ -320,6 +421,16 @@ export function QuizForm({ quiz }: QuizFormProps) {
           )}
         </Button>
       </div>
+
+      {/* AI Generator Modal */}
+      {showAIModal && selectedLesson && (
+        <QuizGeneratorModal
+          lessonId={selectedLesson.id}
+          lessonTitle={selectedLesson.title}
+          onGenerate={handleAIGenerate}
+          onClose={() => setShowAIModal(false)}
+        />
+      )}
     </form>
   );
 }

@@ -1,0 +1,32 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { QuizTaking } from "@/components/quiz/QuizTaking";
+
+const { id } = Astro.params;
+
+if (!id) {
+  return Astro.redirect("/courses");
+}
+
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect("/login");
+}
+---
+
+<Layout title="Rozwiąż quiz - LearnAI Platform">
+  <div class="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+    <div class="container mx-auto px-4 py-12">
+      <div class="max-w-4xl mx-auto">
+        <QuizTaking
+          client:load
+          quizId={id}
+          onComplete={(attemptId) => {
+            window.location.href = `/quizzes/${id}/results?attempt=${attemptId}`;
+          }}
+        />
+      </div>
+    </div>
+  </div>
+</Layout>

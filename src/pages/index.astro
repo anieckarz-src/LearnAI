@@ -8,6 +8,19 @@ import StatsSection from "../components/landing/StatsSection.astro";
 import FeaturesSection from "../components/landing/FeaturesSection.astro";
 import ControlSection from "../components/landing/ControlSection.astro";
 import Footer from "../components/landing/Footer.astro";
+
+// Check if user is logged in and redirect appropriately
+const user = Astro.locals.user;
+
+if (user) {
+  // Redirect admins to admin dashboard
+  if (user.role === "admin") {
+    return Astro.redirect("/admin/dashboard");
+  }
+  
+  // Redirect students to user dashboard
+  return Astro.redirect("/dashboard");
+}
 ---
 
 <Layout title="LearnAI - Platforma Edukacyjna z AI">

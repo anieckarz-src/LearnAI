@@ -6,13 +6,24 @@ A modern, full-stack educational platform with landing page and admin panel, bui
 
 This starter now includes:
 
+### 💳 **Stripe Payment Integration** (NEW!)
+
+- Paid and free course support
+- Secure checkout via Stripe (card + BLIK)
+- Automatic enrollment after payment
+- Admin payment management dashboard
+- Public course catalog with purchase flow
+- Webhook integration for payment verification
+
+[📖 Stripe Setup Guide](./STRIPE_SETUP.md) | [📖 Testing Guide](./TESTING_GUIDE.md) | [📖 Implementation Details](./STRIPE_IMPLEMENTATION.md)
+
 ### 🎓 **Complete Admin Panel**
 
 - Full-featured admin dashboard for managing educational platform
 - User management (roles, permissions, blocking)
 - Course and lesson management (CRUD operations)
 - Quiz management with AI generation support
-- Content moderation system
+- Payment tracking and reporting
 - System settings configuration
 
 [📖 Full Admin Panel Documentation](./ADMIN_PANEL.md)
@@ -46,6 +57,7 @@ This starter now includes:
 
 ### Additional Libraries
 
+- [Stripe](https://stripe.com) - Payment processing
 - recharts - Data visualization
 - react-hook-form + zod - Form validation
 - date-fns - Date formatting
@@ -99,10 +111,20 @@ npm run build
 
 - **Dashboard:** Overview with key metrics and statistics
 - **User Management:** CRUD operations, role assignment, account blocking
-- **Course Management:** Create, edit, publish courses and lessons
+- **Course Management:** Create, edit, publish courses and lessons with pricing
 - **Quiz Management:** View, create, delete quizzes (AI generation ready)
+- **Payment Management:** Track transactions, filter by status, export to CSV
 - **System Settings:** Configure platform, AI, security settings
 - **Audit Logging:** Track all admin actions
+
+### Payment System
+
+- **Stripe Integration:** Secure payment processing with card and BLIK support
+- **Flexible Pricing:** Set course prices or offer free courses
+- **Automatic Enrollment:** Users enrolled immediately after successful payment
+- **Access Control:** Paid course content protected until purchase
+- **Payment Dashboard:** Admin view of all transactions with filtering
+- **Webhook Security:** Verified Stripe webhooks for reliable payment processing
 
 ### Authentication & Security
 
@@ -115,8 +137,10 @@ npm run build
 ### Database Schema
 
 - Users (with roles and blocking)
-- Courses, Lessons, Quizzes
+- Courses (with pricing and Stripe integration)
+- Lessons, Quizzes
 - Course Enrollments
+- Payments (transaction tracking)
 - Quiz Attempts
 - System Settings
 - Audit Log
