@@ -1,9 +1,28 @@
 import type { APIRoute } from "astro";
 
+// Helper function to check quiz ownership via lesson and course
+async function checkQuizOwnership(supabase: any, userId: string, userRole: string, quizId: string): Promise<boolean> {
+  if (userRole === "admin") {
+    return true;
+  }
+
+  if (userRole === "instructor") {
+    const { data: quiz } = await supabase
+      .from("quizzes")
+      .select("lesson_id, lessons!inner(course_id, courses!inner(instructor_id))")
+      .eq("id", quizId)
+      .single();
+
+    return quiz?.lessons?.courses?.instructor_id === userId;
+  }
+
+  return false;
+}
+
 export const GET: APIRoute = async ({ locals, url }) => {
   const { supabase, user } = locals;
 
-  if (!user || user.role !== "admin") {
+  if (!user || !["admin", "instructor"].includes(user.role)) {
     return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -23,7 +42,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
         lesson:lessons(
           id,
           title,
-          course:courses(id, title)
+          course:courses(id, title, instructor_id)
         )
       `,
       { count: "exact" }
@@ -31,6 +50,11 @@ export const GET: APIRoute = async ({ locals, url }) => {
 
     if (lessonId) {
       query = query.eq("lesson_id", lessonId);
+    }
+
+    // Filter by instructor_id for instructors
+    if (user.role === "instructor") {
+      query = query.eq("lesson.course.instructor_id", user.id);
     }
 
     query = query.order("created_at", { ascending: false }).range(offset, offset + limit - 1);
@@ -68,7 +92,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
 export const POST: APIRoute = async ({ locals, request }) => {
   const { supabase, user } = locals;
 
-  if (!user || user.role !== "admin") {
+  if (!user || !["admin", "instructor"].includes(user.role)) {
     return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -78,6 +102,22 @@ export const POST: APIRoute = async ({ locals, request }) => {
   try {
     const body = await request.json();
     const { lesson_id, title, questions, ai_generated } = body;
+
+    // Check ownership for instructors - verify they own the course
+    if (user.role === "instructor") {
+      const { data: lesson } = await supabase
+        .from("lessons")
+        .select("course_id, courses!inner(instructor_id)")
+        .eq("id", lesson_id)
+        .single();
+
+      if (!lesson || lesson.courses?.instructor_id !== user.id) {
+        return new Response(JSON.stringify({ success: false, error: "Forbidden - You don't own this lesson's course" }), {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+    }
 
     if (!lesson_id || !title || !questions) {
       return new Response(JSON.stringify({ success: false, error: "lesson_id, title, and questions are required" }), {

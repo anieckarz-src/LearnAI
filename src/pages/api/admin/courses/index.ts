@@ -4,7 +4,7 @@ import type { CourseFilters } from "@/types";
 export const GET: APIRoute = async ({ locals, url }) => {
   const { supabase, user } = locals;
 
-  if (!user || user.role !== "admin") {
+  if (!user || !["admin", "instructor"].includes(user.role)) {
     return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -20,6 +20,11 @@ export const GET: APIRoute = async ({ locals, url }) => {
     const offset = (page - 1) * limit;
 
     let query = supabase.from("courses").select("*", { count: "exact" });
+
+    // Instructors can only see their own courses
+    if (user.role === "instructor") {
+      query = query.eq("instructor_id", user.id);
+    }
 
     if (status) {
       query = query.eq("status", status);
@@ -64,7 +69,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
 export const POST: APIRoute = async ({ locals, request }) => {
   const { supabase, user } = locals;
 
-  if (!user || user.role !== "admin") {
+  if (!user || !["admin", "instructor"].includes(user.role)) {
     return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -88,6 +93,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
         title,
         description,
         thumbnail_url,
+        instructor_id: user.id, // Auto-assign to current user
         status: "draft",
       })
       .select()

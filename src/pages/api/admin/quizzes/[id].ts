@@ -1,9 +1,28 @@
 import type { APIRoute } from "astro";
 
+// Helper function to check quiz ownership
+async function checkQuizOwnership(supabase: any, userId: string, userRole: string, quizId: string): Promise<boolean> {
+  if (userRole === "admin") {
+    return true;
+  }
+
+  if (userRole === "instructor") {
+    const { data: quiz } = await supabase
+      .from("quizzes")
+      .select("lesson_id, lessons!inner(course_id, courses!inner(instructor_id))")
+      .eq("id", quizId)
+      .single();
+
+    return quiz?.lessons?.courses?.instructor_id === userId;
+  }
+
+  return false;
+}
+
 export const GET: APIRoute = async ({ locals, params }) => {
   const { supabase, user } = locals;
 
-  if (!user || user.role !== "admin") {
+  if (!user || !["admin", "instructor"].includes(user.role)) {
     return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -21,7 +40,7 @@ export const GET: APIRoute = async ({ locals, params }) => {
         lesson:lessons(
           id,
           title,
-          course:courses(id, title)
+          course:courses(id, title, instructor_id)
         )
       `
       )
@@ -31,6 +50,15 @@ export const GET: APIRoute = async ({ locals, params }) => {
     if (error || !quiz) {
       return new Response(JSON.stringify({ success: false, error: "Quiz not found" }), {
         status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Check ownership for instructors
+    const hasAccess = await checkQuizOwnership(supabase, user.id, user.role, id);
+    if (!hasAccess) {
+      return new Response(JSON.stringify({ success: false, error: "Forbidden - You don't own this quiz's course" }), {
+        status: 403,
         headers: { "Content-Type": "application/json" },
       });
     }
@@ -62,7 +90,7 @@ export const GET: APIRoute = async ({ locals, params }) => {
 export const PATCH: APIRoute = async ({ locals, params, request }) => {
   const { supabase, user } = locals;
 
-  if (!user || user.role !== "admin") {
+  if (!user || !["admin", "instructor"].includes(user.role)) {
     return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -71,6 +99,15 @@ export const PATCH: APIRoute = async ({ locals, params, request }) => {
 
   try {
     const { id } = params;
+
+    // Check ownership for instructors
+    const hasAccess = await checkQuizOwnership(supabase, user.id, user.role, id);
+    if (!hasAccess) {
+      return new Response(JSON.stringify({ success: false, error: "Forbidden - You don't own this quiz's course" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     const body = await request.json();
     const { title, lesson_id, questions, ai_generated, passing_score, max_attempts, time_limit_minutes } = body;
 
@@ -134,7 +171,7 @@ export const PATCH: APIRoute = async ({ locals, params, request }) => {
 export const DELETE: APIRoute = async ({ locals, params }) => {
   const { supabase, user } = locals;
 
-  if (!user || user.role !== "admin") {
+  if (!user || !["admin", "instructor"].includes(user.role)) {
     return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -143,6 +180,15 @@ export const DELETE: APIRoute = async ({ locals, params }) => {
 
   try {
     const { id } = params;
+
+    // Check ownership for instructors
+    const hasAccess = await checkQuizOwnership(supabase, user.id, user.role, id);
+    if (!hasAccess) {
+      return new Response(JSON.stringify({ success: false, error: "Forbidden - You don't own this quiz's course" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     const { error } = await supabase.from("quizzes").delete().eq("id", id);
 

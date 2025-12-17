@@ -1,20 +1,22 @@
 import { LayoutDashboard, Users, BookOpen, FileQuestion, Settings, LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import type { User } from "@/types";
 
 interface SidebarProps {
   currentPath: string;
+  user: User;
 }
 
 const navigation = [
-  { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-  { name: "Użytkownicy", href: "/admin/users", icon: Users },
-  { name: "Kursy", href: "/admin/courses", icon: BookOpen },
-  { name: "Quizy", href: "/admin/quizzes", icon: FileQuestion },
-  { name: "Ustawienia", href: "/admin/settings", icon: Settings },
+  { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard, roles: ["admin", "instructor"] },
+  { name: "Użytkownicy", href: "/admin/users", icon: Users, roles: ["admin"] },
+  { name: "Kursy", href: "/admin/courses", icon: BookOpen, roles: ["admin", "instructor"] },
+  { name: "Quizy", href: "/admin/quizzes", icon: FileQuestion, roles: ["admin", "instructor"] },
+  { name: "Ustawienia", href: "/admin/settings", icon: Settings, roles: ["admin"] },
 ];
 
-export function Sidebar({ currentPath }: SidebarProps) {
+export function Sidebar({ currentPath, user }: SidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const handleSignOut = async () => {
@@ -50,33 +52,35 @@ export function Sidebar({ currentPath }: SidebarProps) {
           {/* Logo */}
           <div className="flex h-16 items-center justify-center border-b border-white/10 px-6">
             <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">
-              LearnAI Admin
+              {user.role === "instructor" ? "Panel Prowadzącego" : "EduPortal Admin"}
             </h1>
           </div>
 
           {/* Navigation */}
           <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
-            {navigation.map((item) => {
-              const isActive = currentPath.startsWith(item.href);
-              const Icon = item.icon;
+            {navigation
+              .filter((item) => item.roles.includes(user.role))
+              .map((item) => {
+                const isActive = currentPath.startsWith(item.href);
+                const Icon = item.icon;
 
-              return (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
-                    isActive
-                      ? "bg-blue-600 text-white shadow-lg shadow-blue-500/50"
-                      : "text-gray-300 hover:bg-slate-800 hover:text-white"
-                  )}
-                  aria-current={isActive ? "page" : undefined}
-                >
-                  <Icon className="w-5 h-5 shrink-0" />
-                  {item.name}
-                </a>
-              );
-            })}
+                return (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                      isActive
+                        ? "bg-blue-600 text-white shadow-lg shadow-blue-500/50"
+                        : "text-gray-300 hover:bg-slate-800 hover:text-white"
+                    )}
+                    aria-current={isActive ? "page" : undefined}
+                  >
+                    <Icon className="w-5 h-5 shrink-0" />
+                    {item.name}
+                  </a>
+                );
+              })}
           </nav>
 
           {/* Sign out button */}

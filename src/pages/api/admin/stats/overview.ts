@@ -3,7 +3,7 @@ import type { APIRoute } from "astro";
 export const GET: APIRoute = async ({ locals }) => {
   const { supabase, user } = locals;
 
-  if (!user || user.role !== "admin") {
+  if (!user || !["admin", "instructor"].includes(user.role)) {
     return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -11,57 +11,97 @@ export const GET: APIRoute = async ({ locals }) => {
   }
 
   try {
-    // Get total users
-    const { count: totalUsers } = await supabase.from("users").select("*", { count: "exact", head: true });
+    const isInstructor = user.role === "instructor";
 
-    // Get new users this month
+    // Get total users (admin only)
+    const { count: totalUsers } = isInstructor
+      ? { count: 0 }
+      : await supabase.from("users").select("*", { count: "exact", head: true });
+
+    // Get new users this month (admin only)
     const startOfMonth = new Date();
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
 
-    const { count: newUsersThisMonth } = await supabase
-      .from("users")
-      .select("*", { count: "exact", head: true })
-      .gte("created_at", startOfMonth.toISOString());
+    const { count: newUsersThisMonth } = isInstructor
+      ? { count: 0 }
+      : await supabase.from("users").select("*", { count: "exact", head: true }).gte("created_at", startOfMonth.toISOString());
 
-    // Get total courses
-    const { count: totalCourses } = await supabase.from("courses").select("*", { count: "exact", head: true });
+    // Get total courses (filtered for instructors)
+    let coursesQuery = supabase.from("courses").select("*", { count: "exact", head: true });
+    if (isInstructor) {
+      coursesQuery = coursesQuery.eq("instructor_id", user.id);
+    }
+    const { count: totalCourses } = await coursesQuery;
 
-    // Get published courses
-    const { count: publishedCourses } = await supabase
-      .from("courses")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "published");
+    // Get published courses (filtered for instructors)
+    let publishedQuery = supabase.from("courses").select("*", { count: "exact", head: true }).eq("status", "published");
+    if (isInstructor) {
+      publishedQuery = publishedQuery.eq("instructor_id", user.id);
+    }
+    const { count: publishedCourses } = await publishedQuery;
 
-    // Get draft courses
-    const { count: draftCourses } = await supabase
-      .from("courses")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "draft");
+    // Get draft courses (filtered for instructors)
+    let draftQuery = supabase.from("courses").select("*", { count: "exact", head: true }).eq("status", "draft");
+    if (isInstructor) {
+      draftQuery = draftQuery.eq("instructor_id", user.id);
+    }
+    const { count: draftCourses } = await draftQuery;
 
-    // Get total enrollments
-    const { count: totalEnrollments } = await supabase
-      .from("course_enrollments")
-      .select("*", { count: "exact", head: true });
+    // Get total enrollments (filtered for instructors - only their courses)
+    let enrollmentsQuery = supabase.from("course_enrollments").select("*", { count: "exact", head: true });
+    if (isInstructor) {
+      // Get course IDs for this instructor
+      const { data: instructorCourses } = await supabase
+        .from("courses")
+        .select("id")
+        .eq("instructor_id", user.id);
+      const courseIds = instructorCourses?.map((c) => c.id) || [];
+      if (courseIds.length > 0) {
+        enrollmentsQuery = enrollmentsQuery.in("course_id", courseIds);
+      } else {
+        enrollmentsQuery = enrollmentsQuery.eq("course_id", "00000000-0000-0000-0000-000000000000"); // No courses
+      }
+    }
+    const { count: totalEnrollments } = await enrollmentsQuery;
 
-    // Get active users (users with at least one enrollment)
-    const { data: activeUsersData } = await supabase
-      .from("course_enrollments")
-      .select("user_id")
-      .not("user_id", "is", null);
-
+    // Get active users (filtered for instructors)
+    let activeUsersQuery = supabase.from("course_enrollments").select("user_id").not("user_id", "is", null);
+    if (isInstructor) {
+      const { data: instructorCourses } = await supabase
+        .from("courses")
+        .select("id")
+        .eq("instructor_id", user.id);
+      const courseIds = instructorCourses?.map((c) => c.id) || [];
+      if (courseIds.length > 0) {
+        activeUsersQuery = activeUsersQuery.in("course_id", courseIds);
+      } else {
+        activeUsersQuery = activeUsersQuery.eq("course_id", "00000000-0000-0000-0000-000000000000");
+      }
+    }
+    const { data: activeUsersData } = await activeUsersQuery;
     const activeUsers = activeUsersData ? new Set(activeUsersData.map((e) => e.user_id)).size : 0;
 
-    // Get total quizzes
-    const { count: totalQuizzes } = await supabase.from("quizzes").select("*", { count: "exact", head: true });
+    // Get total quizzes (filtered for instructors)
+    let quizzesQuery = supabase.from("quizzes").select("*, lessons!inner(course_id, courses!inner(instructor_id))", { count: "exact", head: true });
+    if (isInstructor) {
+      quizzesQuery = quizzesQuery.eq("lessons.courses.instructor_id", user.id);
+    }
+    const { count: totalQuizzes } = await quizzesQuery;
 
-    // Get total quiz attempts
-    const { count: totalQuizAttempts } = await supabase
-      .from("quiz_attempts")
-      .select("*", { count: "exact", head: true });
+    // Get total quiz attempts (filtered for instructors)
+    let attemptsQuery = supabase.from("quiz_attempts").select("*, quizzes!inner(lesson_id, lessons!inner(course_id, courses!inner(instructor_id)))", { count: "exact", head: true });
+    if (isInstructor) {
+      attemptsQuery = attemptsQuery.eq("quizzes.lessons.courses.instructor_id", user.id);
+    }
+    const { count: totalQuizAttempts } = await attemptsQuery;
 
-    // Get average quiz score
-    const { data: quizScores } = await supabase.from("quiz_attempts").select("score");
+    // Get average quiz score (filtered for instructors)
+    let scoresQuery = supabase.from("quiz_attempts").select("score, quizzes!inner(lesson_id, lessons!inner(course_id, courses!inner(instructor_id)))");
+    if (isInstructor) {
+      scoresQuery = scoresQuery.eq("quizzes.lessons.courses.instructor_id", user.id);
+    }
+    const { data: quizScores } = await scoresQuery;
 
     const avgQuizScore =
       quizScores && quizScores.length > 0

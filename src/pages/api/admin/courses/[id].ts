@@ -1,9 +1,26 @@
 import type { APIRoute } from "astro";
 
+// Helper function to check course ownership
+async function checkCourseOwnership(supabase: any, userId: string, userRole: string, courseId: string): Promise<boolean> {
+  // Admin has access to all courses
+  if (userRole === "admin") {
+    return true;
+  }
+
+  // Instructor only to their own courses
+  if (userRole === "instructor") {
+    const { data: course } = await supabase.from("courses").select("instructor_id").eq("id", courseId).single();
+
+    return course?.instructor_id === userId;
+  }
+
+  return false;
+}
+
 export const GET: APIRoute = async ({ locals, params }) => {
   const { supabase, user } = locals;
 
-  if (!user || user.role !== "admin") {
+  if (!user || !["admin", "instructor"].includes(user.role)) {
     return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -18,6 +35,15 @@ export const GET: APIRoute = async ({ locals, params }) => {
     if (error || !course) {
       return new Response(JSON.stringify({ success: false, error: "Course not found" }), {
         status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Check ownership for instructors
+    const hasAccess = await checkCourseOwnership(supabase, user.id, user.role, id);
+    if (!hasAccess) {
+      return new Response(JSON.stringify({ success: false, error: "Forbidden - You don't own this course" }), {
+        status: 403,
         headers: { "Content-Type": "application/json" },
       });
     }
@@ -41,7 +67,7 @@ export const GET: APIRoute = async ({ locals, params }) => {
 export const PATCH: APIRoute = async ({ locals, params, request }) => {
   const { supabase, user } = locals;
 
-  if (!user || user.role !== "admin") {
+  if (!user || !["admin", "instructor"].includes(user.role)) {
     return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -50,6 +76,16 @@ export const PATCH: APIRoute = async ({ locals, params, request }) => {
 
   try {
     const { id } = params;
+
+    // Check ownership for instructors
+    const hasAccess = await checkCourseOwnership(supabase, user.id, user.role, id);
+    if (!hasAccess) {
+      return new Response(JSON.stringify({ success: false, error: "Forbidden - You don't own this course" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     const body = await request.json();
     const { title, description, thumbnail_url, status } = body;
 
@@ -94,7 +130,7 @@ export const PATCH: APIRoute = async ({ locals, params, request }) => {
 export const DELETE: APIRoute = async ({ locals, params }) => {
   const { supabase, user } = locals;
 
-  if (!user || user.role !== "admin") {
+  if (!user || !["admin", "instructor"].includes(user.role)) {
     return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -103,6 +139,15 @@ export const DELETE: APIRoute = async ({ locals, params }) => {
 
   try {
     const { id } = params;
+
+    // Check ownership for instructors
+    const hasAccess = await checkCourseOwnership(supabase, user.id, user.role, id);
+    if (!hasAccess) {
+      return new Response(JSON.stringify({ success: false, error: "Forbidden - You don't own this course" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     const { data: course } = await supabase.from("courses").select("*").eq("id", id).single();
 

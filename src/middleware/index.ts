@@ -85,15 +85,15 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const isPublicRoute = publicRoutes.includes(pathname) || publicRoutes.some((route) => pathname.startsWith(route));
   const isPublicApiRoute = publicApiRoutes.some((route) => pathname.startsWith(route));
 
-  // Admin routes protection
+  // Admin routes protection (admin + instructor)
   if (pathname.startsWith("/admin")) {
     // Require authentication
     if (!session?.user) {
       return context.redirect("/login?redirect=" + encodeURIComponent(pathname));
     }
 
-    // Require admin role
-    if (!context.locals.user || context.locals.user.role !== "admin") {
+    // Require admin or instructor role
+    if (!context.locals.user || !["admin", "instructor"].includes(context.locals.user.role)) {
       return context.redirect("/unauthorized");
     }
 
@@ -113,7 +113,19 @@ export const onRequest = defineMiddleware(async (context, next) => {
       });
     }
 
-    if (!context.locals.user || context.locals.user.role !== "admin") {
+    const userRole = context.locals.user?.role;
+
+    // Instructor restrictions
+    if (userRole === "instructor") {
+      // Block access to user management and settings
+      if (pathname.startsWith("/api/admin/users") || pathname.startsWith("/api/admin/settings")) {
+        return new Response(JSON.stringify({ success: false, error: "Forbidden - Admin access required" }), {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+    } else if (userRole !== "admin") {
+      // Not admin or instructor
       return new Response(JSON.stringify({ success: false, error: "Forbidden - Admin access required" }), {
         status: 403,
         headers: { "Content-Type": "application/json" },

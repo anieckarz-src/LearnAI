@@ -6,7 +6,7 @@ import type { QuizDifficulty } from "@/types";
 export const POST: APIRoute = async ({ locals, request }) => {
   const { supabase, user } = locals;
 
-  if (!user || user.role !== "admin") {
+  if (!user || !["admin", "instructor"].includes(user.role)) {
     return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -28,6 +28,22 @@ export const POST: APIRoute = async ({ locals, request }) => {
       });
     }
 
+    // Check ownership for instructors if lesson_id is provided
+    if (lesson_id && user.role === "instructor") {
+      const { data: lesson } = await supabase
+        .from("lessons")
+        .select("course_id, courses!inner(instructor_id)")
+        .eq("id", lesson_id)
+        .single();
+
+      if (!lesson || lesson.courses?.instructor_id !== user.id) {
+        return new Response(JSON.stringify({ success: false, error: "Forbidden - You don't own this lesson's course" }), {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+    }
+
     if (num_questions < 3 || num_questions > 15) {
       return new Response(JSON.stringify({ success: false, error: "num_questions must be between 3 and 15" }), {
         status: 400,
@@ -43,9 +59,9 @@ export const POST: APIRoute = async ({ locals, request }) => {
       });
     }
 
-    // Check rate limit (admins have unlimited, but we still track)
-    const isAdmin = user.role === "admin";
-    const rateLimitCheck = await checkRateLimit(supabase, user.id, "quiz_generation", isAdmin);
+    // Check rate limit (admins and instructors have unlimited, but we still track)
+    const isAdminOrInstructor = ["admin", "instructor"].includes(user.role);
+    const rateLimitCheck = await checkRateLimit(supabase, user.id, "quiz_generation", isAdminOrInstructor);
 
     if (!rateLimitCheck.allowed) {
       return new Response(

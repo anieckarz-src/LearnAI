@@ -1,9 +1,28 @@
 import type { APIRoute } from "astro";
 
+// Helper function to check lesson ownership via course
+async function checkLessonOwnership(supabase: any, userId: string, userRole: string, lessonId: string): Promise<boolean> {
+  if (userRole === "admin") {
+    return true;
+  }
+
+  if (userRole === "instructor") {
+    const { data: lesson } = await supabase
+      .from("lessons")
+      .select("course_id, courses!inner(instructor_id)")
+      .eq("id", lessonId)
+      .single();
+
+    return lesson?.courses?.instructor_id === userId;
+  }
+
+  return false;
+}
+
 export const PATCH: APIRoute = async ({ locals, params, request }) => {
   const { supabase, user } = locals;
 
-  if (!user || user.role !== "admin") {
+  if (!user || !["admin", "instructor"].includes(user.role)) {
     return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -12,6 +31,16 @@ export const PATCH: APIRoute = async ({ locals, params, request }) => {
 
   try {
     const { id } = params;
+
+    // Check ownership for instructors
+    const hasAccess = await checkLessonOwnership(supabase, user.id, user.role, id);
+    if (!hasAccess) {
+      return new Response(JSON.stringify({ success: false, error: "Forbidden - You don't own this lesson's course" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     const body = await request.json();
     const { module_id, title, type, content, video_url, files, order_index } = body;
 
@@ -94,7 +123,7 @@ export const PATCH: APIRoute = async ({ locals, params, request }) => {
 export const DELETE: APIRoute = async ({ locals, params }) => {
   const { supabase, user } = locals;
 
-  if (!user || user.role !== "admin") {
+  if (!user || !["admin", "instructor"].includes(user.role)) {
     return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -103,6 +132,15 @@ export const DELETE: APIRoute = async ({ locals, params }) => {
 
   try {
     const { id } = params;
+
+    // Check ownership for instructors
+    const hasAccess = await checkLessonOwnership(supabase, user.id, user.role, id);
+    if (!hasAccess) {
+      return new Response(JSON.stringify({ success: false, error: "Forbidden - You don't own this lesson's course" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     const { error } = await supabase.from("lessons").delete().eq("id", id);
 

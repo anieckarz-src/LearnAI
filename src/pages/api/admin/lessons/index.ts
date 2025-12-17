@@ -1,9 +1,23 @@
 import type { APIRoute } from "astro";
 
+// Helper function to check course ownership
+async function checkCourseOwnership(supabase: any, userId: string, userRole: string, courseId: string): Promise<boolean> {
+  if (userRole === "admin") {
+    return true;
+  }
+
+  if (userRole === "instructor") {
+    const { data: course } = await supabase.from("courses").select("instructor_id").eq("id", courseId).single();
+    return course?.instructor_id === userId;
+  }
+
+  return false;
+}
+
 export const GET: APIRoute = async ({ locals, url }) => {
   const { supabase, user } = locals;
 
-  if (!user || user.role !== "admin") {
+  if (!user || !["admin", "instructor"].includes(user.role)) {
     return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -16,6 +30,15 @@ export const GET: APIRoute = async ({ locals, url }) => {
     if (!courseId) {
       return new Response(JSON.stringify({ success: false, error: "course_id is required" }), {
         status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Check ownership for instructors
+    const hasAccess = await checkCourseOwnership(supabase, user.id, user.role, courseId);
+    if (!hasAccess) {
+      return new Response(JSON.stringify({ success: false, error: "Forbidden - You don't own this course" }), {
+        status: 403,
         headers: { "Content-Type": "application/json" },
       });
     }
@@ -46,7 +69,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
 export const POST: APIRoute = async ({ locals, request }) => {
   const { supabase, user } = locals;
 
-  if (!user || user.role !== "admin") {
+  if (!user || !["admin", "instructor"].includes(user.role)) {
     return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -66,6 +89,15 @@ export const POST: APIRoute = async ({ locals, request }) => {
           headers: { "Content-Type": "application/json" },
         }
       );
+    }
+
+    // Check ownership for instructors
+    const hasAccess = await checkCourseOwnership(supabase, user.id, user.role, course_id);
+    if (!hasAccess) {
+      return new Response(JSON.stringify({ success: false, error: "Forbidden - You don't own this course" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Verify module exists and belongs to course
