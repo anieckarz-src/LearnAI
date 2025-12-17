@@ -23,15 +23,6 @@ export interface Course {
   lesson_access_mode?: "sequential" | "all_access";
   created_at: string;
   updated_at: string;
-  price?: number | null;
-  stripe_product_id?: string | null;
-  stripe_price_id?: string | null;
-}
-
-export interface CourseWithPrice extends Course {
-  price: number | null;
-  stripe_product_id: string | null;
-  stripe_price_id: string | null;
 }
 
 export interface CourseWithProgress extends Course {
@@ -56,6 +47,31 @@ export interface Module {
 
 export interface ModuleWithLessons extends Module {
   lessons: LessonWithProgress[];
+}
+
+// Preview types (for non-enrolled users)
+export interface LessonPreview {
+  id: string;
+  title: string;
+  type: "content" | "quiz";
+  order_index: number;
+}
+
+export interface ModulePreview {
+  id: string;
+  title: string;
+  description: string | null;
+  order_index: number;
+  lessons: LessonPreview[];
+}
+
+export interface CoursePreviewData {
+  modules: ModulePreview[];
+  stats: {
+    total_modules: number;
+    total_lessons: number;
+    total_quizzes: number;
+  };
 }
 
 // Lesson types
@@ -208,35 +224,6 @@ export interface CourseEnrollment {
   completed_at: string | null;
 }
 
-// Payment types
-export type PaymentStatus = "pending" | "succeeded" | "failed" | "refunded";
-
-export interface Payment {
-  id: string;
-  user_id: string;
-  course_id: string;
-  amount: number;
-  currency: string;
-  stripe_payment_intent_id: string | null;
-  stripe_checkout_session_id: string | null;
-  status: PaymentStatus;
-  created_at: string;
-  paid_at: string | null;
-}
-
-export interface PaymentWithDetails extends Payment {
-  user: User;
-  course: Course;
-}
-
-export interface PaymentFilters extends PaginationParams {
-  status?: PaymentStatus;
-  user_id?: string;
-  course_id?: string;
-  date_from?: string;
-  date_to?: string;
-}
-
 // Stats types
 export interface DashboardStats {
   total_users: number;
@@ -317,7 +304,6 @@ export interface CourseFormData {
   description: string;
   status: CourseStatus;
   thumbnail_url: string;
-  price?: number | null;
 }
 
 // Lesson form types
@@ -352,4 +338,79 @@ export interface AIQuizGenerationOptions {
 export interface AIQuizGenerationResult {
   questions: QuizQuestion[];
   lesson_title: string;
+}
+
+// Custom Quiz Generation types
+export interface CustomQuizOptions {
+  topic: string;
+  description?: string;
+  num_questions: number;
+  difficulty: QuizDifficulty;
+}
+
+// Chat types
+export type ChatMessageRole = "user" | "assistant" | "system";
+
+export interface ChatMessage {
+  id: string;
+  user_id: string;
+  session_id: string;
+  role: ChatMessageRole;
+  content: string;
+  context_type?: string;
+  context_id?: string;
+  created_at: string;
+}
+
+export interface ChatHistoryMessage {
+  role: ChatMessageRole;
+  content: string;
+  created_at?: string;
+}
+
+export interface LessonContext {
+  id: string;
+  title: string;
+  content: string;
+  completed: boolean;
+  moduleTitle?: string;
+}
+
+export interface CourseContext {
+  id: string;
+  title: string;
+  description?: string;
+  totalLessons: number;
+  completedLessons: number;
+  progressPercentage: number;
+  currentModule?: string;
+}
+
+export interface UserProgressContext {
+  totalCoursesEnrolled: number;
+  totalLessonsCompleted: number;
+  averageQuizScore: number;
+  recentActivity: string[];
+}
+
+export interface ChatContext {
+  lesson?: LessonContext;
+  course?: CourseContext;
+  userProgress?: UserProgressContext;
+}
+
+// Rate limiting types
+export interface RateLimitInfo {
+  allowed: boolean;
+  remaining: number;
+  resetAt: Date;
+  current: number;
+  limit: number;
+}
+
+export type RateLimitEndpoint = "chat" | "quiz_generation";
+
+export interface RateLimitStatus {
+  chat: RateLimitInfo;
+  quiz_generation: RateLimitInfo;
 }

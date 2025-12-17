@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Course } from "@/types";
-import { Check, DollarSign } from "lucide-react";
+import { Check } from "lucide-react";
 
 interface CourseCardProps {
   course: Course & {
@@ -27,21 +27,10 @@ export function CourseCard({ course }: CourseCardProps) {
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
-            
-            {/* Price badge */}
-            <div className="absolute top-3 right-3">
-              {course.price !== null && course.price !== undefined && course.price > 0 ? (
-                <Badge className="bg-green-600 text-white font-semibold">
-                  {course.price.toFixed(2)} PLN
-                </Badge>
-              ) : (
-                <Badge className="bg-blue-600 text-white font-semibold">Darmowy</Badge>
-              )}
-            </div>
 
             {/* Enrolled badge */}
             {course.is_enrolled && (
-              <div className="absolute top-3 left-3">
+              <div className="absolute top-3 right-3">
                 <Badge className="bg-purple-600 text-white flex items-center gap-1">
                   <Check className="w-3 h-3" />
                   Zapisany

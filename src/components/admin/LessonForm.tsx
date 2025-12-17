@@ -13,26 +13,31 @@ import { FileUpload } from "./FileUpload";
 import type { Lesson, LessonFile, Module, LessonType } from "@/types";
 import { Save, X } from "lucide-react";
 
-const lessonSchema = z.object({
-  module_id: z.string().min(1, "Moduł jest wymagany"),
-  title: z.string().min(3, "Tytuł musi mieć co najmniej 3 znaki").max(200, "Tytuł może mieć maksymalnie 200 znaków"),
-  type: z.enum(["quiz", "content"], { required_error: "Typ lekcji jest wymagany" }),
-  content: z.string().optional(),
-  video_url: z.string().optional(),
-  files: z.array(z.any()).optional(),
-}).refine((data) => {
-  // For content type, at least one field must be filled
-  if (data.type === "content") {
-    const hasContent = data.content && data.content.trim().length > 0;
-    const hasVideo = data.video_url && data.video_url.trim().length > 0;
-    const hasFiles = data.files && data.files.length > 0;
-    return hasContent || hasVideo || hasFiles;
-  }
-  return true;
-}, {
-  message: "Lekcja typu 'content' musi mieć wypełnione przynajmniej jedno pole: treść, video URL lub pliki",
-  path: ["content"],
-});
+const lessonSchema = z
+  .object({
+    module_id: z.string().min(1, "Moduł jest wymagany"),
+    title: z.string().min(3, "Tytuł musi mieć co najmniej 3 znaki").max(200, "Tytuł może mieć maksymalnie 200 znaków"),
+    type: z.enum(["quiz", "content"], { required_error: "Typ lekcji jest wymagany" }),
+    content: z.string().optional(),
+    video_url: z.string().optional(),
+    files: z.array(z.any()).optional(),
+  })
+  .refine(
+    (data) => {
+      // For content type, at least one field must be filled
+      if (data.type === "content") {
+        const hasContent = data.content && data.content.trim().length > 0;
+        const hasVideo = data.video_url && data.video_url.trim().length > 0;
+        const hasFiles = data.files && data.files.length > 0;
+        return hasContent || hasVideo || hasFiles;
+      }
+      return true;
+    },
+    {
+      message: "Lekcja typu 'content' musi mieć wypełnione przynajmniej jedno pole: treść, video URL lub pliki",
+      path: ["content"],
+    }
+  );
 
 type LessonFormData = z.infer<typeof lessonSchema>;
 
@@ -239,10 +244,7 @@ export function LessonForm({ courseId, lesson, onSave, onCancel }: LessonFormPro
                 <Label htmlFor="files" className="text-white">
                   Dodatkowe pliki (opcjonalnie)
                 </Label>
-                <FileUpload
-                  value={files as LessonFile[]}
-                  onChange={(newFiles) => setValue("files", newFiles)}
-                />
+                <FileUpload value={files as LessonFile[]} onChange={(newFiles) => setValue("files", newFiles)} />
                 <p className="text-xs text-gray-500">Dozwolone typy: PDF, obrazy, dokumenty</p>
               </div>
 
@@ -257,7 +259,8 @@ export function LessonForm({ courseId, lesson, onSave, onCancel }: LessonFormPro
           {selectedType === "quiz" && (
             <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
               <p className="text-sm text-yellow-300">
-                💡 Lekcja typu "quiz" wymaga utworzenia quizu. Po zapisaniu lekcji, będziesz mógł przypisać do niej quiz w zakładce "Quizy".
+                💡 Lekcja typu "quiz" wymaga utworzenia quizu. Po zapisaniu lekcji, będziesz mógł przypisać do niej quiz
+                w zakładce "Quizy".
               </p>
             </div>
           )}

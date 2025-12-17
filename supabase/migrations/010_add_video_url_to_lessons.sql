@@ -5,3 +5,4 @@ ALTER TABLE lessons
 ADD COLUMN video_url TEXT NULL;
 
 COMMENT ON COLUMN lessons.video_url IS 'External video URL (Vimeo, YouTube) - we do NOT store video files on the server';
+

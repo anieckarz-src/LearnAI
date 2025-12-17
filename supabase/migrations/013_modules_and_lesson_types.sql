@@ -90,3 +90,4 @@ COMMENT ON COLUMN public.modules.order_index IS 'Order of modules within a cours
 COMMENT ON COLUMN public.lessons.module_id IS 'Reference to the parent module';
 COMMENT ON COLUMN public.lessons.type IS 'Type of lesson: quiz (requires quiz) or content (video/text/files)';
 COMMENT ON COLUMN public.lessons.files IS 'Array of additional files: [{id, type, url, name, size}]';
+

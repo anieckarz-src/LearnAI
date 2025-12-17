@@ -5,13 +5,11 @@ import type { ModuleWithLessons, LessonWithProgress } from "@/types";
 interface ModulesListProps {
   modules: ModuleWithLessons[];
   currentLessonId?: string;
-  onLessonClick: (lessonId: string) => void;
+  courseId: string;
 }
 
-export function ModulesList({ modules, currentLessonId, onLessonClick }: ModulesListProps) {
-  const [expandedModules, setExpandedModules] = useState<Set<string>>(
-    new Set(modules.map((m) => m.id))
-  );
+export function ModulesList({ modules, currentLessonId, courseId }: ModulesListProps) {
+  const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set(modules.map((m) => m.id)));
 
   const toggleModule = (moduleId: string) => {
     const newExpanded = new Set(expandedModules);
@@ -21,6 +19,14 @@ export function ModulesList({ modules, currentLessonId, onLessonClick }: Modules
       newExpanded.add(moduleId);
     }
     setExpandedModules(newExpanded);
+  };
+
+  const handleLessonClick = (lessonId: string, isAccessible: boolean, e: React.MouseEvent) => {
+    if (!isAccessible) {
+      e.preventDefault();
+      return;
+    }
+    // Let the link handle navigation naturally
   };
 
   const getLessonTypeIcon = (type: string) => {
@@ -40,30 +46,20 @@ export function ModulesList({ modules, currentLessonId, onLessonClick }: Modules
         const progress = calculateModuleProgress(module.lessons);
 
         return (
-          <div
-            key={module.id}
-            className="bg-slate-800/50 border border-white/10 rounded-lg overflow-hidden"
-          >
+          <div key={module.id} className="bg-slate-800/50 border border-white/10 rounded-lg overflow-hidden">
             {/* Module Header */}
             <button
               onClick={() => toggleModule(module.id)}
               className="w-full p-4 flex items-center gap-3 hover:bg-slate-700/30 transition-colors text-left"
             >
               <div className="text-gray-400">
-                {isExpanded ? (
-                  <ChevronDown className="w-5 h-5" />
-                ) : (
-                  <ChevronRight className="w-5 h-5" />
-                )}
+                {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-white font-semibold text-sm truncate">{module.title}</h3>
                 <div className="flex items-center gap-2 mt-1">
                   <div className="flex-1 h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-blue-500 transition-all"
-                      style={{ width: `${progress}%` }}
-                    />
+                    <div className="h-full bg-blue-500 transition-all" style={{ width: `${progress}%` }} />
                   </div>
                   <span className="text-xs text-gray-400">{progress}%</span>
                 </div>
@@ -81,12 +77,12 @@ export function ModulesList({ modules, currentLessonId, onLessonClick }: Modules
                   const isAccessible = lesson.is_accessible;
 
                   return (
-                    <button
+                    <a
                       key={lesson.id}
-                      onClick={() => isAccessible && onLessonClick(lesson.id)}
-                      disabled={!isAccessible}
+                      href={isAccessible ? `/courses/${courseId}/lessons/${lesson.id}` : undefined}
+                      onClick={(e) => handleLessonClick(lesson.id, isAccessible, e)}
                       className={`
-                        w-full p-3 flex items-center gap-3 transition-colors text-left
+                        block w-full p-3 flex items-center gap-3 transition-colors text-left
                         ${isCurrent ? "bg-blue-600/20 border-l-2 border-blue-500" : "border-l-2 border-transparent"}
                         ${isAccessible ? "hover:bg-slate-700/30 cursor-pointer" : "opacity-50 cursor-not-allowed"}
                       `}
@@ -111,7 +107,7 @@ export function ModulesList({ modules, currentLessonId, onLessonClick }: Modules
                           <Lock className="w-4 h-4 text-gray-500" />
                         </div>
                       )}
-                    </button>
+                    </a>
                   );
                 })}
               </div>

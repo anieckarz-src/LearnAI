@@ -2,20 +2,28 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { QuizQuestion, QuizDifficulty } from "@/types";
-import { Sparkles, X, AlertCircle } from "lucide-react";
+import { Sparkles, X, AlertCircle, FileText, Lightbulb } from "lucide-react";
 
 interface QuizGeneratorModalProps {
-  lessonId: string;
-  lessonTitle: string;
+  lessonId?: string;
+  lessonTitle?: string;
   onGenerate: (questions: QuizQuestion[], suggestedTitle: string) => void;
   onClose: () => void;
 }
 
+type GenerationMode = "lesson" | "custom";
+
 export function QuizGeneratorModal({ lessonId, lessonTitle, onGenerate, onClose }: QuizGeneratorModalProps) {
+  const [mode, setMode] = useState<GenerationMode>(lessonId ? "lesson" : "custom");
   const [numQuestions, setNumQuestions] = useState<number>(5);
   const [difficulty, setDifficulty] = useState<QuizDifficulty>("medium");
+  const [customTopic, setCustomTopic] = useState<string>("");
+  const [customDescription, setCustomDescription] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,16 +32,35 @@ export function QuizGeneratorModal({ lessonId, lessonTitle, onGenerate, onClose 
       setLoading(true);
       setError(null);
 
+      // Validate based on mode
+      if (mode === "custom") {
+        if (!customTopic.trim() || customTopic.trim().length < 3) {
+          setError("Temat musi mieć co najmniej 3 znaki");
+          setLoading(false);
+          return;
+        }
+      }
+
+      const requestBody: any = {
+        num_questions: numQuestions,
+        difficulty,
+      };
+
+      if (mode === "lesson" && lessonId) {
+        requestBody.lesson_id = lessonId;
+      } else {
+        requestBody.topic = customTopic.trim();
+        if (customDescription.trim()) {
+          requestBody.description = customDescription.trim();
+        }
+      }
+
       const response = await fetch("/api/admin/quizzes/generate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          lesson_id: lessonId,
-          num_questions: numQuestions,
-          difficulty,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       const result = await response.json();
@@ -77,11 +104,59 @@ export function QuizGeneratorModal({ lessonId, lessonTitle, onGenerate, onClose 
             </div>
           )}
 
-          {/* Lesson info */}
-          <div className="p-4 rounded-lg bg-slate-700/30 border border-white/10">
-            <Label className="text-gray-400 text-sm">Lekcja</Label>
-            <p className="text-white font-medium mt-1">{lessonTitle}</p>
-          </div>
+          {/* Tabs for generation mode */}
+          <Tabs value={mode} onValueChange={(value) => setMode(value as GenerationMode)}>
+            <TabsList className="grid w-full grid-cols-2 bg-slate-700/50">
+              <TabsTrigger value="lesson" disabled={!lessonId} className="data-[state=active]:bg-slate-600">
+                <FileText className="w-4 h-4 mr-2" />Z lekcji
+              </TabsTrigger>
+              <TabsTrigger value="custom" className="data-[state=active]:bg-slate-600">
+                <Lightbulb className="w-4 h-4 mr-2" />
+                Własny temat
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="lesson" className="space-y-4 mt-4">
+              {/* Lesson info */}
+              <div className="p-4 rounded-lg bg-slate-700/30 border border-white/10">
+                <Label className="text-gray-400 text-sm">Lekcja</Label>
+                <p className="text-white font-medium mt-1">{lessonTitle || "Brak wybranej lekcji"}</p>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="custom" className="space-y-4 mt-4">
+              {/* Custom topic inputs */}
+              <div className="space-y-2">
+                <Label htmlFor="custom_topic" className="text-white">
+                  Temat quizu *
+                </Label>
+                <Input
+                  id="custom_topic"
+                  value={customTopic}
+                  onChange={(e) => setCustomTopic(e.target.value)}
+                  placeholder="np. Zaawansowane wzorce React"
+                  className="bg-slate-700/50 border-white/10 text-white"
+                  disabled={loading}
+                />
+                <p className="text-xs text-gray-400">Główny temat, którego będzie dotyczył quiz</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="custom_description" className="text-white">
+                  Dodatkowy kontekst (opcjonalnie)
+                </Label>
+                <Textarea
+                  id="custom_description"
+                  value={customDescription}
+                  onChange={(e) => setCustomDescription(e.target.value)}
+                  placeholder="Możesz dodać więcej szczegółów, które pomogą AI wygenerować lepsze pytania..."
+                  className="bg-slate-700/50 border-white/10 text-white min-h-[80px]"
+                  disabled={loading}
+                />
+                <p className="text-xs text-gray-400">Dodatkowe informacje lub wymagania dotyczące pytań</p>
+              </div>
+            </TabsContent>
+          </Tabs>
 
           {/* Number of questions */}
           <div className="space-y-2">
@@ -146,8 +221,17 @@ export function QuizGeneratorModal({ lessonId, lessonTitle, onGenerate, onClose 
               <div className="text-sm text-blue-300">
                 <p className="font-medium mb-1">Jak to działa?</p>
                 <ul className="space-y-1 text-blue-300/80">
-                  <li>• AI przeanalizuje treść lekcji</li>
-                  <li>• Wygeneruje pytania testujące zrozumienie materiału</li>
+                  {mode === "lesson" ? (
+                    <>
+                      <li>• AI przeanalizuje treść lekcji</li>
+                      <li>• Wygeneruje pytania testujące zrozumienie materiału</li>
+                    </>
+                  ) : (
+                    <>
+                      <li>• AI wygeneruje pytania na podstawie podanego tematu</li>
+                      <li>• Użyje dodatkowego kontekstu, jeśli został podany</li>
+                    </>
+                  )}
                   <li>• Będziesz mógł przejrzeć i edytować pytania przed zapisaniem</li>
                   <li>• Proces może potrwać 10-30 sekund</li>
                 </ul>

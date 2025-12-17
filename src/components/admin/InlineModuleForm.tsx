@@ -80,9 +80,7 @@ export function InlineModuleForm({ courseId, module, onSave, onCancel }: InlineM
   return (
     <Card className="bg-slate-800/50 border-white/10 backdrop-blur-sm animate-in slide-in-from-top-2 duration-200">
       <CardHeader>
-        <CardTitle className="text-white text-lg">
-          {isEditMode ? "Edytuj moduł" : "Nowy moduł"}
-        </CardTitle>
+        <CardTitle className="text-white text-lg">{isEditMode ? "Edytuj moduł" : "Nowy moduł"}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -117,7 +115,11 @@ export function InlineModuleForm({ courseId, module, onSave, onCancel }: InlineM
               <X className="w-4 h-4 mr-2" />
               Anuluj
             </Button>
-            <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700 transition-all duration-200">
+            <Button
+              type="submit"
+              disabled={loading}
+              className="bg-blue-600 hover:bg-blue-700 transition-all duration-200"
+            >
               {loading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />

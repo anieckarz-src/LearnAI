@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Course, CourseStatus, PaginatedResponse } from "@/types";
-import { Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Calendar, DollarSign } from "lucide-react";
+import { Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 
 export function CoursesManagement() {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -174,15 +174,6 @@ export function CoursesManagement() {
                 </CardHeader>
                 <CardContent className="pt-0">
                   <div className="space-y-3">
-                    {/* Price info */}
-                    <div className="flex items-center gap-2 text-sm">
-                      <DollarSign className="w-4 h-4 text-gray-400" />
-                      {course.price !== null && course.price !== undefined && course.price > 0 ? (
-                        <span className="text-green-400 font-semibold">{course.price.toFixed(2)} PLN</span>
-                      ) : (
-                        <span className="text-blue-400 font-semibold">Darmowy</span>
-                      )}
-                    </div>
                     {/* Creation date */}
                     <div className="flex items-center gap-2 text-sm text-gray-400">
                       <Calendar className="w-4 h-4" />

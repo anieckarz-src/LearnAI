@@ -71,3 +71,4 @@ CREATE POLICY "Anyone can view lesson materials"
 ON storage.objects FOR SELECT
 TO public
 USING (bucket_id = 'lesson-materials');
+

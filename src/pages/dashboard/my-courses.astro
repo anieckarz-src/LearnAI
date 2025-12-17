@@ -1,0 +1,29 @@
+---
+import UserLayout from "@/layouts/UserLayout.astro";
+import { UserDashboard } from "@/components/user/UserDashboard";
+import { ChatWidget } from "@/components/chat/ChatWidget";
+
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect("/login?redirect=/dashboard/my-courses");
+}
+
+// Redirect admins to admin dashboard
+if (user.role === "admin") {
+  return Astro.redirect("/admin/courses");
+}
+---
+
+<UserLayout 
+  title="Moje Kursy" 
+  description="Wszystkie kursy, na które jesteś zapisany"
+  user={user} 
+  currentPath={Astro.url.pathname}
+>
+  <!-- AI Chat Widget -->
+  <ChatWidget client:load contextType="general" />
+
+  <!-- Dashboard Content - same component, different context -->
+  <UserDashboard client:load />
+</UserLayout>

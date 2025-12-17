@@ -209,3 +209,4 @@ CREATE POLICY "System can insert audit log"
   ON public.audit_log FOR INSERT
   TO authenticated
   WITH CHECK (true);
+

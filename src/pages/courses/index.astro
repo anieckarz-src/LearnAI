@@ -1,27 +1,43 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import UserLayout from "@/layouts/UserLayout.astro";
 import { CourseCatalog } from "@/components/course/CourseCatalog";
+import { ChatWidget } from "@/components/chat/ChatWidget";
+
+const user = Astro.locals.user;
+
+// Use UserLayout if logged in, otherwise use regular Layout
 ---
 
-<Layout title="Kursy - LearnAI Platform">
-  <div class="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
-    <div class="container mx-auto px-4 py-12">
-      <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <div class="text-center mb-12">
-          <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
-            Nasze <span
-              class="bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">Kursy</span
-            >
-          </h1>
-          <p class="text-xl text-gray-400 max-w-2xl mx-auto">
-            Wybierz kurs, który pomoże Ci osiągnąć Twoje cele edukacyjne
-          </p>
-        </div>
+{user && user.role !== "admin" ? (
+  <UserLayout 
+    title="Katalog Kursów" 
+    description="Przeglądaj i zapisuj się na dostępne kursy"
+    user={user} 
+    currentPath={Astro.url.pathname}
+  >
+    <ChatWidget client:load contextType="general" />
+    <CourseCatalog client:load />
+  </UserLayout>
+) : (
+  <Layout title="Kursy - LearnAI Platform">
+    <div class="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+      <div class="container mx-auto px-4 py-12">
+        <div class="max-w-7xl mx-auto">
+          <!-- Header -->
+          <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+              Nasze <span class="bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">Kursy</span>
+            </h1>
+            <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+              Wybierz kurs, który pomoże Ci osiągnąć Twoje cele edukacyjne
+            </p>
+          </div>
 
-        <!-- Courses Catalog -->
-        <CourseCatalog client:load />
+          <!-- Courses Catalog -->
+          <CourseCatalog client:load />
+        </div>
       </div>
     </div>
-  </div>
-</Layout>
+  </Layout>
+)}

@@ -113,6 +113,28 @@ export const POST: APIRoute = async ({ locals, request }) => {
       // For now, just allow creation
     }
 
+    // If order_index is provided, shift existing lessons at or after that position
+    // to make room for the new lesson
+    if (order_index !== undefined && order_index !== null) {
+      // Get all lessons that need to be shifted
+      const { data: lessonsToShift, error: fetchError } = await supabase
+        .from("lessons")
+        .select("id, order_index")
+        .eq("module_id", module_id)
+        .gte("order_index", order_index)
+        .order("order_index", { ascending: false }); // Process in reverse to avoid conflicts
+
+      if (!fetchError && lessonsToShift && lessonsToShift.length > 0) {
+        // Update each lesson's order_index
+        for (const lessonToShift of lessonsToShift) {
+          await supabase
+            .from("lessons")
+            .update({ order_index: lessonToShift.order_index + 1 })
+            .eq("id", lessonToShift.id);
+        }
+      }
+    }
+
     const { data: lesson, error } = await supabase
       .from("lessons")
       .insert({

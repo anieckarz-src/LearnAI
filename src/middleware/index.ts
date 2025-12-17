@@ -79,8 +79,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const pathname = context.url.pathname;
 
   // Define public routes (accessible without authentication)
-  const publicRoutes = ["/", "/login", "/unauthorized", "/reset-password"];
-  const publicApiRoutes = ["/api/payments/webhook", "/api/auth/signin", "/api/auth/signout"];
+  const publicRoutes = ["/", "/login", "/register", "/unauthorized", "/reset-password", "/courses"];
+  const publicApiRoutes = ["/api/auth/signin", "/api/auth/signout", "/api/auth/signup", "/api/courses"];
 
   const isPublicRoute = publicRoutes.includes(pathname) || publicRoutes.some((route) => pathname.startsWith(route));
   const isPublicApiRoute = publicApiRoutes.some((route) => pathname.startsWith(route));
@@ -159,9 +159,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
 
-  // Course routes protection (user access)
-  if (pathname.startsWith("/courses")) {
-    // Require authentication for course pages
+  // Course lesson routes protection (user access)
+  // Allow public access to course catalog and course details, but require auth for lessons
+  if (pathname.match(/^\/courses\/[^\/]+\/lessons\//)) {
+    // Require authentication for lesson pages
     if (!session?.user) {
       return context.redirect("/login?redirect=" + encodeURIComponent(pathname));
     }
@@ -204,20 +205,30 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
 
-  // API courses routes protection (except webhook which is public)
-  if (pathname.startsWith("/api/courses/") && !isPublicApiRoute) {
-    if (!session?.user) {
-      return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
+  // API courses routes protection
+  // Allow public GET requests to list courses and get course details
+  // Require auth for POST (enroll) and other operations
+  if (pathname.startsWith("/api/courses/")) {
+    const isGetRequest = context.request.method === "GET";
+    const isEnrollEndpoint = pathname.includes("/enroll");
 
-    if (context.locals.user && context.locals.user.is_blocked) {
-      return new Response(JSON.stringify({ success: false, error: "Account blocked" }), {
-        status: 403,
-        headers: { "Content-Type": "application/json" },
-      });
+    // Public endpoints: GET /api/courses and GET /api/courses/[id]
+    const isPublicEndpoint = isGetRequest && !isEnrollEndpoint;
+
+    if (!isPublicEndpoint) {
+      if (!session?.user) {
+        return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      if (context.locals.user && context.locals.user.is_blocked) {
+        return new Response(JSON.stringify({ success: false, error: "Account blocked" }), {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
     }
   }
 

@@ -161,3 +161,4 @@ CREATE TRIGGER payment_audit_log
   AFTER INSERT OR UPDATE ON public.payments
   FOR EACH ROW
   EXECUTE FUNCTION log_payment_changes();
+

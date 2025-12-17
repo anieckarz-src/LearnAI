@@ -54,11 +54,7 @@ export function PromptDialog({
       <AlertDialogContent className="bg-slate-800 border-white/10">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-white">{title}</AlertDialogTitle>
-          {description && (
-            <AlertDialogDescription className="text-gray-400">
-              {description}
-            </AlertDialogDescription>
-          )}
+          {description && <AlertDialogDescription className="text-gray-400">{description}</AlertDialogDescription>}
         </AlertDialogHeader>
         <div className="py-4">
           <Label htmlFor="prompt-input" className="text-white text-sm mb-2 block">
@@ -87,10 +83,7 @@ export function PromptDialog({
           >
             Anuluj
           </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleConfirm}
-            className="bg-blue-600 text-white hover:bg-blue-700"
-          >
+          <AlertDialogAction onClick={handleConfirm} className="bg-blue-600 text-white hover:bg-blue-700">
             OK
           </AlertDialogAction>
         </AlertDialogFooter>

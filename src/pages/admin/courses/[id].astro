@@ -1,6 +1,7 @@
 ---
 import AdminLayout from "@/layouts/AdminLayout.astro";
-import { CourseEditTabs } from "@/components/admin/CourseEditTabs";
+import { CourseForm } from "@/components/admin/CourseForm";
+import { ModulesManager } from "@/components/admin/ModulesManager";
 import type { Course } from "@/types";
 
 const user = Astro.locals.user;
@@ -50,9 +51,14 @@ if (!course || error) {
 
 <AdminLayout
   title={`Edytuj kurs: ${course.title}`}
-  description="Edytuj szczegóły kursu"
+  description="Edytuj szczegóły kursu i zarządzaj modułami"
   user={user}
   currentPath={Astro.url.pathname}
 >
-  <CourseEditTabs client:load course={course} />
+  <div class="space-y-8 scroll-smooth">
+    <CourseForm client:load course={course} compact={true} />
+    <div class="border-t border-white/10 pt-8">
+      <ModulesManager client:load courseId={course.id} />
+    </div>
+  </div>
 </AdminLayout>

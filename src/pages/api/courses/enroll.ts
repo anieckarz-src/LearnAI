@@ -24,7 +24,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
     // Get course details
     const { data: course, error: courseError } = await supabase
       .from("courses")
-      .select("id, price, status")
+      .select("id, status")
       .eq("id", course_id)
       .single();
 
@@ -38,14 +38,6 @@ export const POST: APIRoute = async ({ locals, request }) => {
     // Check if course is published
     if (course.status !== "published") {
       return new Response(JSON.stringify({ success: false, error: "Ten kurs nie jest jeszcze dostępny" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    // Check if course is free
-    if (course.price && course.price > 0) {
-      return new Response(JSON.stringify({ success: false, error: "Ten kurs jest płatny. Użyj opcji zakupu." }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });

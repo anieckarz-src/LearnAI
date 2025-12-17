@@ -95,12 +95,7 @@ export const PATCH: APIRoute = async ({ locals, params, request }) => {
     // Get old quiz data for audit log
     const { data: oldQuiz } = await supabase.from("quizzes").select("*").eq("id", id).single();
 
-    const { data: quiz, error } = await supabase
-      .from("quizzes")
-      .update(updateData)
-      .eq("id", id)
-      .select()
-      .single();
+    const { data: quiz, error } = await supabase.from("quizzes").update(updateData).eq("id", id).select().single();
 
     if (error) {
       throw error;

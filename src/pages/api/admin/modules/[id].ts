@@ -13,11 +13,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
     const { id } = params;
 
-    const { data: module, error } = await supabase
-      .from("modules")
-      .select("*")
-      .eq("id", id)
-      .single();
+    const { data: module, error } = await supabase.from("modules").select("*").eq("id", id).single();
 
     if (error || !module) {
       return new Response(JSON.stringify({ success: false, error: "Module not found" }), {
@@ -62,13 +58,10 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
 
     // Validation
     if (title && title.length < 3) {
-      return new Response(
-        JSON.stringify({ success: false, error: "Title must be at least 3 characters" }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return new Response(JSON.stringify({ success: false, error: "Title must be at least 3 characters" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Build update object
@@ -78,21 +71,13 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
     if (order_index !== undefined) updateData.order_index = order_index;
 
     if (Object.keys(updateData).length === 0) {
-      return new Response(
-        JSON.stringify({ success: false, error: "No fields to update" }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return new Response(JSON.stringify({ success: false, error: "No fields to update" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
-    const { data: module, error } = await supabase
-      .from("modules")
-      .update(updateData)
-      .eq("id", id)
-      .select()
-      .single();
+    const { data: module, error } = await supabase.from("modules").update(updateData).eq("id", id).select().single();
 
     if (error) {
       console.error("Error updating module:", error);

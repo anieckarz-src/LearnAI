@@ -3,3 +3,4 @@
 
 -- Add 'user' to the enum (this will be committed before the next migration runs)
 ALTER TYPE user_role ADD VALUE IF NOT EXISTS 'user';
+

@@ -25,18 +25,13 @@ export function VideoPlayer({ videoUrl, title }: VideoPlayerProps) {
   if (!embedUrl) {
     return (
       <div className="w-full p-6 rounded-lg bg-red-500/10 border border-red-500/50">
-        <p className="text-red-400 text-center">
-          Nieprawidłowy URL wideo. Obsługiwane platformy: Vimeo, YouTube
-        </p>
+        <p className="text-red-400 text-center">Nieprawidłowy URL wideo. Obsługiwane platformy: Vimeo, YouTube</p>
       </div>
     );
   }
 
   return (
-    <div
-      className="relative w-full rounded-lg overflow-hidden bg-black/50"
-      style={{ paddingBottom: "56.25%" }}
-    >
+    <div className="relative w-full rounded-lg overflow-hidden bg-black/50" style={{ paddingBottom: "56.25%" }}>
       <iframe
         className="absolute top-0 left-0 w-full h-full"
         src={embedUrl}

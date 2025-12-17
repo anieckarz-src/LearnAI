@@ -121,16 +121,10 @@ export function LessonSidebar({
 
                 {/* Title */}
                 <div className="flex-1 min-w-0">
-                  <span
-                    className={`font-medium text-sm line-clamp-2 ${
-                      isAccessible ? "text-white" : "text-gray-500"
-                    }`}
-                  >
+                  <span className={`font-medium text-sm line-clamp-2 ${isAccessible ? "text-white" : "text-gray-500"}`}>
                     {lesson.title}
                   </span>
-                  {isCurrent && (
-                    <span className="text-xs text-blue-400 mt-1 block">← Jesteś tutaj</span>
-                  )}
+                  {isCurrent && <span className="text-xs text-blue-400 mt-1 block">← Jesteś tutaj</span>}
                 </div>
               </div>
             </button>

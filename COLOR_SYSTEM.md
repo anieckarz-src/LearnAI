@@ -380,3 +380,4 @@ const { glass = false, hover = false } = Astro.props;
 - Inline styles (gdy potrzebne)
 
 **Spójność jest kluczem!** Używaj tych samych kombinacji co na landing page dla profesjonalnego wyglądu całej aplikacji.
+

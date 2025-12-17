@@ -326,3 +326,4 @@ Przy dodawaniu nowych funkcjonalności:
 3. Implementuj obsługę błędów
 4. Zachowaj accessibility
 5. Dodaj audit logging dla ważnych akcji
+

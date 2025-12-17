@@ -19,9 +19,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
 
     const offset = (page - 1) * limit;
 
-    let query = supabase
-      .from("courses")
-      .select("*", { count: "exact" });
+    let query = supabase.from("courses").select("*", { count: "exact" });
 
     if (status) {
       query = query.eq("status", status);

@@ -11,11 +11,7 @@ export const DELETE: APIRoute = async ({ request, locals }) => {
     }
 
     // Check if user is admin
-    const { data: userData } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", session.user.id)
-      .single();
+    const { data: userData } = await supabase.from("users").select("role").eq("id", session.user.id).single();
 
     if (userData?.role !== "admin") {
       return new Response(JSON.stringify({ success: false, error: "Forbidden - Admin access required" }), {
@@ -35,10 +31,7 @@ export const DELETE: APIRoute = async ({ request, locals }) => {
     }
 
     // Delete all lessons in the array
-    const { error: deleteError, count } = await supabase
-      .from("lessons")
-      .delete()
-      .in("id", lesson_ids);
+    const { error: deleteError, count } = await supabase.from("lessons").delete().in("id", lesson_ids);
 
     if (deleteError) {
       return new Response(JSON.stringify({ success: false, error: "Failed to delete lessons" }), {

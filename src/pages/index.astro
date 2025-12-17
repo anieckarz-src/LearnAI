@@ -17,7 +17,7 @@ if (user) {
   if (user.role === "admin") {
     return Astro.redirect("/admin/dashboard");
   }
-  
+
   // Redirect students to user dashboard
   return Astro.redirect("/dashboard");
 }

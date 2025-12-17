@@ -11,11 +11,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Check if user is admin
-    const { data: userData } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", session.user.id)
-      .single();
+    const { data: userData } = await supabase.from("users").select("role").eq("id", session.user.id).single();
 
     if (userData?.role !== "admin") {
       return new Response(JSON.stringify({ success: false, error: "Forbidden - Admin access required" }), {
@@ -100,10 +96,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
           order_index: index,
         }));
 
-        const { data: insertedLessons } = await supabase
-          .from("lessons")
-          .insert(lessonsToInsert)
-          .select();
+        const { data: insertedLessons } = await supabase.from("lessons").insert(lessonsToInsert).select();
 
         newLessons = insertedLessons || [];
       }

@@ -53,11 +53,7 @@ export const POST: APIRoute = async ({ locals, params, request }) => {
       .eq("user_id", user.id)
       .single();
 
-    const { data: course } = await supabase
-      .from("courses")
-      .select("price")
-      .eq("id", quiz.lesson.course_id)
-      .single();
+    const { data: course } = await supabase.from("courses").select("price").eq("id", quiz.lesson.course_id).single();
 
     const isFree = !course?.price || course.price === 0;
     const hasAccess = isFree || !!enrollment;
@@ -92,12 +88,12 @@ export const POST: APIRoute = async ({ locals, params, request }) => {
     }
 
     // Calculate score
-    const questions = quiz.questions as Array<{
+    const questions = quiz.questions as {
       id: string;
       question: string;
       options: string[];
       correct_answer: number;
-    }>;
+    }[];
 
     let correctAnswers = 0;
     const feedback = questions.map((question) => {

@@ -13,11 +13,7 @@ export const GET: APIRoute = async ({ locals, params }) => {
   try {
     const { id } = params;
 
-    const { data: course, error } = await supabase
-      .from("courses")
-      .select("*")
-      .eq("id", id)
-      .single();
+    const { data: course, error } = await supabase.from("courses").select("*").eq("id", id).single();
 
     if (error || !course) {
       return new Response(JSON.stringify({ success: false, error: "Course not found" }), {
@@ -55,44 +51,9 @@ export const PATCH: APIRoute = async ({ locals, params, request }) => {
   try {
     const { id } = params;
     const body = await request.json();
-    const { title, description, thumbnail_url, status, price } = body;
+    const { title, description, thumbnail_url, status } = body;
 
     const { data: oldCourse } = await supabase.from("courses").select("*").eq("id", id).single();
-
-    // Handle price updates and Stripe integration
-    let stripeProductId = oldCourse?.stripe_product_id;
-    let stripePriceId = oldCourse?.stripe_price_id;
-
-    // If price is being set or changed, handle Stripe
-    if (price !== undefined && price !== oldCourse?.price) {
-      const { createOrUpdateStripeProduct, createStripePrice } = await import("@/lib/stripe.server");
-
-      try {
-        // Create or update product in Stripe
-        if (!stripeProductId) {
-          const product = await createOrUpdateStripeProduct(id, title || oldCourse.title, description);
-          stripeProductId = product.id;
-        }
-
-        // Create new price in Stripe (if price is not null)
-        if (price !== null && price > 0) {
-          const stripePrice = await createStripePrice(stripeProductId, price);
-          stripePriceId = stripePrice.id;
-        } else {
-          // If price is null or 0, clear Stripe price (make course free)
-          stripePriceId = null;
-        }
-      } catch (stripeError) {
-        console.error("Stripe error:", stripeError);
-        return new Response(
-          JSON.stringify({ success: false, error: "Failed to update price in Stripe. Please check your Stripe configuration." }),
-          {
-            status: 500,
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-      }
-    }
 
     const updateData: Record<string, unknown> = {
       title,
@@ -101,18 +62,7 @@ export const PATCH: APIRoute = async ({ locals, params, request }) => {
       status,
     };
 
-    if (price !== undefined) {
-      updateData.price = price;
-      updateData.stripe_product_id = stripeProductId;
-      updateData.stripe_price_id = stripePriceId;
-    }
-
-    const { data: course, error } = await supabase
-      .from("courses")
-      .update(updateData)
-      .eq("id", id)
-      .select()
-      .single();
+    const { data: course, error } = await supabase.from("courses").update(updateData).eq("id", id).select().single();
 
     if (error) {
       throw error;

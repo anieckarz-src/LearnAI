@@ -169,3 +169,4 @@ CREATE TRIGGER quiz_attempt_audit_log
   AFTER INSERT OR UPDATE ON public.quiz_attempts
   FOR EACH ROW
   EXECUTE FUNCTION log_quiz_attempt_changes();
+

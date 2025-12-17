@@ -12,3 +12,4 @@ DROP TABLE IF EXISTS public.content_reports;
 -- Drop the custom types
 DROP TYPE IF EXISTS content_type;
 DROP TYPE IF EXISTS report_status;
+

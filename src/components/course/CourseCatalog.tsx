@@ -43,9 +43,10 @@ export function CourseCatalog() {
     }
   };
 
-  const filteredCourses = courses.filter((course) =>
-    course.title.toLowerCase().includes(search.toLowerCase()) ||
-    (course.description && course.description.toLowerCase().includes(search.toLowerCase()))
+  const filteredCourses = courses.filter(
+    (course) =>
+      course.title.toLowerCase().includes(search.toLowerCase()) ||
+      (course.description && course.description.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (

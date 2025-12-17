@@ -101,7 +101,7 @@ export function DashboardContent() {
       <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-5">
         {statCards.map((stat) => {
           const Icon = stat.icon;
-          
+
           return (
             <Card key={stat.title} className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
               <CardContent className="p-4">

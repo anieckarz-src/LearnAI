@@ -36,15 +36,25 @@ export function LessonDetailsView({ lesson, onEdit, onClose }: LessonDetailsView
             <span className="text-2xl">{lesson.type === "quiz" ? "❓" : "🎬"}</span>
             <h4 className="text-white font-semibold">{lesson.title}</h4>
           </div>
-          <p className="text-sm text-gray-400 capitalize">
-            Typ: {lesson.type === "quiz" ? "Quiz" : "Treść"}
-          </p>
+          <p className="text-sm text-gray-400 capitalize">Typ: {lesson.type === "quiz" ? "Quiz" : "Treść"}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="ghost" onClick={onEdit} className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 transition-all duration-200" title="Edytuj lekcję">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={onEdit}
+            className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 transition-all duration-200"
+            title="Edytuj lekcję"
+          >
             <Edit className="w-4 h-4" />
           </Button>
-          <Button size="sm" variant="ghost" onClick={onClose} className="text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-200" title="Zwiń szczegóły">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={onClose}
+            className="text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-200"
+            title="Zwiń szczegóły"
+          >
             <ChevronUp className="w-4 h-4" />
           </Button>
         </div>
@@ -107,7 +117,10 @@ export function LessonDetailsView({ lesson, onEdit, onClose }: LessonDetailsView
               </div>
               <div className="space-y-2">
                 {lesson.files.map((file, index) => (
-                  <div key={index} className="bg-slate-700/50 rounded-lg p-2 flex items-center justify-between hover:bg-slate-700/70 transition-all duration-200 group">
+                  <div
+                    key={index}
+                    className="bg-slate-700/50 rounded-lg p-2 flex items-center justify-between hover:bg-slate-700/70 transition-all duration-200 group"
+                  >
                     <div className="flex items-center gap-2">
                       <span className="text-xl">📎</span>
                       <div>
@@ -142,16 +155,15 @@ export function LessonDetailsView({ lesson, onEdit, onClose }: LessonDetailsView
 
       {lesson.type === "quiz" && (
         <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-          <p className="text-sm text-blue-300">
-            💡 Lekcja typu Quiz. Zarządzanie quizem dostępne w osobnej sekcji.
-          </p>
+          <p className="text-sm text-blue-300">💡 Lekcja typu Quiz. Zarządzanie quizem dostępne w osobnej sekcji.</p>
         </div>
       )}
 
       {/* Metadata */}
       <div className="pt-3 border-t border-white/10">
         <p className="text-xs text-gray-500">
-          Utworzono: {new Date(lesson.created_at).toLocaleDateString("pl-PL", {
+          Utworzono:{" "}
+          {new Date(lesson.created_at).toLocaleDateString("pl-PL", {
             year: "numeric",
             month: "long",
             day: "numeric",

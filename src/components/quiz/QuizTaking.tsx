@@ -130,9 +130,7 @@ export function QuizTaking({ quizId, onComplete }: QuizTakingProps) {
           <AlertCircle className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
           <p className="text-white text-lg mb-2">Nie możesz rozpocząć quizu</p>
           <p className="text-gray-400">
-            {quiz?.max_attempts
-              ? `Wykorzystałeś wszystkie ${quiz.max_attempts} próby.`
-              : "Brak dostępu do tego quizu."}
+            {quiz?.max_attempts ? `Wykorzystałeś wszystkie ${quiz.max_attempts} próby.` : "Brak dostępu do tego quizu."}
           </p>
           <Button onClick={() => window.history.back()} className="mt-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -209,16 +207,12 @@ export function QuizTaking({ quizId, onComplete }: QuizTakingProps) {
               <div className="flex items-start gap-3">
                 <Badge
                   className={`flex-shrink-0 ${
-                    answers[question.id] !== undefined
-                      ? "bg-blue-600 text-white"
-                      : "bg-slate-700 text-gray-300"
+                    answers[question.id] !== undefined ? "bg-blue-600 text-white" : "bg-slate-700 text-gray-300"
                   }`}
                 >
                   {index + 1}
                 </Badge>
-                <CardTitle className="text-white text-lg font-medium leading-relaxed">
-                  {question.question}
-                </CardTitle>
+                <CardTitle className="text-white text-lg font-medium leading-relaxed">{question.question}</CardTitle>
               </div>
             </CardHeader>
 
@@ -237,9 +231,7 @@ export function QuizTaking({ quizId, onComplete }: QuizTakingProps) {
                     <div className="flex items-center gap-3">
                       <div
                         className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                          answers[question.id] === optionIndex
-                            ? "border-blue-500 bg-blue-500"
-                            : "border-gray-400"
+                          answers[question.id] === optionIndex ? "border-blue-500 bg-blue-500" : "border-gray-400"
                         }`}
                       >
                         {answers[question.id] === optionIndex && <Check className="w-4 h-4 text-white" />}

@@ -2,6 +2,7 @@
 import Layout from "@/layouts/Layout.astro";
 import { ModulesList } from "@/components/course/ModulesList";
 import { LessonContent as NewLessonContent } from "@/components/course/LessonContent";
+import { ChatWidget } from "@/components/chat/ChatWidget";
 
 const { courseId, lessonId } = Astro.params;
 
@@ -50,14 +51,11 @@ try {
 
     if (hasAccess) {
       // Fetch modules with lessons using the new API endpoint
-      const modulesResponse = await fetch(
-        `${Astro.url.origin}/api/courses/${courseId}/modules`,
-        {
-          headers: {
-            cookie: Astro.request.headers.get("cookie") || "",
-          },
-        }
-      );
+      const modulesResponse = await fetch(`${Astro.url.origin}/api/courses/${courseId}/modules`, {
+        headers: {
+          cookie: Astro.request.headers.get("cookie") || "",
+        },
+      });
 
       if (modulesResponse.ok) {
         const modulesResult = await modulesResponse.json();
@@ -132,10 +130,7 @@ const progress = {
               <h2 class="text-xl font-bold text-white truncate">{course.title}</h2>
               <div class="mt-2 flex items-center gap-2">
                 <div class="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
-                  <div
-                    class="h-full bg-blue-500 transition-all"
-                    style={`width: ${progress.percentage}%`}
-                  />
+                  <div class="h-full bg-blue-500 transition-all" style={`width: ${progress.percentage}%`} />
                 </div>
                 <span class="text-sm text-gray-400">{progress.percentage}%</span>
               </div>
@@ -147,9 +142,7 @@ const progress = {
             <ModulesList
               modules={modulesWithLessons}
               currentLessonId={lessonId}
-              onLessonClick={(id: string) => {
-                window.location.href = `/courses/${courseId}/lessons/${id}`;
-              }}
+              courseId={courseId}
               client:load
             />
           </div>
@@ -162,9 +155,7 @@ const progress = {
             <div class="mb-8">
               <h1 class="text-3xl font-bold text-white mb-2">{lesson.title}</h1>
               <div class="flex items-center gap-4 text-sm text-gray-400">
-                <span class="capitalize">
-                  {lesson.type === "quiz" ? "Lekcja Quiz" : "Lekcja Treściowa"}
-                </span>
+                <span class="capitalize">{lesson.type === "quiz" ? "Lekcja Quiz" : "Lekcja Treściowa"}</span>
                 {lesson.completed && (
                   <span class="px-2 py-1 bg-green-500/20 text-green-400 rounded-md text-xs font-medium">
                     ✓ Ukończone
@@ -189,6 +180,14 @@ const progress = {
             )}
           </div>
         </main>
+
+        {/* AI Chat Widget with lesson context */}
+        <ChatWidget 
+          client:load 
+          contextType="lesson" 
+          contextId={lessonId}
+          contextTitle={lesson.title}
+        />
       </div>
     )
   }
@@ -202,13 +201,20 @@ const progress = {
       const lessonId = window.location.pathname.split("/").pop();
       const courseId = window.location.pathname.split("/")[2];
 
+      // Disable button during request
+      markCompleteBtn.disabled = true;
+      markCompleteBtn.textContent = "Zapisywanie...";
+
       try {
-        const response = await fetch(`/api/lessons/${lessonId}/complete`, {
+        const response = await fetch("/api/user/lesson-progress", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ course_id: courseId }),
+          body: JSON.stringify({
+            lesson_id: lessonId,
+            course_id: courseId,
+          }),
         });
 
         const result = await response.json();
@@ -217,10 +223,14 @@ const progress = {
           window.location.reload();
         } else {
           alert(result.error || "Nie udało się oznaczyć lekcji jako ukończonej");
+          markCompleteBtn.disabled = false;
+          markCompleteBtn.textContent = "Oznacz jako ukończone";
         }
       } catch (error) {
         console.error("Error marking lesson as complete:", error);
         alert("Wystąpił błąd");
+        markCompleteBtn.disabled = false;
+        markCompleteBtn.textContent = "Oznacz jako ukończone";
       }
     });
   }

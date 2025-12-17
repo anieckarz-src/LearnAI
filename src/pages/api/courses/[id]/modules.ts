@@ -37,11 +37,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
     }
 
     // Fetch course
-    const { data: course, error: courseError } = await supabase
-      .from("courses")
-      .select("*")
-      .eq("id", courseId)
-      .single();
+    const { data: course, error: courseError } = await supabase.from("courses").select("*").eq("id", courseId).single();
 
     if (courseError || !course) {
       return new Response(JSON.stringify({ success: false, error: "Course not found" }), {
@@ -102,10 +98,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
     let quizzesMap = new Map();
 
     if (quizLessonIds.length > 0) {
-      const { data: quizzes } = await supabase
-        .from("quizzes")
-        .select("*")
-        .in("lesson_id", quizLessonIds);
+      const { data: quizzes } = await supabase.from("quizzes").select("*").in("lesson_id", quizLessonIds);
 
       quizzesMap = new Map(quizzes?.map((q) => [q.lesson_id, q]) || []);
     }
@@ -125,12 +118,25 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
           // Determine accessibility
           let is_accessible = true;
-          if (isSequential && index > 0) {
-            // Check if previous lesson is completed
-            const moduleLessonsForModule = lessons?.filter((l) => l.module_id === module.id) || [];
-            const prevLesson = moduleLessonsForModule[index - 1];
-            const prevLessonProgress = prevLesson ? progressMap.get(prevLesson.id) : null;
-            is_accessible = prevLessonProgress?.completed || false;
+
+          // Admins have access to all lessons
+          if (isAdmin) {
+            is_accessible = true;
+          } else if (isSequential) {
+            // In sequential mode, check if previous lesson is completed
+            if (index > 0) {
+              // Get the previous lesson from the already filtered moduleLessons array
+              const filteredModuleLessons = (lessons || []).filter((l) => l.module_id === module.id);
+              const prevLesson = filteredModuleLessons[index - 1];
+              const prevLessonProgress = progressMap.get(prevLesson.id);
+              is_accessible = prevLessonProgress?.completed || false;
+            } else {
+              // First lesson in module is always accessible
+              is_accessible = true;
+            }
+          } else {
+            // In all_access mode (or undefined/null), all lessons are accessible
+            is_accessible = true;
           }
 
           if (!completed) {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { toast } from "sonner";
 import {
   DndContext,
   closestCenter,
@@ -12,14 +13,21 @@ import {
   type DragOverEvent,
   type DragEndEvent,
 } from "@dnd-kit/core";
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { InlineModuleForm } from "./InlineModuleForm";
 import { SortableModuleItem } from "./SortableModuleItem";
+import { KeyboardShortcutsDialog } from "./KeyboardShortcutsDialog";
 import type { Lesson, Module } from "@/types";
-import { Plus, Loader2, GripVertical } from "lucide-react";
+import { Plus, Loader2, GripVertical, ChevronDown, ChevronUp } from "lucide-react";
 
 interface ModuleWithLessons extends Module {
   lessons: Lesson[];
@@ -34,13 +42,14 @@ export function ModulesManager({ courseId }: ModulesManagerProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
-  
+
   // State for inline module management
   const [addingNewModule, setAddingNewModule] = useState(false);
   const [editingModuleId, setEditingModuleId] = useState<string | null>(null);
-  
+
   // State for inline lesson management
   const [addingLessonToModule, setAddingLessonToModule] = useState<string | null>(null);
+  const [insertLessonPosition, setInsertLessonPosition] = useState<number>(0);
   const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
   const [expandedLessonDetails, setExpandedLessonDetails] = useState<Set<string>>(new Set());
 
@@ -88,6 +97,17 @@ export function ModulesManager({ courseId }: ModulesManagerProps) {
     },
     { enableOnFormTags: true }
   );
+
+  // Bulk actions: Expand/Collapse all modules
+  const handleExpandAll = () => {
+    setExpandedModules(new Set(modules.map((m) => m.id)));
+    toast.success("Wszystkie moduły zostały rozwinięte");
+  };
+
+  const handleCollapseAll = () => {
+    setExpandedModules(new Set());
+    toast.success("Wszystkie moduły zostały zwinięte");
+  };
 
   const fetchModules = async () => {
     try {
@@ -169,9 +189,16 @@ export function ModulesManager({ courseId }: ModulesManagerProps) {
 
       // Remove module from state without full refresh
       setModules(modules.filter((m) => m.id !== moduleId));
+
+      toast.success("Moduł został usunięty", {
+        description: "Moduł i wszystkie jego lekcje zostały usunięte.",
+      });
     } catch (err) {
       console.error("Error deleting module:", err);
-      alert(err instanceof Error ? err.message : "Wystąpił błąd podczas usuwania modułu");
+      const errorMessage = err instanceof Error ? err.message : "Wystąpił błąd podczas usuwania modułu";
+      toast.error("Błąd usuwania modułu", {
+        description: errorMessage,
+      });
     }
   };
 
@@ -191,22 +218,42 @@ export function ModulesManager({ courseId }: ModulesManagerProps) {
       setExpandedModules(new Set([...expandedModules, moduleId]));
     }
     setAddingLessonToModule(moduleId);
+    setInsertLessonPosition(0); // Default to beginning
+  };
+
+  const handleAddLessonAt = (moduleId: string, position: number) => {
+    // Expand module if collapsed
+    if (!expandedModules.has(moduleId)) {
+      setExpandedModules(new Set([...expandedModules, moduleId]));
+    }
+    setAddingLessonToModule(moduleId);
+    setInsertLessonPosition(position);
   };
 
   const handleSaveNewLesson = async (lessonData: Lesson) => {
-    // Optimistically add the lesson to the module
+    // Optimistically add the lesson to the module at the correct position
     setModules(
-      modules.map((module) =>
-        module.id === lessonData.module_id
-          ? { ...module, lessons: [...module.lessons, lessonData] }
-          : module
-      )
+      modules.map((module) => {
+        if (module.id === lessonData.module_id) {
+          const updatedLessons = [...module.lessons];
+          // Insert at the specified position
+          updatedLessons.splice(insertLessonPosition, 0, lessonData);
+          // Renumber order_index for all lessons
+          updatedLessons.forEach((lesson, index) => {
+            lesson.order_index = index;
+          });
+          return { ...module, lessons: updatedLessons };
+        }
+        return module;
+      })
     );
     setAddingLessonToModule(null);
+    setInsertLessonPosition(0);
   };
 
   const handleCancelNewLesson = () => {
     setAddingLessonToModule(null);
+    setInsertLessonPosition(0);
   };
 
   const handleToggleLessonExpand = (lessonId: string) => {
@@ -261,12 +308,18 @@ export function ModulesManager({ courseId }: ModulesManagerProps) {
             lessons: module.lessons.filter((l) => l.id !== lessonId),
           }))
         );
+
+        toast.success("Lekcja została usunięta", {
+          description: "Lekcja została pomyślnie usunięta.",
+        });
       } else {
-        alert(result.error || "Nie udało się usunąć lekcji");
+        throw new Error(result.error || "Nie udało się usunąć lekcji");
       }
     } catch (error) {
       console.error("Error deleting lesson:", error);
-      alert("Wystąpił błąd");
+      toast.error("Błąd usuwania lekcji", {
+        description: error instanceof Error ? error.message : "Wystąpił błąd",
+      });
     }
   };
 
@@ -284,12 +337,18 @@ export function ModulesManager({ courseId }: ModulesManagerProps) {
         const newModule = result.data.module;
         const newLessons = result.data.lessons || [];
         setModules([...modules, { ...newModule, lessons: newLessons }]);
+
+        toast.success("Moduł został zduplikowany", {
+          description: `Utworzono kopię modułu z ${newLessons.length} lekcjami.`,
+        });
       } else {
-        alert(result.error || "Nie udało się zduplikować modułu");
+        throw new Error(result.error || "Nie udało się zduplikować modułu");
       }
     } catch (error) {
       console.error("Error duplicating module:", error);
-      alert("Wystąpił błąd");
+      toast.error("Błąd duplikowania modułu", {
+        description: error instanceof Error ? error.message : "Wystąpił błąd",
+      });
     }
   };
 
@@ -307,24 +366,28 @@ export function ModulesManager({ courseId }: ModulesManagerProps) {
         const newLesson = result.data;
         setModules(
           modules.map((module) =>
-            module.id === newLesson.module_id
-              ? { ...module, lessons: [...module.lessons, newLesson] }
-              : module
+            module.id === newLesson.module_id ? { ...module, lessons: [...module.lessons, newLesson] } : module
           )
         );
+
+        toast.success("Lekcja została zduplikowana", {
+          description: "Utworzono kopię lekcji.",
+        });
       } else {
-        alert(result.error || "Nie udało się zduplikować lekcji");
+        throw new Error(result.error || "Nie udało się zduplikować lekcji");
       }
     } catch (error) {
       console.error("Error duplicating lesson:", error);
-      alert("Wystąpił błąd");
+      toast.error("Błąd duplikowania lekcji", {
+        description: error instanceof Error ? error.message : "Wystąpił błąd",
+      });
     }
   };
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
     setActiveId(active.id as string);
-    
+
     // Determine if dragging a module or lesson
     const isModule = modules.some((m) => m.id === active.id);
     setActiveType(isModule ? "module" : "lesson");
@@ -365,7 +428,7 @@ export function ModulesManager({ courseId }: ModulesManagerProps) {
 
     // Remove from source
     const newSourceLessons = sourceModule.lessons.filter((l) => l.id !== lessonId);
-    
+
     // Add to target
     const newTargetLessons = [...targetModule.lessons, lesson];
 
@@ -431,7 +494,7 @@ export function ModulesManager({ courseId }: ModulesManagerProps) {
         const newIndex = module.lessons.findIndex((l) => l.id === over.id);
 
         const newLessons = arrayMove(module.lessons, oldIndex, newIndex);
-        
+
         setModules(modules.map((m) => (m.id === sourceModuleId ? { ...m, lessons: newLessons } : m)));
 
         try {
@@ -482,31 +545,77 @@ export function ModulesManager({ courseId }: ModulesManagerProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <Skeleton className="h-7 w-48 mb-2" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+          <Skeleton className="h-10 w-32" />
+        </div>
+
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="bg-slate-800/50 border-white/10">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="w-4 h-4" />
+                  <Skeleton className="w-4 h-4" />
+                  <Skeleton className="h-6 flex-1" />
+                  <Skeleton className="w-16 h-4" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     );
   }
 
   if (error) {
-    return (
-      <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400">
-        {error}
-      </div>
-    );
+    return <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400">{error}</div>;
   }
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h2 className="text-xl font-semibold text-white">Moduły kursu</h2>
           <p className="text-sm text-gray-400 mt-0.5">Zarządzaj modułami i lekcjami w tym kursie</p>
         </div>
-        <Button onClick={handleAddModule} className="bg-blue-600 hover:bg-blue-700 transition-all duration-200">
-          <Plus className="w-4 h-4 mr-2" />
-          Dodaj moduł
-        </Button>
+        <div className="flex items-center gap-2">
+          {/* Keyboard shortcuts button */}
+          <KeyboardShortcutsDialog />
+
+          {/* Bulk actions */}
+          {modules.length > 0 && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExpandAll}
+                className="text-gray-400 hover:text-white border-white/10"
+              >
+                <ChevronDown className="w-4 h-4 mr-2" />
+                Rozwiń wszystkie
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCollapseAll}
+                className="text-gray-400 hover:text-white border-white/10"
+              >
+                <ChevronUp className="w-4 h-4 mr-2" />
+                Zwiń wszystkie
+              </Button>
+            </>
+          )}
+
+          <Button onClick={handleAddModule} className="bg-blue-600 hover:bg-blue-700 transition-all duration-200">
+            <Plus className="w-4 h-4 mr-2" />
+            Dodaj moduł
+          </Button>
+        </div>
       </div>
 
       {/* Inline form for adding new module */}
@@ -547,7 +656,7 @@ export function ModulesManager({ courseId }: ModulesManagerProps) {
             <div>
               {modules.map((module) => {
                 const isEditingThisModule = editingModuleId === module.id;
-                
+
                 // If editing this module, show inline form
                 if (isEditingThisModule) {
                   return (
@@ -561,7 +670,7 @@ export function ModulesManager({ courseId }: ModulesManagerProps) {
                     </div>
                   );
                 }
-                
+
                 return (
                   <SortableModuleItem
                     key={module.id}
@@ -569,10 +678,12 @@ export function ModulesManager({ courseId }: ModulesManagerProps) {
                     courseId={courseId}
                     isExpanded={expandedModules.has(module.id)}
                     isAddingLesson={addingLessonToModule === module.id}
+                    insertPosition={addingLessonToModule === module.id ? insertLessonPosition : null}
                     editingLessonId={editingLessonId}
                     expandedLessonDetails={expandedLessonDetails}
                     onToggleExpansion={() => toggleModuleExpansion(module.id)}
                     onAddLesson={() => handleAddLesson(module.id)}
+                    onAddLessonAt={(position: number) => handleAddLessonAt(module.id, position)}
                     onEditModule={() => handleEditModule(module.id)}
                     onDeleteModule={() => handleDeleteModule(module.id)}
                     onSaveNewLesson={handleSaveNewLesson}
@@ -590,10 +701,15 @@ export function ModulesManager({ courseId }: ModulesManagerProps) {
               })}
             </div>
           </SortableContext>
-          
-          <DragOverlay dropAnimation={null}>
+
+          <DragOverlay
+            dropAnimation={{
+              duration: 200,
+              easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)",
+            }}
+          >
             {activeId && activeType === "module" ? (
-              <div className="opacity-90 rotate-1 scale-105 transition-all duration-200">
+              <div className="opacity-90 rotate-2 scale-105 transition-all duration-200 shadow-2xl">
                 <Card className="border-blue-500/50 shadow-xl bg-slate-800/50 backdrop-blur-sm">
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
@@ -606,13 +722,11 @@ export function ModulesManager({ courseId }: ModulesManagerProps) {
                 </Card>
               </div>
             ) : activeId && activeType === "lesson" ? (
-              <div className="opacity-90 rotate-1 scale-105 transition-all duration-200">
+              <div className="opacity-90 rotate-2 scale-105 transition-all duration-200 shadow-2xl">
                 <div className="bg-slate-800/50 border border-blue-500/50 rounded-lg p-3 shadow-xl backdrop-blur-sm">
                   <div className="flex items-center gap-2">
                     <GripVertical className="w-4 h-4 text-muted-foreground" />
-                    <div className="text-sm font-medium text-white">
-                      {findLessonById(activeId)?.title || "Lesson"}
-                    </div>
+                    <div className="text-sm font-medium text-white">{findLessonById(activeId)?.title || "Lesson"}</div>
                   </div>
                 </div>
               </div>

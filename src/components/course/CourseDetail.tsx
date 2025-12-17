@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PurchaseButton } from "./PurchaseButton";
-import type { Course, Lesson } from "@/types";
-import { BookOpen, Calendar, ArrowLeft, CheckCircle2, Lock } from "lucide-react";
+import { ModulesList } from "./ModulesList";
+import { ModulesPreview } from "./ModulesPreview";
+import type { Course, ModuleWithLessons, CoursePreviewData } from "@/types";
+import { BookOpen, Calendar, ArrowLeft, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface CourseDetailProps {
@@ -11,16 +13,16 @@ interface CourseDetailProps {
 }
 
 interface CourseData extends Course {
-  has_access: boolean;
   is_enrolled: boolean;
-  lessons: Lesson[] | null;
-  lesson_progress?: Array<{ lesson_id: string; completed: boolean; completed_at: string | null }> | null;
-  lesson_access_mode?: "sequential" | "all_access";
+  lesson_count?: number;
 }
 
 export function CourseDetail({ courseId }: CourseDetailProps) {
   const [course, setCourse] = useState<CourseData | null>(null);
+  const [modules, setModules] = useState<ModuleWithLessons[]>([]);
+  const [preview, setPreview] = useState<CoursePreviewData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingModules, setLoadingModules] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,11 +41,50 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
       }
 
       setCourse(result.data);
+
+      // If user is enrolled, fetch modules; otherwise fetch preview
+      if (result.data.is_enrolled) {
+        await fetchModules();
+      } else {
+        await fetchPreview();
+      }
     } catch (err) {
       console.error("Error fetching course:", err);
       setError("Wystąpił błąd podczas pobierania kursu");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchModules = async () => {
+    try {
+      setLoadingModules(true);
+      const response = await fetch(`/api/courses/${courseId}/modules`);
+      const result = await response.json();
+
+      if (result.success) {
+        setModules(result.data);
+      }
+    } catch (err) {
+      console.error("Error fetching modules:", err);
+    } finally {
+      setLoadingModules(false);
+    }
+  };
+
+  const fetchPreview = async () => {
+    try {
+      setLoadingModules(true);
+      const response = await fetch(`/api/courses/${courseId}/preview`);
+      const result = await response.json();
+
+      if (result.success) {
+        setPreview(result.data);
+      }
+    } catch (err) {
+      console.error("Error fetching preview:", err);
+    } finally {
+      setLoadingModules(false);
     }
   };
 
@@ -53,53 +94,29 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
     return tmp.textContent || tmp.innerText || "";
   };
 
-  // Calculate progress
+  // Calculate progress from modules
   const calculateProgress = () => {
-    if (!course?.lessons || !course.lesson_progress) {
+    if (modules.length === 0) {
       return { completed: 0, total: 0, percentage: 0 };
     }
 
-    const progressMap = new Map(course.lesson_progress.map((p) => [p.lesson_id, p.completed]));
-    const completed = course.lessons.filter((l) => progressMap.get(l.id) === true).length;
-    const total = course.lessons.length;
-    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    let completed = 0;
+    let total = 0;
 
+    modules.forEach((module) => {
+      module.lessons.forEach((lesson) => {
+        total++;
+        if (lesson.completed) {
+          completed++;
+        }
+      });
+    });
+
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
     return { completed, total, percentage };
   };
 
-  // Check if lesson is accessible based on sequential mode
-  const isLessonAccessible = (lessonIndex: number) => {
-    if (!course?.lessons || !course.lesson_progress) {
-      return true;
-    }
-
-    // If all_access mode, all lessons are accessible
-    if (course.lesson_access_mode === "all_access" || !course.lesson_access_mode) {
-      return true;
-    }
-
-    // First lesson is always accessible
-    if (lessonIndex === 0) {
-      return true;
-    }
-
-    // For sequential mode, check if all previous lessons are completed
-    const progressMap = new Map(course.lesson_progress.map((p) => [p.lesson_id, p.completed]));
-    const previousLessons = course.lessons.slice(0, lessonIndex);
-
-    return previousLessons.every((lesson) => progressMap.get(lesson.id) === true);
-  };
-
-  // Check if lesson is completed
-  const isLessonCompleted = (lessonId: string) => {
-    if (!course?.lesson_progress) {
-      return false;
-    }
-    const progress = course.lesson_progress.find((p) => p.lesson_id === lessonId);
-    return progress?.completed || false;
-  };
-
-  const progress = course ? calculateProgress() : { completed: 0, total: 0, percentage: 0 };
+  const progress = calculateProgress();
 
   if (loading) {
     return (
@@ -154,22 +171,11 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
                   <Calendar className="w-4 h-4" />
                   <span>{new Date(course.created_at).toLocaleDateString("pl-PL")}</span>
                 </div>
-                {course.lessons && (
+                {course.lesson_count !== undefined && (
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4" />
-                    <span>{course.lessons.length} lekcji</span>
+                    <span>{course.lesson_count} lekcji</span>
                   </div>
-                )}
-              </div>
-
-              {/* Price badge */}
-              <div className="mb-4">
-                {course.price !== null && course.price !== undefined && course.price > 0 ? (
-                  <Badge className="bg-green-600 text-white text-lg px-4 py-1">
-                    {course.price.toFixed(2)} PLN
-                  </Badge>
-                ) : (
-                  <Badge className="bg-blue-600 text-white text-lg px-4 py-1">Darmowy</Badge>
                 )}
               </div>
             </div>
@@ -185,24 +191,21 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
             </div>
           </div>
 
-          {/* Purchase button */}
-          <div className="max-w-md">
-            <PurchaseButton
-              courseId={course.id}
-              price={course.price}
-              isEnrolled={course.is_enrolled}
-              hasAccess={course.has_access}
-            />
-          </div>
+          {/* Enroll button */}
+          {!course.is_enrolled && (
+            <div className="max-w-md">
+              <PurchaseButton courseId={course.id} isEnrolled={course.is_enrolled} />
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* Lessons section */}
-      {course.has_access && course.lessons ? (
+      {/* Modules and Lessons section */}
+      {course.is_enrolled ? (
         <Card className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-white text-2xl">Lekcje</CardTitle>
+              <CardTitle className="text-white text-2xl">Program kursu</CardTitle>
               {progress.total > 0 && (
                 <Badge className="bg-blue-600 text-white px-4 py-2">
                   {progress.completed} / {progress.total} ukończone
@@ -231,66 +234,38 @@ export function CourseDetail({ courseId }: CourseDetailProps) {
             )}
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {course.lessons.map((lesson, index) => {
-                const isAccessible = isLessonAccessible(index);
-                const isCompleted = isLessonCompleted(lesson.id);
-
-                return isAccessible ? (
-                  <a
-                    key={lesson.id}
-                    href={`/courses/${course.id}/lessons/${lesson.id}`}
-                    className="block p-4 rounded-lg bg-slate-700/30 border border-white/5 hover:border-blue-500/30 hover:bg-slate-700/50 transition-all"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${
-                            isCompleted
-                              ? "bg-green-600 text-white"
-                              : "bg-blue-600/20 text-blue-400"
-                          }`}
-                        >
-                          {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : index + 1}
-                        </div>
-                        <span className="text-white font-medium">{lesson.title}</span>
-                      </div>
-                      {isCompleted && (
-                        <Badge className="bg-green-600 text-white">Ukończona</Badge>
-                      )}
-                    </div>
-                  </a>
-                ) : (
-                  <div
-                    key={lesson.id}
-                    className="block p-4 rounded-lg bg-slate-700/10 border border-white/5 opacity-50 cursor-not-allowed"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-700 text-gray-500 font-semibold text-sm">
-                          <Lock className="w-4 h-4" />
-                        </div>
-                        <span className="text-gray-500 font-medium">{lesson.title}</span>
-                      </div>
-                      <Badge className="bg-slate-700 text-gray-400">Zablokowana</Badge>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            {loadingModules ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+            ) : modules.length > 0 ? (
+              <ModulesList modules={modules} courseId={courseId} />
+            ) : (
+              <div className="text-center py-8 text-gray-400">Brak modułów w tym kursie</div>
+            )}
           </CardContent>
         </Card>
       ) : (
-        !course.has_access && (
-          <Card className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
-            <CardContent className="text-center py-12">
-              <Lock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-400 text-lg">
-                Kup kurs, aby uzyskać dostęp do {course.lessons?.length || "wszystkich"} lekcji
-              </p>
-            </CardContent>
-          </Card>
-        )
+        <Card className="bg-slate-800/50 border-white/10 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="text-white text-2xl">Program kursu</CardTitle>
+            <p className="text-gray-400 text-sm mt-2">Zobacz czego się nauczysz w tym kursie</p>
+          </CardHeader>
+          <CardContent>
+            {loadingModules ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+            ) : preview ? (
+              <ModulesPreview preview={preview} />
+            ) : (
+              <div className="text-center py-12">
+                <Lock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-400 text-lg">Zapisz się na kurs, aby uzyskać dostęp do wszystkich lekcji</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
     </div>
   );

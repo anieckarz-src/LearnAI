@@ -97,11 +97,8 @@ export function SortableLessonItem({
           <div {...attributes} {...listeners} className="cursor-move touch-none">
             <GripVertical className="w-4 h-4 text-gray-500" />
           </div>
-          
-          <button
-            onClick={onEdit}
-            className="flex items-center gap-3 flex-1 text-left"
-          >
+
+          <button onClick={onEdit} className="flex items-center gap-3 flex-1 text-left">
             <span className="text-lg">{getLessonTypeIcon(lesson.type)}</span>
             <span className="text-white text-sm flex-1">{lesson.title}</span>
             <span className="text-xs text-gray-500 capitalize">{lesson.type}</span>
@@ -118,7 +115,7 @@ export function SortableLessonItem({
             >
               <Edit className="w-3.5 h-3.5" />
             </Button>
-            
+
             {/* Dropdown menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

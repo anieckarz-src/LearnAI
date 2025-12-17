@@ -251,3 +251,4 @@ CREATE POLICY "Admins can manage quizzes"
   TO authenticated
   USING (is_admin())
   WITH CHECK (is_admin());
+

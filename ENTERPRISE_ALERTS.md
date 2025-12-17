@@ -202,3 +202,4 @@ const handleAction = async () => {
 - Mniej rozpraszania
 - Profesjonalny wygląd
 - Łatwiejsze testowanie
+

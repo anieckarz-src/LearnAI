@@ -2,6 +2,7 @@
 import type { User } from "@/types";
 import "@/styles/global.css";
 import { Sidebar } from "@/components/admin/Sidebar";
+import { Toaster } from "@/components/ui/toaster";
 
 interface Props {
   title: string;
@@ -23,6 +24,9 @@ const { title, description, user, currentPath } = Astro.props;
     <link rel="icon" type="image/png" href="/favicon.png" />
   </head>
   <body class="bg-slate-950 text-white antialiased">
+    <!-- Toast notifications -->
+    <Toaster client:only="react" />
+
     <!-- Sidebar -->
     <Sidebar currentPath={currentPath} client:load />
 

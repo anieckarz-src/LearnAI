@@ -14,3 +14,4 @@ ON CONFLICT (key) DO NOTHING;
 
 -- Note: First admin user should be created manually after signup through Supabase dashboard
 -- by updating the user's role to 'admin' in the users table
+

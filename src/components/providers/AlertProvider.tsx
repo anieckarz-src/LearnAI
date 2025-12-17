@@ -85,9 +85,7 @@ export function AlertProvider({ children }: { children: ReactNode }) {
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white">{dialogState.title}</AlertDialogTitle>
             {dialogState.description && (
-              <AlertDialogDescription className="text-gray-400">
-                {dialogState.description}
-              </AlertDialogDescription>
+              <AlertDialogDescription className="text-gray-400">{dialogState.description}</AlertDialogDescription>
             )}
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -116,7 +114,7 @@ export function AlertProvider({ children }: { children: ReactNode }) {
 
 export function useAlert() {
   const context = useContext(AlertContext);
-  
+
   // Fallback for SSR or when provider is not available
   // This prevents errors during server-side rendering
   // The component will work correctly after client-side hydration
@@ -132,6 +130,6 @@ export function useAlert() {
     // If we're in the browser but provider is missing, throw error
     throw new Error("useAlert must be used within AlertProvider");
   }
-  
+
   return context;
 }

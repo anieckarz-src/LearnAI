@@ -20,8 +20,7 @@ export const GET: APIRoute = async ({ locals, params }) => {
       });
     }
 
-    // Check if user has access
-    let hasAccess = false;
+    // Check if user is enrolled
     let isEnrolled = false;
 
     if (user) {
@@ -35,47 +34,19 @@ export const GET: APIRoute = async ({ locals, params }) => {
       isEnrolled = !!enrollment;
     }
 
-    // Free courses are always accessible
-    if (!course.price || course.price <= 0) {
-      hasAccess = true;
-    } else {
-      hasAccess = isEnrolled;
-    }
-
-    // Get lessons (only if user has access)
-    let lessons = null;
-    let lessonProgress = null;
-    
-    if (hasAccess) {
-      const { data: lessonsData } = await supabase
-        .from("lessons")
-        .select("*")
-        .eq("course_id", id)
-        .order("order_index");
-
-      lessons = lessonsData;
-
-      // Get user's progress for this course (if authenticated)
-      if (user) {
-        const { data: progressData } = await supabase
-          .from("lesson_progress")
-          .select("lesson_id, completed, completed_at")
-          .eq("user_id", user.id)
-          .eq("course_id", id);
-
-        lessonProgress = progressData;
-      }
-    }
+    // Get lesson count
+    const { count: lessonCount } = await supabase
+      .from("lessons")
+      .select("*", { count: "exact", head: true })
+      .eq("course_id", id);
 
     return new Response(
       JSON.stringify({
         success: true,
         data: {
           ...course,
-          has_access: hasAccess,
           is_enrolled: isEnrolled,
-          lessons: lessons,
-          lesson_progress: lessonProgress,
+          lesson_count: lessonCount || 0,
         },
       }),
       {

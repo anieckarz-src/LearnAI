@@ -177,3 +177,4 @@ CREATE TRIGGER lesson_progress_audit_log
   AFTER INSERT OR UPDATE ON public.lesson_progress
   FOR EACH ROW
   EXECUTE FUNCTION log_lesson_progress_changes();
+

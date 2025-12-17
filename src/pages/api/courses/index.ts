@@ -5,7 +5,6 @@ export const GET: APIRoute = async ({ locals, url }) => {
 
   try {
     const search = url.searchParams.get("search");
-    const isFree = url.searchParams.get("is_free");
 
     // Build query for published courses
     let query = supabase
@@ -19,12 +18,8 @@ export const GET: APIRoute = async ({ locals, url }) => {
       query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
     }
 
-    // Apply free/paid filter
-    if (isFree === "true") {
-      query = query.is("price", null);
-    } else if (isFree === "false") {
-      query = query.not("price", "is", null);
-    }
+    // Note: All courses are now free after payment system removal
+    // The is_free filter has been removed as it's no longer applicable
 
     const { data: courses, error } = await query;
 

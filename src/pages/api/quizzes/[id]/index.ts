@@ -46,11 +46,7 @@ export const GET: APIRoute = async ({ locals, params }) => {
       .single();
 
     // Check if course is free
-    const { data: course } = await supabase
-      .from("courses")
-      .select("price")
-      .eq("id", quiz.lesson.course_id)
-      .single();
+    const { data: course } = await supabase.from("courses").select("price").eq("id", quiz.lesson.course_id).single();
 
     const isFree = !course?.price || course.price === 0;
     const hasAccess = isFree || !!enrollment;

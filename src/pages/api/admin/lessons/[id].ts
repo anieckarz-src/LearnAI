@@ -72,12 +72,7 @@ export const PATCH: APIRoute = async ({ locals, params, request }) => {
       }
     }
 
-    const { data: lesson, error } = await supabase
-      .from("lessons")
-      .update(updateData)
-      .eq("id", id)
-      .select()
-      .single();
+    const { data: lesson, error } = await supabase.from("lessons").update(updateData).eq("id", id).select().single();
 
     if (error) {
       throw error;

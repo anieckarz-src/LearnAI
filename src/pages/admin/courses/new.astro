@@ -13,6 +13,11 @@ if (user.role !== "admin") {
 }
 ---
 
-<AdminLayout title="Nowy kurs" description="Utwórz nowy kurs edukacyjny z modułami i lekcjami" user={user} currentPath={Astro.url.pathname}>
+<AdminLayout
+  title="Nowy kurs"
+  description="Utwórz nowy kurs edukacyjny z modułami i lekcjami"
+  user={user}
+  currentPath={Astro.url.pathname}
+>
   <CourseCreator client:load />
 </AdminLayout>

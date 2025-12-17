@@ -287,9 +287,7 @@ export function QuizForm({ quiz }: QuizFormProps) {
                   Generowanie quizu przez AI
                 </p>
                 <p className="text-sm text-gray-400 mt-1">
-                  {lesson_id
-                    ? "Kliknij aby wygenerować pytania na podstawie treści lekcji"
-                    : "Najpierw wybierz lekcję"}
+                  {lesson_id ? "Kliknij aby wygenerować pytania na podstawie treści lekcji" : "Najpierw wybierz lekcję"}
                 </p>
               </div>
               <Button
@@ -371,7 +369,8 @@ export function QuizForm({ quiz }: QuizFormProps) {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-white">
-            Pytania ({questions.length}) {aiGenerated && <span className="text-purple-400 text-sm ml-2">★ Wygenerowane przez AI</span>}
+            Pytania ({questions.length}){" "}
+            {aiGenerated && <span className="text-purple-400 text-sm ml-2">★ Wygenerowane przez AI</span>}
           </h3>
           <Button type="button" onClick={addQuestion} variant="outline" size="sm" disabled={questions.length >= 50}>
             <Plus className="w-4 h-4 mr-2" />

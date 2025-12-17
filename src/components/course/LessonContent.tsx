@@ -96,18 +96,14 @@ export function LessonContent({ lesson }: LessonContentProps) {
               <div className="flex items-center justify-between bg-slate-700/30 rounded-lg p-4">
                 <div>
                   <h3 className="text-white font-semibold">{lesson.quiz.title}</h3>
-                  <p className="text-sm text-gray-400 mt-1">
-                    Liczba pytań: {lesson.quiz.questions?.length || 0}
-                  </p>
+                  <p className="text-sm text-gray-400 mt-1">Liczba pytań: {lesson.quiz.questions?.length || 0}</p>
                   {lesson.quiz.passing_score && (
-                    <p className="text-sm text-gray-400">
-                      Wymagany wynik: {lesson.quiz.passing_score}%
-                    </p>
+                    <p className="text-sm text-gray-400">Wymagany wynik: {lesson.quiz.passing_score}%</p>
                   )}
                 </div>
                 <button
                   onClick={() => {
-                    window.location.href = `/quiz/${lesson.quiz?.id}`;
+                    window.location.href = `/quizzes/${lesson.quiz?.id}/take`;
                   }}
                   className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
                 >

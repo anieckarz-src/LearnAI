@@ -4,7 +4,7 @@ import { Toaster } from "sonner";
 export function Providers() {
   return (
     <AlertProvider>
-      <Toaster 
+      <Toaster
         position="top-right"
         theme="dark"
         toastOptions={{

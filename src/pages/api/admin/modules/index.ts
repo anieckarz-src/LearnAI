@@ -73,23 +73,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Validation
     if (!course_id || !title) {
-      return new Response(
-        JSON.stringify({ success: false, error: "course_id and title are required" }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return new Response(JSON.stringify({ success: false, error: "course_id and title are required" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     if (title.length < 3) {
-      return new Response(
-        JSON.stringify({ success: false, error: "Title must be at least 3 characters" }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return new Response(JSON.stringify({ success: false, error: "Title must be at least 3 characters" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const { supabase } = locals;

@@ -6,9 +6,5 @@ interface ClientWrapperProps {
 }
 
 export function ClientWrapper({ children }: ClientWrapperProps) {
-  return (
-    <AlertProvider>
-      {children}
-    </AlertProvider>
-  );
+  return <AlertProvider>{children}</AlertProvider>;
 }

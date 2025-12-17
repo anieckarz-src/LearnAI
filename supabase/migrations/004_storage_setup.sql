@@ -61,3 +61,4 @@ CREATE POLICY "Anyone can view course thumbnails"
 ON storage.objects FOR SELECT
 TO public
 USING (bucket_id = 'course-thumbnails');
+

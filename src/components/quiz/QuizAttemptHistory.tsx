@@ -181,31 +181,21 @@ export function QuizAttemptHistory({ quizId }: QuizAttemptHistoryProps) {
                 <div
                   key={attempt.id}
                   className={`p-4 rounded-lg border-2 transition-all ${
-                    attempt.passed
-                      ? "border-green-500/30 bg-green-500/5"
-                      : "border-slate-700 bg-slate-700/20"
+                    attempt.passed ? "border-green-500/30 bg-green-500/5" : "border-slate-700 bg-slate-700/20"
                   }`}
                 >
                   <div className="flex items-center justify-between flex-wrap gap-4">
                     <div className="flex items-center gap-4">
-                      <Badge
-                        className={`${
-                          attempt.passed ? "bg-green-600 text-white" : "bg-slate-600 text-white"
-                        }`}
-                      >
+                      <Badge className={`${attempt.passed ? "bg-green-600 text-white" : "bg-slate-600 text-white"}`}>
                         #{data.attempts.length - index}
                       </Badge>
 
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <span className={`text-2xl font-bold ${
-                            attempt.passed ? "text-green-400" : "text-white"
-                          }`}>
+                          <span className={`text-2xl font-bold ${attempt.passed ? "text-green-400" : "text-white"}`}>
                             {attempt.score}%
                           </span>
-                          {attempt.passed && (
-                            <Badge className="bg-green-600 text-white">✓ Zaliczony</Badge>
-                          )}
+                          {attempt.passed && <Badge className="bg-green-600 text-white">✓ Zaliczony</Badge>}
                           {attempt.score === data.stats.best_score && (
                             <Badge className="bg-yellow-600 text-white">
                               <Award className="w-3 h-3 mr-1" />
@@ -230,9 +220,7 @@ export function QuizAttemptHistory({ quizId }: QuizAttemptHistoryProps) {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() =>
-                        (window.location.href = `/quizzes/${quizId}/results?attempt=${attempt.id}`)
-                      }
+                      onClick={() => (window.location.href = `/quizzes/${quizId}/results?attempt=${attempt.id}`)}
                     >
                       <Eye className="w-3 h-3 mr-1" />
                       Zobacz szczegóły
