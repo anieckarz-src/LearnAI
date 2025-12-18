@@ -1,4 +1,4 @@
-# 🎓 Przewodnik po Prezentacji - EduPortal
+# 🎓 Przewodnik po Prezentacji - Uniwersytet AI
 
 ## 📋 Spis treści
 
@@ -59,7 +59,7 @@
 
 1. **Pokaż stronę główną** (`http://localhost:3000`)
    - Nowoczesny design z gradientami
-   - Profesjonalny branding (EduPortal)
+   - Profesjonalny branding (Uniwersytet AI)
    - Responsywność (pokaż na różnych szerokościach)
 
 2. **Nawigacja**

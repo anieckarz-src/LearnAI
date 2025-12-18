@@ -470,8 +470,8 @@ INSERT INTO public.quiz_attempts (id, quiz_id, user_id, score, answers, time_spe
 ON CONFLICT (id) DO NOTHING;
 
 -- Step 10: Update system settings for university branding
-UPDATE public.system_settings 
-SET value = '{"value": "EduPortal"}'
+UPDATE public.system_settings
+SET value = '{"value": "Uniwersytet AI"}'
 WHERE key = 'platform_name';
 
 UPDATE public.system_settings 

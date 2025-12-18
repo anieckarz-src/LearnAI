@@ -1,4 +1,4 @@
-# EduPortal - University Learning Management System
+# Uniwersytet AI - Learning Management System
 
 A modern, full-stack educational platform with landing page and admin panel, built with Astro, React, and Supabase.
 

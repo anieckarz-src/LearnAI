@@ -52,7 +52,7 @@ export function Sidebar({ currentPath, user }: SidebarProps) {
           {/* Logo */}
           <div className="flex h-16 items-center justify-center border-b border-white/10 px-6">
             <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">
-              {user.role === "instructor" ? "Panel Prowadzącego" : "EduPortal Admin"}
+              {user.role === "instructor" ? "Panel Prowadzącego" : "Uniwersytet AI Admin"}
             </h1>
           </div>
 
